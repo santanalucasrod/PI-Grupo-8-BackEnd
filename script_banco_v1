@@ -1,0 +1,157 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `cafeteria` DEFAULT CHARACTER SET utf8 ;
+USE `cafeteria` ;
+
+-- -----------------------------------------------------
+-- Table `mydb`.`funcionario`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `cafeteria`.`funcionario` (
+  `id` INT NOT NULL auto_increment,
+  `nome` VARCHAR(50) NOT NULL,
+  `senha` VARCHAR(128) NOT NULL,
+  `email` VARCHAR(254) NOT NULL,
+  `gerente` TINYINT NOT NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`recurso`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `cafeteria`.`recurso` (
+  `id` INT NOT NULL,
+  `nome` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`permissao`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `cafeteria`.`permissao` (
+  `id` INT NOT NULL,
+  `recurso` VARCHAR(20) NOT NULL,
+  `read` TINYINT NOT NULL,
+  `update` TINYINT NOT NULL,
+  `delete` TINYINT NOT NULL,
+  `create` TINYINT NOT NULL,
+  `recurso_id` INT NOT NULL,
+  `funcionario_id` INT NOT NULL,
+  PRIMARY KEY (`id`, `recurso_id`),
+  INDEX `fk_permissao_recurso1_idx` (`recurso_id` ASC) VISIBLE,
+  INDEX `fk_permissao_funcionario1_idx` (`funcionario_id` ASC) VISIBLE,
+  CONSTRAINT `fk_permissao_recurso1`
+    FOREIGN KEY (`recurso_id`)
+    REFERENCES `mydb`.`recurso` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_permissao_funcionario1`
+    FOREIGN KEY (`funcionario_id`)
+    REFERENCES `mydb`.`funcionario` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`produto`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `cafeteria`.`produto` (
+  `id` INT NOT NULL,
+  `nome` VARCHAR(45) NOT NULL,
+  `preco_unidade` DECIMAL(5,2) NULL,
+  `descricao` VARCHAR(200) NULL,
+  `path_ft` VARCHAR(45) NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`ingrediente`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `cafeteria`.`ingrediente` (
+  `id` INT NOT NULL,
+  `nome` VARCHAR(50) NOT NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`pedido`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `cafeteria`.`pedido` (
+  `id` INT NOT NULL,
+  `dt_hr_pedido` DATETIME NOT NULL,
+  `dt_hr_pronto` DATETIME NOT NULL,
+  `info_adicional` VARCHAR(200) NULL,
+  `status` VARCHAR(11) NOT NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`venda`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `cafeteria`.`venda` (
+  `produto_id` INT NOT NULL,
+  `pedido_id` INT NOT NULL,
+  `quantidade` INT NOT NULL,
+  PRIMARY KEY (`produto_id`, `pedido_id`),
+  INDEX `fk_produto_has_pedido_pedido1_idx` (`pedido_id` ASC) VISIBLE,
+  INDEX `fk_produto_has_pedido_produto1_idx` (`produto_id` ASC) VISIBLE,
+  CONSTRAINT `fk_produto_has_pedido_produto1`
+    FOREIGN KEY (`produto_id`)
+    REFERENCES `mydb`.`produto` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_produto_has_pedido_pedido1`
+    FOREIGN KEY (`pedido_id`)
+    REFERENCES `mydb`.`pedido` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`produto_ingrediente`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `cafeteria`.`produto_ingrediente` (
+  `produto_id` INT NOT NULL,
+  `ingrediente_id` INT NOT NULL,
+  PRIMARY KEY (`produto_id`, `ingrediente_id`),
+  INDEX `fk_produto_has_ingrediente_ingrediente1_idx` (`ingrediente_id` ASC) VISIBLE,
+  INDEX `fk_produto_has_ingrediente_produto1_idx` (`produto_id` ASC) VISIBLE,
+  CONSTRAINT `fk_produto_has_ingrediente_produto1`
+    FOREIGN KEY (`produto_id`)
+    REFERENCES `mydb`.`produto` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_produto_has_ingrediente_ingrediente1`
+    FOREIGN KEY (`ingrediente_id`)
+    REFERENCES `mydb`.`ingrediente` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+DROP USER IF EXISTS "developer";
+CREATE USER "developer" IDENTIFIED BY "sptech";
+GRANT ALL PRIVILEGES on cafeteria.* TO "developer";
+FLUSH PRIVILEGES;
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+insert into funcionario(nome, senha, email, gerente)
+values ("Raika", "senha123", "raika@gmail.com", 1);
