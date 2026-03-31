@@ -1,44 +1,25 @@
--- MySQL Workbench Forward Engineering
 
-SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
-SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
-
--- -----------------------------------------------------
--- Schema mydb
--- -----------------------------------------------------
--- -----------------------------------------------------
--- Schema mydb
--- -----------------------------------------------------
 CREATE SCHEMA IF NOT EXISTS `cafeteria` DEFAULT CHARACTER SET utf8 ;
 USE `cafeteria` ;
 
--- -----------------------------------------------------
--- Table `mydb`.`funcionario`
--- -----------------------------------------------------
+-- Tabela de Funcionarios
 CREATE TABLE IF NOT EXISTS `cafeteria`.`funcionario` (
   `id` INT NOT NULL auto_increment,
   `nome` VARCHAR(50) NOT NULL,
   `senha` VARCHAR(128) NOT NULL,
   `email` VARCHAR(254) NOT NULL,
   `gerente` TINYINT NOT NULL,
-  PRIMARY KEY (`id`))
-ENGINE = InnoDB;
+  PRIMARY KEY (`id`)
+  );
 
-
--- -----------------------------------------------------
--- Table `mydb`.`recurso`
--- -----------------------------------------------------
+-- Tabela de Recurso
 CREATE TABLE IF NOT EXISTS `cafeteria`.`recurso` (
   `id` INT NOT NULL,
   `nome` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`id`))
-ENGINE = InnoDB;
+  PRIMARY KEY (`id`)
+  );
 
-
--- -----------------------------------------------------
--- Table `mydb`.`permissao`
--- -----------------------------------------------------
+-- Tabela de Permissão
 CREATE TABLE IF NOT EXISTS `cafeteria`.`permissao` (
   `id` INT NOT NULL,
   `recurso` VARCHAR(20) NOT NULL,
@@ -51,58 +32,50 @@ CREATE TABLE IF NOT EXISTS `cafeteria`.`permissao` (
   PRIMARY KEY (`id`, `recurso_id`),
   INDEX `fk_permissao_recurso1_idx` (`recurso_id` ASC) VISIBLE,
   INDEX `fk_permissao_funcionario1_idx` (`funcionario_id` ASC) VISIBLE,
-  CONSTRAINT `fk_permissao_recurso1`
-    FOREIGN KEY (`recurso_id`)
-    REFERENCES `mydb`.`recurso` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_permissao_funcionario1`
-    FOREIGN KEY (`funcionario_id`)
-    REFERENCES `mydb`.`funcionario` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+  CONSTRAINT `fk_permissao_recurso1` FOREIGN KEY (`recurso_id`) REFERENCES recurso(`id`),
+  CONSTRAINT `fk_permissao_funcionario1` FOREIGN KEY (`funcionario_id`) REFERENCES funcionario(id)
+);
 
+-- Categoria Produtos
+CREATE TABLE IF NOT EXISTS `cafeteria`.`categoria` (
+  `id` INT NOT NULL,
+  `nome` VARCHAR(50) NOT NULL,
+  PRIMARY KEY (`id`)
+  );
 
--- -----------------------------------------------------
--- Table `mydb`.`produto`
--- -----------------------------------------------------
+-- Tabela Produto
 CREATE TABLE IF NOT EXISTS `cafeteria`.`produto` (
   `id` INT NOT NULL,
   `nome` VARCHAR(45) NOT NULL,
+  `categoria` int not null, 
   `preco_unidade` DECIMAL(5,2) NULL,
   `descricao` VARCHAR(200) NULL,
   `path_ft` VARCHAR(45) NULL,
-  PRIMARY KEY (`id`))
-ENGINE = InnoDB;
+  PRIMARY KEY (`id`),
+  constraint foreign key(categoria) references categoria(id)
+  );
 
 
--- -----------------------------------------------------
--- Table `mydb`.`ingrediente`
--- -----------------------------------------------------
+-- Tabela de Ingredientes
 CREATE TABLE IF NOT EXISTS `cafeteria`.`ingrediente` (
   `id` INT NOT NULL,
   `nome` VARCHAR(50) NOT NULL,
-  PRIMARY KEY (`id`))
-ENGINE = InnoDB;
+  PRIMARY KEY (`id`)
+  );
 
 
--- -----------------------------------------------------
--- Table `mydb`.`pedido`
--- -----------------------------------------------------
+-- Tabela de Pedidos
 CREATE TABLE IF NOT EXISTS `cafeteria`.`pedido` (
   `id` INT NOT NULL,
   `dt_hr_pedido` DATETIME NOT NULL,
   `dt_hr_pronto` DATETIME NOT NULL,
   `info_adicional` VARCHAR(200) NULL,
   `status` VARCHAR(11) NOT NULL,
-  PRIMARY KEY (`id`))
-ENGINE = InnoDB;
+  PRIMARY KEY (`id`)
+);
 
 
--- -----------------------------------------------------
--- Table `mydb`.`venda`
--- -----------------------------------------------------
+--  Tabela de Venda
 CREATE TABLE IF NOT EXISTS `cafeteria`.`venda` (
   `produto_id` INT NOT NULL,
   `pedido_id` INT NOT NULL,
@@ -110,48 +83,26 @@ CREATE TABLE IF NOT EXISTS `cafeteria`.`venda` (
   PRIMARY KEY (`produto_id`, `pedido_id`),
   INDEX `fk_produto_has_pedido_pedido1_idx` (`pedido_id` ASC) VISIBLE,
   INDEX `fk_produto_has_pedido_produto1_idx` (`produto_id` ASC) VISIBLE,
-  CONSTRAINT `fk_produto_has_pedido_produto1`
-    FOREIGN KEY (`produto_id`)
-    REFERENCES `mydb`.`produto` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_produto_has_pedido_pedido1`
-    FOREIGN KEY (`pedido_id`)
-    REFERENCES `mydb`.`pedido` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+  CONSTRAINT `fk_produto_has_pedido_produto1` FOREIGN KEY (`produto_id`) REFERENCES produto(`id`),
+  CONSTRAINT `fk_produto_has_pedido_pedido1` FOREIGN KEY (`pedido_id`) REFERENCES pedido(`id`)
+  );
 
-
--- -----------------------------------------------------
--- Table `mydb`.`produto_ingrediente`
--- -----------------------------------------------------
+-- Produto com ingrediente
 CREATE TABLE IF NOT EXISTS `cafeteria`.`produto_ingrediente` (
   `produto_id` INT NOT NULL,
   `ingrediente_id` INT NOT NULL,
   PRIMARY KEY (`produto_id`, `ingrediente_id`),
   INDEX `fk_produto_has_ingrediente_ingrediente1_idx` (`ingrediente_id` ASC) VISIBLE,
   INDEX `fk_produto_has_ingrediente_produto1_idx` (`produto_id` ASC) VISIBLE,
-  CONSTRAINT `fk_produto_has_ingrediente_produto1`
-    FOREIGN KEY (`produto_id`)
-    REFERENCES `mydb`.`produto` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_produto_has_ingrediente_ingrediente1`
-    FOREIGN KEY (`ingrediente_id`)
-    REFERENCES `mydb`.`ingrediente` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+  CONSTRAINT `fk_produto_has_ingrediente_produto1` FOREIGN KEY (`produto_id`) REFERENCES produto(`id`),
+  CONSTRAINT `fk_produto_has_ingrediente_ingrediente1` FOREIGN KEY (`ingrediente_id`) REFERENCES ingrediente(`id`)
+);
 
 DROP USER IF EXISTS "developer";
 CREATE USER "developer" IDENTIFIED BY "sptech";
 GRANT ALL PRIVILEGES on cafeteria.* TO "developer";
 FLUSH PRIVILEGES;
 
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
 insert into funcionario(nome, senha, email, gerente)
 values ("Raika", "senha123", "raika@gmail.com", 1);
+
