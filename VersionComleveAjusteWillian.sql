@@ -1,8 +1,7 @@
-
-CREATE SCHEMA IF NOT EXISTS `cafeteria` DEFAULT CHARACTER SET utf8 ;
+CREATE SCHEMA IF NOT EXISTS `cafeteria` ;
 USE `cafeteria` ;
-
 -- Tabela de Funcionarios
+
 CREATE TABLE IF NOT EXISTS `cafeteria`.`funcionario` (
   `id` INT NOT NULL auto_increment,
   `nome` VARCHAR(50) NOT NULL,
@@ -14,51 +13,48 @@ CREATE TABLE IF NOT EXISTS `cafeteria`.`funcionario` (
 
 -- Tabela de Recurso
 CREATE TABLE IF NOT EXISTS `cafeteria`.`recurso` (
-  `id` INT NOT NULL,
+  `id` INT NOT NULL auto_increment,
   `nome` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`)
   );
 
 -- Tabela de Permissão
 CREATE TABLE IF NOT EXISTS `cafeteria`.`permissao` (
-  `id` INT NOT NULL,
-  `recurso` VARCHAR(20) NOT NULL,
+  `id` INT NOT NULL auto_increment,
   `read` TINYINT NOT NULL,
   `update` TINYINT NOT NULL,
   `delete` TINYINT NOT NULL,
   `create` TINYINT NOT NULL,
   `recurso_id` INT NOT NULL,
   `funcionario_id` INT NOT NULL,
-  PRIMARY KEY (`id`, `recurso_id`),
-  INDEX `fk_permissao_recurso1_idx` (`recurso_id` ASC) VISIBLE,
-  INDEX `fk_permissao_funcionario1_idx` (`funcionario_id` ASC) VISIBLE,
+  PRIMARY KEY (`id`),
   CONSTRAINT `fk_permissao_recurso1` FOREIGN KEY (`recurso_id`) REFERENCES recurso(`id`),
   CONSTRAINT `fk_permissao_funcionario1` FOREIGN KEY (`funcionario_id`) REFERENCES funcionario(id)
 );
 
 -- Categoria Produtos
 CREATE TABLE IF NOT EXISTS `cafeteria`.`categoria` (
-  `id` INT NOT NULL,
+  `id` INT NOT NULL auto_increment,
   `nome` VARCHAR(50) NOT NULL,
   PRIMARY KEY (`id`)
   );
 
 -- Tabela Produto
 CREATE TABLE IF NOT EXISTS `cafeteria`.`produto` (
-  `id` INT NOT NULL,
+  `id` INT NOT NULL auto_increment,
   `nome` VARCHAR(45) NOT NULL,
-  `categoria` int not null, 
+  `categoria_id` int not null, 
   `preco_unidade` DECIMAL(5,2) NULL,
   `descricao` VARCHAR(200) NULL,
   `path_ft` VARCHAR(45) NULL,
   PRIMARY KEY (`id`),
-  constraint foreign key(categoria) references categoria(id)
+  constraint foreign key(categoria_id) references categoria(id)
   );
 
 
 -- Tabela de Ingredientes
 CREATE TABLE IF NOT EXISTS `cafeteria`.`ingrediente` (
-  `id` INT NOT NULL,
+  `id` INT NOT NULL auto_increment,
   `nome` VARCHAR(50) NOT NULL,
   PRIMARY KEY (`id`)
   );
@@ -66,7 +62,7 @@ CREATE TABLE IF NOT EXISTS `cafeteria`.`ingrediente` (
 
 -- Tabela de Pedidos
 CREATE TABLE IF NOT EXISTS `cafeteria`.`pedido` (
-  `id` INT NOT NULL,
+  `id` INT NOT NULL auto_increment,
   `dt_hr_pedido` DATETIME NOT NULL,
   `dt_hr_pronto` DATETIME NOT NULL,
   `info_adicional` VARCHAR(200) NULL,
@@ -77,23 +73,21 @@ CREATE TABLE IF NOT EXISTS `cafeteria`.`pedido` (
 
 --  Tabela de Venda
 CREATE TABLE IF NOT EXISTS `cafeteria`.`venda` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
   `produto_id` INT NOT NULL,
   `pedido_id` INT NOT NULL,
   `quantidade` INT NOT NULL,
-  PRIMARY KEY (`produto_id`, `pedido_id`),
-  INDEX `fk_produto_has_pedido_pedido1_idx` (`pedido_id` ASC) VISIBLE,
-  INDEX `fk_produto_has_pedido_produto1_idx` (`produto_id` ASC) VISIBLE,
+  UNIQUE (`produto_id`, `pedido_id`),
   CONSTRAINT `fk_produto_has_pedido_produto1` FOREIGN KEY (`produto_id`) REFERENCES produto(`id`),
   CONSTRAINT `fk_produto_has_pedido_pedido1` FOREIGN KEY (`pedido_id`) REFERENCES pedido(`id`)
   );
 
 -- Produto com ingrediente
 CREATE TABLE IF NOT EXISTS `cafeteria`.`produto_ingrediente` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
   `produto_id` INT NOT NULL,
   `ingrediente_id` INT NOT NULL,
-  PRIMARY KEY (`produto_id`, `ingrediente_id`),
-  INDEX `fk_produto_has_ingrediente_ingrediente1_idx` (`ingrediente_id` ASC) VISIBLE,
-  INDEX `fk_produto_has_ingrediente_produto1_idx` (`produto_id` ASC) VISIBLE,
+  UNIQUE(`produto_id`, `ingrediente_id`),
   CONSTRAINT `fk_produto_has_ingrediente_produto1` FOREIGN KEY (`produto_id`) REFERENCES produto(`id`),
   CONSTRAINT `fk_produto_has_ingrediente_ingrediente1` FOREIGN KEY (`ingrediente_id`) REFERENCES ingrediente(`id`)
 );
