@@ -26,7 +26,7 @@ public class ProdutoService {
     }
 
     public ProdutoResponseDto criar(ProdutoRequestDto dto) {
-        Categoria categoria = buscarCategoriaPorId(dto.getCategoriaId());
+        Categoria categoria = buscarCategoriaPorId(dto.getCategoria().getId());
         Produto produto = ProdutoMapper.toEntity(dto, categoria);
         return ProdutoMapper.toResponseDTO(produtoRepository.save(produto));
     }
@@ -50,7 +50,7 @@ public class ProdutoService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Produto não encontrado"));
 
-        Categoria categoria = buscarCategoriaPorId(dto.getCategoriaId());
+        Categoria categoria = buscarCategoriaPorId(dto.getCategoria().getId());
 
         produto.setNome(dto.getNome());
         produto.setCategoria(categoria);

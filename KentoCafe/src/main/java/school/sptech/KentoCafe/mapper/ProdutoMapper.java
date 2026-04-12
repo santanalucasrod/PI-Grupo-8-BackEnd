@@ -21,8 +21,8 @@ public class ProdutoMapper {
         ProdutoResponseDto dto = new ProdutoResponseDto();
         dto.setId(produto.getId());
         dto.setNome(produto.getNome());
-        dto.setCategoriaNome(produto.getCategoria().getNome());
-        dto.setCategoriaId(produto.getCategoria().getId());
+        ProdutoResponseDto.Categoria categoria = new ProdutoResponseDto.Categoria(produto.getCategoria().getId(),produto.getCategoria().getNome());
+        dto.setCategoria(categoria);
         dto.setPrecoUnidade(produto.getPrecoUnidade());
         dto.setDescricao(produto.getDescricao());
         dto.setPathFt(produto.getPathFt());
