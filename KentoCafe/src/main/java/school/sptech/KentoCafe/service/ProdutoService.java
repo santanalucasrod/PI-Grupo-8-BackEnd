@@ -5,10 +5,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import school.sptech.KentoCafe.dto.produto.ProdutoRequestDto;
 import school.sptech.KentoCafe.dto.produto.ProdutoResponseDto;
+import school.sptech.KentoCafe.dto.produtoIngrediente.ProdutoIngredienteResponse;
 import school.sptech.KentoCafe.entity.Categoria;
 import school.sptech.KentoCafe.entity.Produto;
 import school.sptech.KentoCafe.mapper.ProdutoMapper;
 import school.sptech.KentoCafe.repository.CategoriaRepository;
+import school.sptech.KentoCafe.repository.ProdutoIngredienteRepository;
 import school.sptech.KentoCafe.repository.ProdutoRepository;
 
 import java.util.List;
@@ -18,11 +20,13 @@ public class ProdutoService {
 
     private final ProdutoRepository produtoRepository;
     private final CategoriaRepository categoriaRepository;
+    final ProdutoIngredienteRepository produtoIngredienteRepository;
 
     public ProdutoService(ProdutoRepository produtoRepository,
-                          CategoriaRepository categoriaRepository) {
+                          CategoriaRepository categoriaRepository, ProdutoIngredienteRepository produtoIngredienteRepository) {
         this.produtoRepository = produtoRepository;
         this.categoriaRepository = categoriaRepository;
+        this.produtoIngredienteRepository = produtoIngredienteRepository;
     }
 
     public ProdutoResponseDto criar(ProdutoRequestDto dto) {
@@ -64,6 +68,10 @@ public class ProdutoService {
     public void deletar(Integer id) {
         if (!produtoRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não encontrado");
+        }
+        if (produtoIngredienteRepository.existsByProdutoId(id) != 0){
+            produtoIngredienteRepository.deletarProdutoIngredientePorProdutoId(id);
+            produtoRepository.deleteById(id);
         }
         produtoRepository.deleteById(id);
     }

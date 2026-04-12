@@ -5,6 +5,7 @@ import school.sptech.KentoCafe.dto.ingrediente.IngredienteRequest;
 import school.sptech.KentoCafe.entity.Ingrediente;
 import school.sptech.KentoCafe.mapper.IngredienteMapper;
 import school.sptech.KentoCafe.repository.IngredienteRepository;
+import school.sptech.KentoCafe.repository.ProdutoIngredienteRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,9 +14,11 @@ import java.util.Optional;
 public class IngredienteService {
 
     final IngredienteRepository ingredienteRepository;
+    final ProdutoIngredienteRepository produtoIngredienteRepository;
 
-    public IngredienteService(IngredienteRepository ingredienteRepository) {
+    public IngredienteService(IngredienteRepository ingredienteRepository, ProdutoIngredienteRepository produtoIngredienteRepository) {
         this.ingredienteRepository = ingredienteRepository;
+        this.produtoIngredienteRepository = produtoIngredienteRepository;
     }
 
     public List<Ingrediente> buscarIngredientes() {
@@ -41,6 +44,9 @@ public class IngredienteService {
     }
 
     public void deletarPorId(Integer id){
+        if (produtoIngredienteRepository.existsByIngredienteId(id) != 0){
+            produtoIngredienteRepository.deletarProdutoIngredientePorIngredienteId(id);
+        }
         ingredienteRepository.deleteById(id);
     }
 

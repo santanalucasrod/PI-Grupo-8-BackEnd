@@ -10,6 +10,8 @@ import school.sptech.KentoCafe.entity.ProdutoIngrediente;
 import school.sptech.KentoCafe.mapper.ProdutoIngredienteMapper;
 import school.sptech.KentoCafe.service.ProdutoIngredienteService;
 
+import java.util.List;
+
 @RestController
 public class ProdutoIngredienteController {
 
@@ -39,5 +41,49 @@ public class ProdutoIngredienteController {
         }
         produtoIngredienteService.excluirPorId(id);
         return ResponseEntity.status(204).build();
+    }
+
+    @GetMapping("/por-ingrediente/{id}")
+    public ResponseEntity<List<ProdutoIngredienteResponse>> buscarProdutoIngredientePorIngredienteId(
+            @RequestParam Integer id
+    ){
+        List<ProdutoIngrediente> produtoIngredientes = produtoIngredienteService.buscarProdutoIngredientePorIngredienteId(id);
+        if (produtoIngredientes.isEmpty()){
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.status(200).body(ProdutoIngredienteMapper.toResponseList(produtoIngredientes));
+    }
+
+    @GetMapping("/por-produto/{id}")
+    public ResponseEntity<List<ProdutoIngredienteResponse>> buscarProdutoIngredientePorProdutoId(
+            @RequestParam Integer id
+    ){
+        List<ProdutoIngrediente> produtoIngredientes = produtoIngredienteService.buscarProdutoIngredientePorProdutoId(id);
+        if (produtoIngredientes.isEmpty()){
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.status(200).body(ProdutoIngredienteMapper.toResponseList(produtoIngredientes));
+    }
+
+    @DeleteMapping("/por-produto/{id}")
+    public ResponseEntity<Void> deletarProdutoIngredientePorProdutoId(
+            @RequestParam Integer id
+    ){
+        if (produtoIngredienteService.existeProdutoIngredientePorProdutoId(id)){
+            produtoIngredienteService.deleteProdutoIngredientePorProdutoId(id);
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.status(404).build();
+    }
+
+    @DeleteMapping("/por-ingrediente/{id}")
+    public ResponseEntity<Void> deletarProdutoIngredientePorIngredienteId(
+            @RequestParam Integer id
+    ){
+        if (produtoIngredienteService.existeProdutoIngredientePorIngredienteId(id)){
+            produtoIngredienteService.deleteProdutoIngredientePorIngredienteId(id);
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.status(404).build();
     }
 }
