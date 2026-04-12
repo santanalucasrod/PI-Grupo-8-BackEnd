@@ -73,4 +73,8 @@ public class ProdutoService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Categoria não encontrada"));
     }
+
+    public List<Produto> buscarProdutosPorIngredienteId(Integer id){
+        return produtoRepository.findByIngredienteId(id);
+    }
 }

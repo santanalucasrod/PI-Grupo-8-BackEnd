@@ -75,11 +75,16 @@ public class IngredienteController {
         return ResponseEntity.status(204).build();
     }
 
-    @GetMapping("/{produtoId}")
+    @GetMapping("/por-produto/{produtoId}")
     public ResponseEntity<List<IngredienteResponse>> buscarIngredientesPorProduto(
-            @RequestParam Integer id
+            @RequestParam Integer produtoId
     ){
-        return null;
+        List<Ingrediente> ingredientes = ingredienteService.buscarIngredientePorProdutoId(produtoId);
+        if (ingredientes.isEmpty()){
+            return ResponseEntity.status(404).build();
+        }
+
+        return ResponseEntity.status(200).body(IngredienteMapper.toResponseList(ingredientes));
     }
 
 }

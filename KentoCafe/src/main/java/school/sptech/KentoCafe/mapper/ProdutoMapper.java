@@ -5,6 +5,8 @@ import school.sptech.KentoCafe.dto.produto.ProdutoResponseDto;
 import school.sptech.KentoCafe.entity.Categoria;
 import school.sptech.KentoCafe.entity.Produto;
 
+import java.util.List;
+
 public class ProdutoMapper {
 
     public static Produto toEntity(ProdutoRequestDto dto, Categoria categoria) {
@@ -27,5 +29,11 @@ public class ProdutoMapper {
         dto.setDescricao(produto.getDescricao());
         dto.setPathFt(produto.getPathFt());
         return dto;
+    }
+
+    public static List<ProdutoResponseDto> toResponseList(List<Produto> produtos) {
+        return produtos.stream()
+                .map(ProdutoMapper::toResponseDTO)
+                .toList();
     }
 }

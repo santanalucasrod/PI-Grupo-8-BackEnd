@@ -43,4 +43,8 @@ public class IngredienteService {
     public void deletarPorId(Integer id){
         ingredienteRepository.deleteById(id);
     }
+
+    public List<Ingrediente> buscarIngredientePorProdutoId(Integer id){
+        return ingredienteRepository.findByProdutoId(id);
+    }
 }
