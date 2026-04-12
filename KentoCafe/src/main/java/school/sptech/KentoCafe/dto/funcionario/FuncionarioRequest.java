@@ -1,39 +1,15 @@
-package school.sptech.KentoCafe.entity;
+package school.sptech.KentoCafe.dto.funcionario;
 
-import jakarta.persistence.*;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 
-@Entity
-@Table(name = "funcionario")
-public class Funcionario {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+public class FuncionarioRequest {
     private String nome;
-    @NotBlank
     private String senha;
-    @NotBlank
     private String email;
     private Boolean gerente;
-
-    public Funcionario() {
-    }
-
-    public Funcionario(Integer id, String nome, String senha, String email, Boolean gerente) {
-        this.id = id;
-        this.nome = nome;
-        this.senha = senha;
-        this.email = email;
-        this.gerente = gerente;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public String getNome() {
         return nome;
@@ -67,3 +43,4 @@ public class Funcionario {
         this.gerente = gerente;
     }
 }
+

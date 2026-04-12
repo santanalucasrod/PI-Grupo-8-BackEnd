@@ -1,25 +1,16 @@
-package school.sptech.KentoCafe.entity;
+package school.sptech.KentoCafe.dto.funcionario;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-
-@Entity
-@Table(name = "funcionario")
-public class Funcionario {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class FuncionarioResponse {
     private Integer id;
     private String nome;
-    @NotBlank
     private String senha;
-    @NotBlank
     private String email;
     private Boolean gerente;
 
-    public Funcionario() {
+    public FuncionarioResponse() {
     }
 
-    public Funcionario(Integer id, String nome, String senha, String email, Boolean gerente) {
+    public FuncionarioResponse(Integer id, String nome, String senha, String email, Boolean gerente) {
         this.id = id;
         this.nome = nome;
         this.senha = senha;
