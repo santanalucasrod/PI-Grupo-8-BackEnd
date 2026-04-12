@@ -1,10 +1,8 @@
 package school.sptech.KentoCafe.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import school.sptech.KentoCafe.dto.produtoIngrediente.ProdutoIngredienteRequest;
 import school.sptech.KentoCafe.dto.produtoIngrediente.ProdutoIngredienteResponse;
 import school.sptech.KentoCafe.entity.ProdutoIngrediente;
 import school.sptech.KentoCafe.mapper.ProdutoIngredienteMapper;
@@ -83,6 +81,35 @@ public class ProdutoIngredienteController {
         if (produtoIngredienteService.existeProdutoIngredientePorIngredienteId(id)){
             produtoIngredienteService.deleteProdutoIngredientePorIngredienteId(id);
             return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.status(404).build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ProdutoIngredienteResponse>> buscarProdutoIngredientes(){
+        List<ProdutoIngrediente> produtoIngredientes = produtoIngredienteService.buscarProdutoIngredientes();
+        if (produtoIngredientes.isEmpty()){
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.status(200).body(ProdutoIngredienteMapper.toResponseList(produtoIngredientes));
+    }
+
+    @PostMapping
+    public ResponseEntity<ProdutoIngredienteResponse> criarProdutoIngrediente(
+            @RequestBody ProdutoIngredienteRequest req
+    ){
+        ProdutoIngrediente produtoIngrediente = produtoIngredienteService.criarProdutoIngrediente(req);
+        return ResponseEntity.status(201).body(ProdutoIngredienteMapper.toResponse(produtoIngrediente));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ProdutoIngredienteResponse> editarProdutoIngrediente(
+            @RequestParam Integer id,
+            @RequestBody ProdutoIngredienteRequest req
+    ){
+        if (buscarProdutoIngredientePorId(id) != null){
+            ProdutoIngrediente produtoIngrediente = produtoIngredienteService.editarProdutoIngrediente(id, req);
+            return ResponseEntity.status(200).body(ProdutoIngredienteMapper.toResponse(produtoIngrediente));
         }
         return ResponseEntity.status(404).build();
     }

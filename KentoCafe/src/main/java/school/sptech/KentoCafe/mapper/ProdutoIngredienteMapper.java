@@ -24,6 +24,7 @@ public class ProdutoIngredienteMapper {
         ProdutoIngredienteResponse res = new ProdutoIngredienteResponse();
         res.setIngrediente(ingrediente);
         res.setProduto(produto);
+        res.setId(produtoIngrediente.getId());
         return res;
     }
 
