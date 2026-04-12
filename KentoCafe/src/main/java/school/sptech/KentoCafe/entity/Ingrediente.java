@@ -26,4 +26,12 @@ public class Ingrediente {
     public void setNome(String nome) {
         this.nome = nome;
     }
+
+    public Ingrediente(Integer id, String nome) {
+        this.id = id;
+        this.nome = nome;
+    }
+
+    public Ingrediente() {
+    }
 }

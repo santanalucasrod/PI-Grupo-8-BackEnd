@@ -75,4 +75,11 @@ public class IngredienteController {
         return ResponseEntity.status(204).build();
     }
 
+    @GetMapping("/{produtoId}")
+    public ResponseEntity<List<IngredienteResponse>> buscarIngredientesPorProduto(
+            @RequestParam Integer id
+    ){
+        return null;
+    }
+
 }

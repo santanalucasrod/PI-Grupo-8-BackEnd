@@ -46,4 +46,12 @@ public class ProdutoController {
         produtoService.deletar(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{ingredienteId}")
+    public ResponseEntity<List<ProdutoResponseDto>> buscarProdutosPorIngrediente(
+            @RequestParam Integer id
+    ){
+        return null;
+    }
+
 }

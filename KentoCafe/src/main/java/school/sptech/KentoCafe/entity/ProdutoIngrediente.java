@@ -38,4 +38,13 @@ public class ProdutoIngrediente {
     public void setIngrediente(Ingrediente ingrediente) {
         this.ingrediente = ingrediente;
     }
+
+    public ProdutoIngrediente(Integer id, Produto produto, Ingrediente ingrediente) {
+        this.id = id;
+        this.produto = produto;
+        this.ingrediente = ingrediente;
+    }
+
+    public ProdutoIngrediente() {
+    }
 }
