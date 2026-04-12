@@ -32,6 +32,6 @@ public class ProdutoIngredienteController {
     public ResponseEntity<Void> deletarProdutoIngredientePorId(
             @RequestParam Integer id
     ){
-    return null;
+
     }
 }

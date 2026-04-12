@@ -68,4 +68,16 @@ public class Produto {
     public void setPathFt(String pathFt) {
         this.pathFt = pathFt;
     }
+
+    public Produto(Integer id, String nome, Categoria categoria, Double precoUnidade, String descricao, String pathFt) {
+        this.id = id;
+        this.nome = nome;
+        this.categoria = categoria;
+        this.precoUnidade = precoUnidade;
+        this.descricao = descricao;
+        this.pathFt = pathFt;
+    }
+
+    public Produto() {
+    }
 }

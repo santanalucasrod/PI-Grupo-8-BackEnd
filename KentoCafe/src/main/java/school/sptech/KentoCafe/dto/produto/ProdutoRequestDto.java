@@ -8,9 +8,6 @@ public class ProdutoRequestDto {
     @Size(max = 45, message = "Nome deve ter no máximo 45 caracteres")
     private String nome;
 
-    @NotNull(message = "Categoria é obrigatória")
-    private Integer categoriaId;
-
     @DecimalMin(value = "0.01", message = "Preço deve ser maior que zero")
     private Double precoUnidade;
 
@@ -22,11 +19,55 @@ public class ProdutoRequestDto {
     @Size(max = 45, message = "Path da foto deve ter no máximo 45 caracteres")
     private String pathFt;
 
+    private Categoria categoria;
+
+    public static class Categoria{
+        private Integer id;
+        private String nome;
+
+        public Integer getId() {
+            return id;
+        }
+
+        public void setId(Integer id) {
+            this.id = id;
+        }
+
+        public String getNome() {
+            return nome;
+        }
+
+        public void setNome(String nome) {
+            this.nome = nome;
+        }
+
+        public Categoria(Integer id, String nome) {
+            this.id = id;
+            this.nome = nome;
+        }
+
+        public Categoria() {
+        }
+    }
+
+    public Categoria getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
+    }
+
+    public ProdutoRequestDto(String nome, Double precoUnidade, String descricao, String pathFt, Categoria categoria) {
+        this.nome = nome;
+        this.precoUnidade = precoUnidade;
+        this.descricao = descricao;
+        this.pathFt = pathFt;
+        this.categoria = categoria;
+    }
+
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
-
-    public Integer getCategoriaId() { return categoriaId; }
-    public void setCategoriaId(Integer categoriaId) { this.categoriaId = categoriaId; }
 
     public Double getPrecoUnidade() { return precoUnidade; }
     public void setPrecoUnidade(Double precoUnidade) { this.precoUnidade = precoUnidade; }

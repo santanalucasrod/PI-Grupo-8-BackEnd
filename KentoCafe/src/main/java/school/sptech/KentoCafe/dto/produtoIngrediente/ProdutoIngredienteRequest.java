@@ -1,10 +1,9 @@
 package school.sptech.KentoCafe.dto.produtoIngrediente;
 
-import school.sptech.KentoCafe.entity.Categoria;
 
 public class ProdutoIngredienteRequest {
-    private ProdutoIngredienteResponse.Produto produto;
-    private ProdutoIngredienteResponse.Ingrediente ingrediente;
+    private Produto produto;
+    private Ingrediente ingrediente;
 
     public static class Produto {
         private Integer id;
@@ -57,14 +56,29 @@ public class ProdutoIngredienteRequest {
             this.categoria = categoria;
         }
 
-        public Double getPrecoUnidade() { return precoUnidade; }
-        public void setPrecoUnidade(Double precoUnidade) { this.precoUnidade = precoUnidade; }
+        public Double getPrecoUnidade() {
+            return precoUnidade;
+        }
 
-        public String getDescricao() { return descricao; }
-        public void setDescricao(String descricao) { this.descricao = descricao; }
+        public void setPrecoUnidade(Double precoUnidade) {
+            this.precoUnidade = precoUnidade;
+        }
 
-        public String getPathFt() { return pathFt; }
-        public void setPathFt(String pathFt) { this.pathFt = pathFt; }
+        public String getDescricao() {
+            return descricao;
+        }
+
+        public void setDescricao(String descricao) {
+            this.descricao = descricao;
+        }
+
+        public String getPathFt() {
+            return pathFt;
+        }
+
+        public void setPathFt(String pathFt) {
+            this.pathFt = pathFt;
+        }
 
         public Produto(Integer id, String nome, Categoria categoria, Double precoUnidade, String descricao, String pathFt) {
             this.id = id;
@@ -108,7 +122,7 @@ public class ProdutoIngredienteRequest {
         }
     }
 
-    public ProdutoIngredienteRequest(ProdutoIngredienteResponse.Produto produto, ProdutoIngredienteResponse.Ingrediente ingrediente) {
+    public ProdutoIngredienteRequest(Produto produto, Ingrediente ingrediente) {
         this.produto = produto;
         this.ingrediente = ingrediente;
     }
@@ -116,19 +130,20 @@ public class ProdutoIngredienteRequest {
     public ProdutoIngredienteRequest() {
     }
 
-    public ProdutoIngredienteResponse.Produto getProduto() {
+    public Produto getProduto() {
         return produto;
     }
 
-    public void setProduto(ProdutoIngredienteResponse.Produto produto) {
+    public void setProduto(Produto produto) {
         this.produto = produto;
     }
 
-    public ProdutoIngredienteResponse.Ingrediente getIngrediente() {
+    public Ingrediente getIngrediente() {
         return ingrediente;
     }
 
-    public void setIngrediente(ProdutoIngredienteResponse.Ingrediente ingrediente) {
+    public void setIngrediente(Ingrediente ingrediente) {
         this.ingrediente = ingrediente;
     }
+
 }
