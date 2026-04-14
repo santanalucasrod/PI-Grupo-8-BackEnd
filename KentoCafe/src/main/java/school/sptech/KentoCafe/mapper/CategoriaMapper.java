@@ -21,7 +21,7 @@ public class CategoriaMapper {
         dto.setNome(categoria.getNome());
         dto.setProdutos(
                 produtos.stream()
-                        .map(ProdutoMapper::toResponseDTO)
+                        .map(ProdutoMapper::toResponse)
                         .toList()
         );
         return dto;
