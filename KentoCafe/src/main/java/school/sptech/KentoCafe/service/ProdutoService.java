@@ -3,8 +3,8 @@ package school.sptech.KentoCafe.service;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import school.sptech.KentoCafe.dto.produto.ProdutoRequestDto;
-import school.sptech.KentoCafe.dto.produto.ProdutoResponseDto;
+import school.sptech.KentoCafe.dto.produto.ProdutoRequest;
+import school.sptech.KentoCafe.dto.produto.ProdutoResponse;
 import school.sptech.KentoCafe.dto.produtoIngrediente.ProdutoIngredienteResponse;
 import school.sptech.KentoCafe.entity.Categoria;
 import school.sptech.KentoCafe.entity.Produto;
@@ -29,27 +29,27 @@ public class ProdutoService {
         this.produtoIngredienteRepository = produtoIngredienteRepository;
     }
 
-    public ProdutoResponseDto criar(ProdutoRequestDto dto) {
+    public ProdutoResponse criar(ProdutoRequest dto) {
         Categoria categoria = buscarCategoriaPorId(dto.getCategoria().getId());
         Produto produto = ProdutoMapper.toEntity(dto, categoria);
-        return ProdutoMapper.toResponseDTO(produtoRepository.save(produto));
+        return ProdutoMapper.toResponse(produtoRepository.save(produto));
     }
 
-    public List<ProdutoResponseDto> listarTodos() {
+    public List<ProdutoResponse> listarTodos() {
         return produtoRepository.findAll()
                 .stream()
                 .map(ProdutoMapper::toResponseDTO)
                 .toList();
     }
 
-    public ProdutoResponseDto buscarPorId(Integer id) {
+    public ProdutoResponse buscarPorId(Integer id) {
         Produto produto = produtoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Produto não encontrado"));
-        return ProdutoMapper.toResponseDTO(produto);
+        return ProdutoMapper.toResponse(produto);
     }
 
-    public ProdutoResponseDto atualizar(Integer id, ProdutoRequestDto dto) {
+    public ProdutoResponse atualizar(Integer id, ProdutoRequest dto) {
         Produto produto = produtoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Produto não encontrado"));
@@ -62,7 +62,7 @@ public class ProdutoService {
         produto.setDescricao(dto.getDescricao());
         produto.setPathFt(dto.getPathFt());
 
-        return ProdutoMapper.toResponseDTO(produtoRepository.save(produto));
+        return ProdutoMapper.toResponse(produtoRepository.save(produto));
     }
 
     public void deletar(Integer id) {
