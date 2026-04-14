@@ -2,7 +2,7 @@ package school.sptech.KentoCafe.dto.produto;
 
 import jakarta.validation.constraints.*;
 
-public class ProdutoRequestDto {
+public class ProdutoRequest {
 
     @NotBlank(message = "Nome é obrigatório")
     @Size(max = 45, message = "Nome deve ter no máximo 45 caracteres")
@@ -58,7 +58,7 @@ public class ProdutoRequestDto {
         this.categoria = categoria;
     }
 
-    public ProdutoRequestDto(String nome, Double precoUnidade, String descricao, String pathFt, Categoria categoria) {
+    public ProdutoRequest(String nome, Double precoUnidade, String descricao, String pathFt, Categoria categoria) {
         this.nome = nome;
         this.precoUnidade = precoUnidade;
         this.descricao = descricao;

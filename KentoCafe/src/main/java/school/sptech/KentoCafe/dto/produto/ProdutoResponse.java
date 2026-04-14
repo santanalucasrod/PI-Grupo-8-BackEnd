@@ -1,8 +1,6 @@
 package school.sptech.KentoCafe.dto.produto;
 
-import school.sptech.KentoCafe.entity.Categoria;
-
-public class ProdutoResponseDto {
+public class ProdutoResponse {
 
     private Integer id;
     private String nome;
@@ -48,7 +46,7 @@ public class ProdutoResponseDto {
         this.categoria = categoria;
     }
 
-    public ProdutoResponseDto(Integer id, String nome, Categoria categoria, Double precoUnidade, String descricao, String pathFt) {
+    public ProdutoResponse(Integer id, String nome, Categoria categoria, Double precoUnidade, String descricao, String pathFt) {
         this.id = id;
         this.nome = nome;
         this.categoria = categoria;
@@ -57,7 +55,7 @@ public class ProdutoResponseDto {
         this.pathFt = pathFt;
     }
 
-    public ProdutoResponseDto() {
+    public ProdutoResponse() {
     }
 
     public Integer getId() { return id; }
