@@ -17,6 +17,7 @@ import school.sptech.KentoCafe.entity.Funcionario;
 import school.sptech.KentoCafe.repository.FuncionarioRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class FuncionarioService {
@@ -55,19 +56,28 @@ public class FuncionarioService {
     }
 
     // Métod responsável por criar um usuário
-    public Funcionario criarFuncionario(FuncionarioRequest  funcionarioRequest) {
-
-
-        // Cria um novo usuário com os dados fornecidos
-        Funcionario funcionarioCriado = new Funcionario();
-        funcionarioCriado.setEmail(funcionarioRequest.getEmail());
-        funcionarioCriado.setSenha(securityConfiguration.passwordEncoder().encode(funcionarioRequest.getSenha()));
-        funcionarioCriado.setNome(funcionarioRequest.getNome());
-        funcionarioCriado.setGerente(funcionarioRequest.getGerente());
+    public Funcionario criarFuncionario(Funcionario funcionario) {
+        Funcionario funcionarioCriado = repository.findByEmail(funcionario.getEmail()).orElseThrow(() -> new RuntimeException("Usuário já existe com esse email."));
 
         // Salva o novo usuário no banco de dados
         return repository.save(funcionarioCriado);
 
+    }
+
+    public List<Funcionario> listarFuncionario(){
+        return repository.findAll();
+    }
+
+    public Funcionario atualizarFuncionario(Funcionario funcionario, Integer id){
+        return null;
+    }
+
+    public void deletarFuncionario(Integer id){
+
+    }
+
+    public Funcionario buscarFuncionario(Integer id){
+        return null;
     }
 
 }

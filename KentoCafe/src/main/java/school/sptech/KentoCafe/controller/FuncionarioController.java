@@ -23,8 +23,11 @@ public class FuncionarioController {
 
     @PostMapping("/cadastro")
     public ResponseEntity<FuncionarioResponse> criarFuncionario(@RequestBody FuncionarioRequest funcionarioRequest) {
-        Funcionario funcionario=funcionarioService.criarFuncionario(funcionarioRequest);
-        FuncionarioResponse responseDto= FuncionarioMapper.toResponse(funcionario);
+        Funcionario funcionario=FuncionarioMapper.toEntity(funcionarioRequest);
+
+        Funcionario funcionarioCriado=funcionarioService.criarFuncionario(funcionario);
+
+        FuncionarioResponse responseDto= FuncionarioMapper.toResponse(funcionarioCriado);
         return ResponseEntity.status(201).body(responseDto);
     }
 
@@ -34,12 +37,12 @@ public class FuncionarioController {
     }
 
 
-    @GetMapping("/test")
+    @GetMapping("/autenticado")
     public ResponseEntity<String> getAuthenticationTest() {
         return new ResponseEntity<>("Autenticado com sucesso", HttpStatus.OK);
     }
 
-    @GetMapping("/test2")
+    @GetMapping("/gerenteautenticado")
     public ResponseEntity<String> getAuthenticationTestGerente() {
         return new ResponseEntity<>("Autenticado com  gerente", HttpStatus.OK);
     }
