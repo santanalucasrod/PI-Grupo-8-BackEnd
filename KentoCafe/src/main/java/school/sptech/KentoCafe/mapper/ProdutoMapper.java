@@ -19,7 +19,7 @@ public class ProdutoMapper {
         return produto;
     }
 
-    public static ProdutoResponse toResponseDTO(Produto produto) {
+    public static ProdutoResponse toResponse(Produto produto) {
         ProdutoResponse dto = new ProdutoResponse();
         dto.setId(produto.getId());
         dto.setNome(produto.getNome());
@@ -33,7 +33,7 @@ public class ProdutoMapper {
 
     public static List<ProdutoResponse> toResponseList(List<Produto> produtos) {
         return produtos.stream()
-                .map(ProdutoMapper::toResponseDTO)
+                .map(ProdutoMapper::toResponse)
                 .toList();
     }
 }

@@ -38,7 +38,7 @@ public class ProdutoService {
     public List<ProdutoResponse> listarTodos() {
         return produtoRepository.findAll()
                 .stream()
-                .map(ProdutoMapper::toResponseDTO)
+                .map(ProdutoMapper::toResponse)
                 .toList();
     }
 
