@@ -3,8 +3,10 @@ package school.sptech.KentoCafe.controller;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import school.sptech.KentoCafe.dto.produto.ProdutoRequestDto;
-import school.sptech.KentoCafe.dto.produto.ProdutoResponseDto;
+import school.sptech.KentoCafe.dto.produto.ProdutoRequest;
+import school.sptech.KentoCafe.dto.produto.ProdutoRequest;
+import school.sptech.KentoCafe.dto.produto.ProdutoResponse;
+import school.sptech.KentoCafe.dto.produto.ProdutoResponse;
 import school.sptech.KentoCafe.entity.Ingrediente;
 import school.sptech.KentoCafe.entity.Produto;
 import school.sptech.KentoCafe.mapper.IngredienteMapper;
@@ -24,24 +26,24 @@ public class ProdutoController {
     }
 
     @PostMapping
-    public ResponseEntity<ProdutoResponseDto> criar(@RequestBody @Valid ProdutoRequestDto dto) {
+    public ResponseEntity<ProdutoResponse> criar(@RequestBody @Valid ProdutoRequest dto) {
         return ResponseEntity.status(201).body(produtoService.criar(dto));
     }
 
     @GetMapping
-    public ResponseEntity<List<ProdutoResponseDto>> listarTodos() {
+    public ResponseEntity<List<ProdutoResponse>> listarTodos() {
         return ResponseEntity.ok(produtoService.listarTodos());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProdutoResponseDto> buscarPorId(@PathVariable Integer id) {
+    public ResponseEntity<ProdutoResponse> buscarPorId(@PathVariable Integer id) {
         return ResponseEntity.ok(produtoService.buscarPorId(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProdutoResponseDto> atualizar(
+    public ResponseEntity<ProdutoResponse> atualizar(
             @PathVariable Integer id,
-            @RequestBody @Valid ProdutoRequestDto dto) {
+            @RequestBody @Valid ProdutoRequest dto) {
         return ResponseEntity.ok(produtoService.atualizar(id, dto));
     }
 
@@ -52,7 +54,7 @@ public class ProdutoController {
     }
 
     @GetMapping("/por-ingrediente/{ingredienteId}")
-    public ResponseEntity<List<ProdutoResponseDto>> buscarProdutosPorIngrediente(
+    public ResponseEntity<List<ProdutoResponse>> buscarProdutosPorIngrediente(
             @RequestParam Integer ingredienteId
     ){
         List<Produto> produtos = produtoService.buscarProdutosPorIngredienteId(ingredienteId);
