@@ -52,6 +52,8 @@ public class SecurityConfig {
             "/ingrediente/**",
             "/produto/**",
             "/funcionario/cadastro",
+            "/funcionario/crud/**",
+            "/funcionario/crud",
             "/funcionario/none",
             //habilita todas as rotas (xpto)
             //"/**"
@@ -59,13 +61,13 @@ public class SecurityConfig {
 
     // Endpoints que requerem autenticação para serem acessados
     public static final String [] ENDPOINTS_WITH_AUTHENTICATION_REQUIRED = {
-            "/funcionario/test"
+            "/funcionario/autenticado"
     };
 
 
     // Endpoints que só podem ser acessador por usuários com permissão de administrador
     public static final String [] ENDPOINTS_GERENTE = {
-            "/funcionario/test2"
+            "/funcionario/gerenteautenticado"
     };
 
     @Bean
@@ -86,12 +88,12 @@ public class SecurityConfig {
 
                 //especifica quais rotas estão bloqueadas e quais não estão
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED).permitAll()
-                        .requestMatchers(ENDPOINTS_WITH_AUTHENTICATION_REQUIRED).authenticated()
                         .requestMatchers(ENDPOINTS_GERENTE).access((authentication, context) -> {
                             UserDetailsImpl user = (UserDetailsImpl) authentication.get().getPrincipal();
                             return new AuthorizationDecision(user.isManager());
                         })
+                        .requestMatchers(ENDPOINTS_WITH_AUTHENTICATION_REQUIRED).authenticated()
+                        .requestMatchers(ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED).permitAll()
                         .anyRequest().denyAll()
                 )
                 //tratativa de erro

@@ -9,6 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import school.sptech.KentoCafe.entity.Funcionario;
 import school.sptech.KentoCafe.repository.FuncionarioRepository;
@@ -29,6 +30,8 @@ public class JwtAuthenticatorFilter extends OncePerRequestFilter {
     Middleware
      */
 
+
+    private final AntPathMatcher matcher = new AntPathMatcher();
     @Autowired
     private JwtService jwtTokenService; // Service que definimos anteriormente
 
@@ -77,18 +80,25 @@ public class JwtAuthenticatorFilter extends OncePerRequestFilter {
     // Verifica se o endpoint requer autenticação antes de processar a requisição
     //isso inclui endspoints/**
     private boolean checkIfEndpointIsNotPublic(HttpServletRequest request) {
-        String uri = request.getRequestURI();
 
-        return Arrays.stream(SecurityConfig.ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED)
-                .noneMatch(pattern -> {
-                    // remove /** do final se existir
-                    if (pattern.endsWith("/**")) {
-                        String base = pattern.replace("/**", "");
-                        return uri.startsWith(base);
-                    }
+        //(remove contexto tipo /api, se houver)
+        String uri = request.getServletPath();
 
-                    // comparação normal
-                    return uri.equals(pattern);
+        System.out.println("Verificando URI: " + uri);
+
+        // Percorre todas as rotas públicas definidas no SecurityConfig
+        boolean isPublic = Arrays.stream(SecurityConfig.ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED)
+                .anyMatch(pattern -> {
+
+                    //if essa url combina com padrão pattern?
+                    //pattern: /funcionario/**
+                    // url: funcionario/crud/1
+                    boolean match = matcher.match(pattern, uri);
+
+                    return match;
                 });
+
+        // se não for pública então é privada
+        return !isPublic;
     }
 }

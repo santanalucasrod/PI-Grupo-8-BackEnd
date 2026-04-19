@@ -6,6 +6,8 @@ import school.sptech.KentoCafe.dto.funcionario.FuncionarioRequest;
 import school.sptech.KentoCafe.dto.funcionario.FuncionarioResponse;
 import school.sptech.KentoCafe.entity.Funcionario;
 
+import java.util.List;
+
 public class FuncionarioMapper {
 
     @Autowired
@@ -18,7 +20,7 @@ public class FuncionarioMapper {
         Funcionario funcionario = new Funcionario();
         funcionario.setNome(dto.getNome());
         funcionario.setEmail(dto.getEmail());
-        funcionario.setSenha(securityConfiguration.passwordEncoder().encode(dto.getSenha()));
+        funcionario.setSenha(dto.getSenha());
         funcionario.setGerente(dto.getGerente());
 
 
@@ -37,5 +39,11 @@ public class FuncionarioMapper {
         dto.setGerente(funcionario.getGerente());
 
         return dto;
+    }
+
+    public static List<FuncionarioResponse> toResponseDto(List<Funcionario> games) {
+        return games.stream()
+                .map(FuncionarioMapper::toResponse)
+                .toList();
     }
 }

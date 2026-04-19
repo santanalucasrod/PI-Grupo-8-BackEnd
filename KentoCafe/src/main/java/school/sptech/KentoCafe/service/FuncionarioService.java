@@ -2,6 +2,7 @@ package school.sptech.KentoCafe.service;
 
 import org.apache.coyote.Request;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,6 +15,8 @@ import school.sptech.KentoCafe.dto.funcionario.FuncionarioRequest;
 import school.sptech.KentoCafe.dto.token.LoginUserDto;
 import school.sptech.KentoCafe.dto.token.RecoveryJwtTokenDto;
 import school.sptech.KentoCafe.entity.Funcionario;
+import school.sptech.KentoCafe.exception.EntidadeNaoEncontradoException;
+import school.sptech.KentoCafe.exception.FuncionarioConflitoException;
 import school.sptech.KentoCafe.repository.FuncionarioRepository;
 
 import java.util.List;
@@ -57,11 +60,16 @@ public class FuncionarioService {
 
     // Métod responsável por criar um usuário
     public Funcionario criarFuncionario(Funcionario funcionario) {
-        Funcionario funcionarioCriado = repository.findByEmail(funcionario.getEmail()).orElseThrow(() -> new RuntimeException("Usuário já existe com esse email."));
+        Optional<Funcionario> existente = repository.findByEmail(funcionario.getEmail());
+
+        if (existente.isPresent()) {
+            throw new FuncionarioConflitoException("Usuário já existe com esse email.");
+        }
+
+        funcionario.setSenha(passwordEncoder.encode(funcionario.getSenha()));
 
         // Salva o novo usuário no banco de dados
-        return repository.save(funcionarioCriado);
-
+        return repository.save(funcionario);
     }
 
     public List<Funcionario> listarFuncionario(){
@@ -69,15 +77,34 @@ public class FuncionarioService {
     }
 
     public Funcionario atualizarFuncionario(Funcionario funcionario, Integer id){
-        return null;
+
+        boolean existente = repository.existsById(id);
+
+        if (!existente) {
+            throw new EntidadeNaoEncontradoException("Usuário não existe");
+        }
+
+        funcionario.setSenha(passwordEncoder.encode(funcionario.getSenha()));
+        funcionario.setId(id);
+
+        // Salva o novo usuário no banco de dados
+        return repository.save(funcionario);
     }
 
     public void deletarFuncionario(Integer id){
-
+        if (!repository.existsById(id)){
+            throw new RuntimeException("sem id");
+        }
+        repository.deleteById(id);
     }
 
     public Funcionario buscarFuncionario(Integer id){
-        return null;
+        Optional<Funcionario> funcionarioOptional= repository.findById(id);
+
+        if (funcionarioOptional.isEmpty()){
+            throw new RuntimeException("entidade não existe");
+        }
+        return funcionarioOptional.get();
     }
 
 }
