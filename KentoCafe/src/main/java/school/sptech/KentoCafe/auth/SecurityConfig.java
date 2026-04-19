@@ -94,7 +94,7 @@ public class SecurityConfig {
                         })
                         .requestMatchers(ENDPOINTS_WITH_AUTHENTICATION_REQUIRED).authenticated()
                         .requestMatchers(ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED).permitAll()
-                        .anyRequest().denyAll()
+                        .anyRequest().permitAll()
                 )
                 //tratativa de erro
                 .exceptionHandling(ex -> ex
