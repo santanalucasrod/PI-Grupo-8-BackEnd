@@ -14,6 +14,8 @@ import school.sptech.KentoCafe.repository.ProdutoIngredienteRepository;
 import school.sptech.KentoCafe.repository.ProdutoRepository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ProdutoService {
@@ -84,5 +86,22 @@ public class ProdutoService {
 
     public List<Produto> buscarProdutosPorIngredienteId(Integer id){
         return produtoRepository.findByIngredienteId(id);
+    }
+
+    public List<ProdutoResponse> listarPorCategoria(Integer id) {
+        return ProdutoMapper.toResponseList(produtoRepository.findByCategoriaId(id));
+    }
+
+    public Map<String, List<ProdutoResponse>> listarPorCategoriaAgrupados() {
+        List<Produto> todos = produtoRepository.findAll();
+
+        Map<String, List<Produto>> produtosAgrupados = todos.stream()
+                .collect(Collectors.groupingBy(p -> p.getCategoria().getNome()));
+
+        return produtosAgrupados.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> ProdutoMapper.toResponseList(e.getValue())
+                ));
     }
 }
