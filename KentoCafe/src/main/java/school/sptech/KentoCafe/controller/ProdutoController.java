@@ -14,6 +14,7 @@ import school.sptech.KentoCafe.mapper.ProdutoMapper;
 import school.sptech.KentoCafe.service.ProdutoService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/produtos")
@@ -64,4 +65,15 @@ public class ProdutoController {
         return ResponseEntity.status(200).body(ProdutoMapper.toResponseList(produtos));
     }
 
+    @GetMapping("/categoria/{id}")
+    public ResponseEntity<List<ProdutoResponse>> listarPorCategoria(@PathVariable Integer id) {
+        List<ProdutoResponse> produtos = produtoService.listarPorCategoria(id);
+        return produtos.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(produtos);
+    }
+
+    @GetMapping("/agrupados")
+    public ResponseEntity<Map<String, List<ProdutoResponse>>> listarAgrupados() {
+        Map<String, List<ProdutoResponse>> agrupados = produtoService.listarPorCategoriaAgrupados();
+        return ResponseEntity.ok(agrupados);
+    }
 }

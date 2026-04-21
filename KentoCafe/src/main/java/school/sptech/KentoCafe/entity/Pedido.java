@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "pedido")
@@ -12,11 +14,14 @@ public class Pedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Column(name = "dt_hr_pedido")
-    private LocalDate dtHrPedido;
+    private LocalDateTime dtHrPedido;
     @Column(name = "dt_hr_pronto")
-    private LocalDate dtHrPronto;
+    private LocalDateTime dtHrPronto;
     private String infoAdicional;
     private String status;
+
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
+    private List<Venda> itens;
 
     public Integer getId() {
         return id;
@@ -26,19 +31,19 @@ public class Pedido {
         this.id = id;
     }
 
-    public LocalDate getDtHrPedido() {
+    public LocalDateTime getDtHrPedido() {
         return dtHrPedido;
     }
 
-    public void setDtHrPedido(LocalDate dtHrPedido) {
+    public void setDtHrPedido(LocalDateTime dtHrPedido) {
         this.dtHrPedido = dtHrPedido;
     }
 
-    public LocalDate getDtHrPronto() {
+    public LocalDateTime getDtHrPronto() {
         return dtHrPronto;
     }
 
-    public void setDtHrPronto(LocalDate dtHrPronto) {
+    public void setDtHrPronto(LocalDateTime dtHrPronto) {
         this.dtHrPronto = dtHrPronto;
     }
 
@@ -56,5 +61,13 @@ public class Pedido {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public List<Venda> getItens() {
+        return itens;
+    }
+
+    public void setItens(List<Venda> itens) {
+        this.itens = itens;
     }
 }
