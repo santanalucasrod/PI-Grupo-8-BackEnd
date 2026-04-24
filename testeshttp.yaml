@@ -1,0 +1,317 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: Kento café
+meta:
+  id: wrk_508406768a50452f8b37f57cf3c9185a
+  created: 1776016387531
+  modified: 1776108502652
+  description: ""
+collection:
+  - name: Funcionario
+    meta:
+      id: fld_065510ab85a1438184c373398cc1fa38
+      created: 1776568097050
+      modified: 1776568097050
+      sortKey: -1776568097052
+      description: ""
+    children:
+      - url: "{{ _.url }}/funcionario/cadastro"
+        name: Criar User gerente
+        meta:
+          id: req_c15efaf31a3b47698169c33cdf4d983c
+          created: 1776016387534
+          modified: 1777064194363
+          isPrivate: false
+          description: ""
+          sortKey: -1776614249547
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"nome": "admin",
+              "email": "admin@email.com",
+              "senha": "12345",
+              "gerente": true
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.2.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.url }}/funcionario/cadastro"
+        name: Criar User cliente
+        meta:
+          id: req_41fe0f7f049341ebb904ff42d7c2c0e8
+          created: 1776016387537
+          modified: 1777064189819
+          isPrivate: false
+          description: ""
+          sortKey: -1776614249447
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"nome": "user",
+              "email": "user@email.com",
+              "senha": "12345",
+              "gerente": false
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.2.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.url }}/funcionario/crud"
+        name: Consultar Funcionario
+        meta:
+          id: req_b8e55b7bd275419888e89228eb516562
+          created: 1776568166897
+          modified: 1776615358648
+          isPrivate: false
+          description: ""
+          sortKey: -1776614249347
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        authentication:
+          type: none
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.url }}/funcionario/crud/3"
+        name: Editar Funcionario
+        meta:
+          id: req_f640c352ee3743a8af06b8f6347bdcf2
+          created: 1776568301613
+          modified: 1777064217647
+          isPrivate: false
+          description: ""
+          sortKey: -1776614249322
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"nome": "admin",
+              "email": "user@email.com",
+              "senha": "12345",
+              "gerente": true
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        authentication:
+          type: bearer
+          token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJwaXp6dXJnLWFwaSIsImlhdCI6MTc3NjYxMDkwMCwiZXhwIjoxNzc2NzU0OTAwLCJzdWIiOiJhZG1pbkBlbWFpbC5jb20ifQ.TtoiPXY0w_NzOTv8CnXDyMe3M-VO4zM3aRurmKdzGPU
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.url }}/funcionario/crud/3"
+        name: Deletar Funcionario
+        meta:
+          id: req_5a82d087814341bb88d2815cba502838
+          created: 1776568318088
+          modified: 1777064215215
+          isPrivate: false
+          description: ""
+          sortKey: -1776614249297
+        method: DELETE
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        authentication:
+          type: bearer
+          token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJwaXp6dXJnLWFwaSIsImlhdCI6MTc3NjYxMDkwMCwiZXhwIjoxNzc2NzU0OTAwLCJzdWIiOiJhZG1pbkBlbWFpbC5jb20ifQ.TtoiPXY0w_NzOTv8CnXDyMe3M-VO4zM3aRurmKdzGPU
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.url }}/funcionario/crud/2"
+        name: Pesquisar Funcionario
+        meta:
+          id: req_8e8041cfe4614b03a16abe39c7456c4e
+          created: 1776569645512
+          modified: 1777064220646
+          isPrivate: false
+          description: ""
+          sortKey: -1776614249334.5
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Autenticacao
+    meta:
+      id: fld_ec3291a262294e9f8d69330be50b4e4e
+      created: 1777064176791
+      modified: 1777064887837
+      sortKey: -1777064176791
+      description: ""
+    children:
+      - url: "{{ _.url }}/auth/login"
+        name: Fazer Login
+        meta:
+          id: req_72024022834445caa77c66f616eb52a4
+          created: 1776016387535
+          modified: 1777064249492
+          isPrivate: false
+          description: ""
+          sortKey: -1777064235785
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "email": "admin@email.com",
+              "password": "12345"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.2.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.url }}/funcionario/autenticado"
+        name: Testar rota autenticada
+        meta:
+          id: req_42e0d5dd3e1543f09d0b2eb594493d7d
+          created: 1776016387536
+          modified: 1777064246354
+          isPrivate: false
+          description: ""
+          sortKey: -1777064235685
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.2.0
+        authentication:
+          type: bearer
+          disabled: false
+          token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJwaXp6dXJnLWFwaSIsImlhdCI6MTc3NjYxMDkwMCwiZXhwIjoxNzc2NzU0OTAwLCJzdWIiOiJhZG1pbkBlbWFpbC5jb20ifQ.TtoiPXY0w_NzOTv8CnXDyMe3M-VO4zM3aRurmKdzGPU333
+          prefix: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.url }}/funcionario/gerenteautenticado"
+        name: Testar rota autenticada gerente
+        meta:
+          id: req_8341dd50fcbe4c23a29e9ab310df9979
+          created: 1776016387538
+          modified: 1777064243325
+          isPrivate: false
+          description: ""
+          sortKey: -1777064235585
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.2.0
+        authentication:
+          type: bearer
+          disabled: false
+          token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJwaXp6dXJnLWFwaSIsImlhdCI6MTc3NjYxMDkwMCwiZXhwIjoxNzc2NzU0OTAwLCJzdWIiOiJhZG1pbkBlbWFpbC5jb20ifQ.TtoiPXY0w_NzOTv8CnXDyMe3M-VO4zM3aRurmKdzGPU
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.url }}/funcionario/none"
+        name: Testar rota não autenticada
+        meta:
+          id: req_0030cda2243049da8e3fce4695abe409
+          created: 1776016387540
+          modified: 1777064266797
+          isPrivate: false
+          description: ""
+          sortKey: -1777064235735
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.2.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_13b51a36aa3a5c4f7b41a4806db78b6ad7f6b2bf
+    created: 1776108502777
+    modified: 1776108502777
+environments:
+  name: Base Environment
+  meta:
+    id: env_6d433b9a62674daf9ac88d0ddbb74733
+    created: 1776016387532
+    modified: 1776108502605
+    isPrivate: false
+  data:
+    url: http://localhost:8080
