@@ -1,5 +1,8 @@
 package school.sptech.KentoCafe.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.hibernate.sql.ast.tree.expression.Summarization;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.sptech.KentoCafe.dto.produtoIngrediente.ProdutoIngredienteRequest;
@@ -9,7 +12,7 @@ import school.sptech.KentoCafe.mapper.ProdutoIngredienteMapper;
 import school.sptech.KentoCafe.service.ProdutoIngredienteService;
 
 import java.util.List;
-
+@Tag(name = "Produtos Ingrediente", description = "orquestrador de requisiçoes envolvendo busca de produtos por ingredientes")
 @RestController
 public class ProdutoIngredienteController {
 
@@ -19,6 +22,7 @@ public class ProdutoIngredienteController {
         this.produtoIngredienteService = produtoIngredienteService;
     }
 
+    @Operation(summary = "listar todos os vínculos produto-ingrediente")
     @GetMapping("/{id}")
     public ResponseEntity<ProdutoIngredienteResponse> buscarProdutoIngredientePorId(
             @RequestParam Integer id
@@ -29,7 +33,7 @@ public class ProdutoIngredienteController {
         }
         return ResponseEntity.status(200).body(ProdutoIngredienteMapper.toResponse(produtoIngrediente));
     }
-
+    @Operation(summary = "Buscar vínculo por ID")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarProdutoIngredientePorId(
             @RequestParam Integer id
@@ -40,7 +44,7 @@ public class ProdutoIngredienteController {
         produtoIngredienteService.excluirPorId(id);
         return ResponseEntity.status(204).build();
     }
-
+    @Operation(summary = "Atualizar vínculo de produto-ingrediente")
     @GetMapping("/por-ingrediente/{id}")
     public ResponseEntity<List<ProdutoIngredienteResponse>> buscarProdutoIngredientePorIngredienteId(
             @RequestParam Integer id
@@ -51,7 +55,7 @@ public class ProdutoIngredienteController {
         }
         return ResponseEntity.status(200).body(ProdutoIngredienteMapper.toResponseList(produtoIngredientes));
     }
-
+    @Operation(summary = "Deletar vínculo por ID")
     @GetMapping("/por-produto/{id}")
     public ResponseEntity<List<ProdutoIngredienteResponse>> buscarProdutoIngredientePorProdutoId(
             @RequestParam Integer id
@@ -63,6 +67,7 @@ public class ProdutoIngredienteController {
         return ResponseEntity.status(200).body(ProdutoIngredienteMapper.toResponseList(produtoIngredientes));
     }
 
+    @Operation(summary = "Deletar vínculos por produto")
     @DeleteMapping("/por-produto/{id}")
     public ResponseEntity<Void> deletarProdutoIngredientePorProdutoId(
             @RequestParam Integer id
@@ -74,6 +79,7 @@ public class ProdutoIngredienteController {
         return ResponseEntity.status(404).build();
     }
 
+    @Operation(summary = "Deleta vínculos por ingrediente")
     @DeleteMapping("/por-ingrediente/{id}")
     public ResponseEntity<Void> deletarProdutoIngredientePorIngredienteId(
             @RequestParam Integer id
@@ -85,6 +91,7 @@ public class ProdutoIngredienteController {
         return ResponseEntity.status(404).build();
     }
 
+    @Operation(summary = "Listar produto Ingredientes")
     @GetMapping
     public ResponseEntity<List<ProdutoIngredienteResponse>> buscarProdutoIngredientes(){
         List<ProdutoIngrediente> produtoIngredientes = produtoIngredienteService.buscarProdutoIngredientes();
@@ -94,6 +101,7 @@ public class ProdutoIngredienteController {
         return ResponseEntity.status(200).body(ProdutoIngredienteMapper.toResponseList(produtoIngredientes));
     }
 
+    @Operation(summary = "Criar produto ingrediente")
     @PostMapping
     public ResponseEntity<ProdutoIngredienteResponse> criarProdutoIngrediente(
             @RequestBody ProdutoIngredienteRequest req
@@ -102,6 +110,7 @@ public class ProdutoIngredienteController {
         return ResponseEntity.status(201).body(ProdutoIngredienteMapper.toResponse(produtoIngrediente));
     }
 
+    @Operation(summary = "Editar produto ingrediente")
     @PutMapping("/{id}")
     public ResponseEntity<ProdutoIngredienteResponse> editarProdutoIngrediente(
             @RequestParam Integer id,

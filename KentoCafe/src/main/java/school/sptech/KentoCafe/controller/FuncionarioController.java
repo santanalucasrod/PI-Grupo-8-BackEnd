@@ -1,6 +1,7 @@
 package school.sptech.KentoCafe.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import school.sptech.KentoCafe.service.FuncionarioService;
 
 import java.util.List;
 
+@Tag(name = "Funcionarios", description = "orquestrador das requisições envolvendo funcionarios")
 @Controller
 @RequestMapping("/funcionario")
 public class FuncionarioController {
