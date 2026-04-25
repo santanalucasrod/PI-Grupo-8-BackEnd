@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import school.sptech.KentoCafe.dto.pedido.pedido.PedidoRequest;
 import school.sptech.KentoCafe.dto.pedido.pedido.PedidoResponse;
 import school.sptech.KentoCafe.service.PedidoService;
-@Tag(name = "Produto", description = "Orquestrador de requisições envolvendo pedido")
+@Tag(name = "Pedido", description = "Orquestrador de requisições envolvendo pedido")
 @RestController
 @RequestMapping("/pedidos")
 public class PedidoController {

@@ -1,6 +1,7 @@
 package school.sptech.KentoCafe.service;
 
 import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
 import school.sptech.KentoCafe.dto.pedido.item.ItemRequest;
 import school.sptech.KentoCafe.dto.pedido.pedido.PedidoRequest;
 import school.sptech.KentoCafe.dto.pedido.pedido.PedidoResponse;
@@ -15,6 +16,7 @@ import school.sptech.KentoCafe.repository.ProdutoRepository;
 
 import java.time.LocalDateTime;
 
+@Service
 public class PedidoService {
     private final PedidoRepository pedidoRepository;
     private final ProdutoRepository produtoRepository;
