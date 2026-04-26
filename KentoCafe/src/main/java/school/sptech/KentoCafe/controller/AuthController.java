@@ -14,7 +14,7 @@ import school.sptech.KentoCafe.dto.token.RecoveryJwtTokenDto;
 import school.sptech.KentoCafe.service.FuncionarioService;
 
 @Tag(name = "Autenticação JWT",
-        description = "endpoints de login e geração de token")
+        description = "Endpoints de login e geração de token JWT")
 @Controller
 @RequestMapping("/auth")
 public class AuthController {
@@ -22,9 +22,8 @@ public class AuthController {
     @Autowired
     private FuncionarioService funcionarioService;
 
-    @Operation(description = "Autentica com dados validos sendo apresentados e retorna um token JWT")
-    @ApiResponse(responseCode = "200", description = "esse código representa que a operação ocorreu com sucesso" +
-            "ou seja o usuário acessou o sistema")
+    @Operation(summary = "Validar Login", description = "Autentica um funcionário e retorna um token JWT")
+    @ApiResponse(responseCode = "200", description = "Login realizado com sucesso")
     @PostMapping("/login")
     public ResponseEntity<RecoveryJwtTokenDto> authenticateUser(@RequestBody LoginUserDto loginUserDto) {
         RecoveryJwtTokenDto token = funcionarioService.authenticateUser(loginUserDto);

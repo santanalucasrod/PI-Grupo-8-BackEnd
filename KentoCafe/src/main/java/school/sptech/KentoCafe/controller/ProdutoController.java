@@ -1,6 +1,7 @@
 package school.sptech.KentoCafe.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.hibernate.sql.ast.tree.expression.Summarization;
@@ -18,7 +19,7 @@ import school.sptech.KentoCafe.service.ProdutoService;
 
 import java.util.List;
 import java.util.Map;
-@Tag(name = "Produtos", description = "Orquestrador de requisições envolvendo produto")
+@Tag(name = "Produtos", description = "Gerenciamento do cardápio de produtos da cafeteria")
 @RestController
 @RequestMapping("/produtos")
 public class ProdutoController {
@@ -28,38 +29,44 @@ public class ProdutoController {
     public ProdutoController(ProdutoService produtoService) {
         this.produtoService = produtoService;
     }
-    @Operation(summary = "cria produto", description = "cria um novo produto ")
+    @Operation(summary = "Criar produto")
+    @ApiResponse(responseCode = "201", description = "Produto criado com sucesso")
     @PostMapping
     public ResponseEntity<ProdutoResponse> criar(@RequestBody @Valid ProdutoRequest dto) {
         return ResponseEntity.status(201).body(produtoService.criar(dto));
     }
-    @Operation(summary = "lista produtos", description = "lista todos os produtos existentes")
+    @Operation(summary = "Listar produtos", description = "Retorna todos os produtos do cardápio")
+    @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso")
     @GetMapping
     public ResponseEntity<List<ProdutoResponse>> listarTodos() {
         return ResponseEntity.ok(produtoService.listarTodos());
     }
 
-    @Operation(summary = "busca produtos pelo id")
+    @Operation(summary = "Buscar produto por ID")
+    @ApiResponse(responseCode = "200", description = "Produto encontrado")
     @GetMapping("/{id}")
     public ResponseEntity<ProdutoResponse> buscarPorId(@PathVariable Integer id) {
         return ResponseEntity.ok(produtoService.buscarPorId(id));
     }
 
-    @Operation(summary = "atualiza produto", description = "atualiza um produto a partir de seu id")
+    @Operation(summary = "Atualizar produto")
+    @ApiResponse(responseCode = "200", description = "Produto atualizado com sucesso")
     @PutMapping("/{id}")
     public ResponseEntity<ProdutoResponse> atualizar(
             @PathVariable Integer id,
             @RequestBody @Valid ProdutoRequest dto) {
         return ResponseEntity.ok(produtoService.atualizar(id, dto));
     }
-@Operation(summary = "deleta produto", description = "deleta produto a partir do seu id")
+    @Operation(summary = "Deletar produto")
+    @ApiResponse(responseCode = "204", description = "Produto deletado com sucesso")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Integer id) {
         produtoService.deletar(id);
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Busca produto por ingrediente", description = "a partir do id de um ingrediente é listados os produtos que o utilizam")
+    @Operation(summary = "Buscar produtos por ingrediente")
+    @ApiResponse(responseCode = "200", description = "Produtos encontrados")
     @GetMapping("/por-ingrediente/{ingredienteId}")
     public ResponseEntity<List<ProdutoResponse>> buscarProdutosPorIngrediente(
             @RequestParam Integer ingredienteId
@@ -71,14 +78,16 @@ public class ProdutoController {
         return ResponseEntity.status(200).body(ProdutoMapper.toResponseList(produtos));
     }
 
-    @Operation(summary = "Busca produtos de uma categoria",description = "retorna uma lista de produtos que compoém uma categoria")
+    @Operation(summary = "Listar produtos por categoria")
+    @ApiResponse(responseCode = "200", description = "Produtos encontrados")
     @GetMapping("/categoria/{id}")
     public ResponseEntity<List<ProdutoResponse>> listarPorCategoria(@PathVariable Integer id) {
         List<ProdutoResponse> produtos = produtoService.listarPorCategoria(id);
         return produtos.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(produtos);
     }
 
-    @Operation(summary = "Lista produtos agrupados", description = "lista os produtos agrupando por categorias")
+    @Operation(summary = "Listar produtos agrupados por categoria", description = "Retorna um mapa com categorias como chave e lista de produtos como valor")
+    @ApiResponse(responseCode = "200", description = "Produtos agrupados retornados com sucesso")
     @GetMapping("/agrupados")
     public ResponseEntity<Map<String, List<ProdutoResponse>>> listarAgrupados() {
         Map<String, List<ProdutoResponse>> agrupados = produtoService.listarPorCategoriaAgrupados();

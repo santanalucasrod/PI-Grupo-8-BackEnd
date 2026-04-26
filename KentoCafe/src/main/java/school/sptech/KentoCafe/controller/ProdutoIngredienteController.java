@@ -12,7 +12,7 @@ import school.sptech.KentoCafe.mapper.ProdutoIngredienteMapper;
 import school.sptech.KentoCafe.service.ProdutoIngredienteService;
 
 import java.util.List;
-@Tag(name = "Produtos Ingrediente", description = "orquestrador de requisiçoes envolvendo busca de produtos por ingredientes")
+@Tag(name = "Produto-Ingrediente", description = "Relacionamento entre produtos e seus ingredientes")
 @RestController
 public class ProdutoIngredienteController {
 
@@ -22,7 +22,7 @@ public class ProdutoIngredienteController {
         this.produtoIngredienteService = produtoIngredienteService;
     }
 
-    @Operation(summary = "listar todos os vínculos produto-ingrediente")
+    @Operation(summary = "Buscar vinculo ProdutoIngrediente por id ")
     @GetMapping("/{id}")
     public ResponseEntity<ProdutoIngredienteResponse> buscarProdutoIngredientePorId(
             @RequestParam Integer id
@@ -33,7 +33,7 @@ public class ProdutoIngredienteController {
         }
         return ResponseEntity.status(200).body(ProdutoIngredienteMapper.toResponse(produtoIngrediente));
     }
-    @Operation(summary = "Buscar vínculo por ID")
+    @Operation(summary = "Deletar vínculo por ID")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarProdutoIngredientePorId(
             @RequestParam Integer id
@@ -44,7 +44,7 @@ public class ProdutoIngredienteController {
         produtoIngredienteService.excluirPorId(id);
         return ResponseEntity.status(204).build();
     }
-    @Operation(summary = "Atualizar vínculo de produto-ingrediente")
+    @Operation(summary = "Buscar vinculo por id ingrediente")
     @GetMapping("/por-ingrediente/{id}")
     public ResponseEntity<List<ProdutoIngredienteResponse>> buscarProdutoIngredientePorIngredienteId(
             @RequestParam Integer id
@@ -55,7 +55,7 @@ public class ProdutoIngredienteController {
         }
         return ResponseEntity.status(200).body(ProdutoIngredienteMapper.toResponseList(produtoIngredientes));
     }
-    @Operation(summary = "Deletar vínculo por ID")
+    @Operation(summary = "Buscar vínculo por id produto")
     @GetMapping("/por-produto/{id}")
     public ResponseEntity<List<ProdutoIngredienteResponse>> buscarProdutoIngredientePorProdutoId(
             @RequestParam Integer id
@@ -67,7 +67,7 @@ public class ProdutoIngredienteController {
         return ResponseEntity.status(200).body(ProdutoIngredienteMapper.toResponseList(produtoIngredientes));
     }
 
-    @Operation(summary = "Deletar vínculos por produto")
+    @Operation(summary = "Deletar vínculo por id produto")
     @DeleteMapping("/por-produto/{id}")
     public ResponseEntity<Void> deletarProdutoIngredientePorProdutoId(
             @RequestParam Integer id
@@ -79,7 +79,7 @@ public class ProdutoIngredienteController {
         return ResponseEntity.status(404).build();
     }
 
-    @Operation(summary = "Deleta vínculos por ingrediente")
+    @Operation(summary = "Deleta vínculos por id ingrediente")
     @DeleteMapping("/por-ingrediente/{id}")
     public ResponseEntity<Void> deletarProdutoIngredientePorIngredienteId(
             @RequestParam Integer id

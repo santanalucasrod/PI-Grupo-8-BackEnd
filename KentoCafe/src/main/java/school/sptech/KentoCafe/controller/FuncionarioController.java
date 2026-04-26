@@ -1,6 +1,7 @@
 package school.sptech.KentoCafe.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
@@ -17,14 +18,15 @@ import school.sptech.KentoCafe.service.FuncionarioService;
 
 import java.util.List;
 
-@Tag(name = "Funcionarios", description = "orquestrador das requisições envolvendo funcionarios")
+@Tag(name = "Funcionários", description = "Gerenciamento de funcionários e autenticação de acesso")
 @Controller
 @RequestMapping("/funcionario")
 public class FuncionarioController {
     @Autowired
     private FuncionarioService funcionarioService;
 
-    @Operation(summary = "Cadastrar funcionário",description = "cadastra um novo user/funcionario no sistema")
+    @Operation(summary = "Cadastrar funcionário", description = "Cria um novo funcionário no sistema")
+    @ApiResponse(responseCode = "201", description = "Funcionário cadastrado com sucesso")
     @PostMapping("/cadastro")
     public ResponseEntity<FuncionarioResponse> criarFuncionario(@RequestBody FuncionarioRequest funcionarioRequest) {
         Funcionario funcionario=FuncionarioMapper.toEntity(funcionarioRequest);
@@ -40,19 +42,20 @@ public class FuncionarioController {
         return new ResponseEntity<>("Sem autenticação", HttpStatus.OK);
     }
 
-    @Operation(summary = "verificar autenticação", description = "rota protegida para validar token jwt")
+    @Operation(summary = "Verificar autenticação", description = "Rota protegida para validar token JWT")
+    @ApiResponse(responseCode = "200", description = "Token válido")
     @GetMapping("/autenticado")
     public ResponseEntity<String> getAuthenticationTest() {
         return new ResponseEntity<>("Autenticado com sucesso", HttpStatus.OK);
     }
 
-    @Operation(summary = "verifica autenticação de gerentes", description = "rota exclusiva para autenticação dos gerentes")
+    @Operation(summary = "Verificar autenticação de gerente", description = "Rota exclusiva para gerentes")
     @GetMapping("/gerenteautenticado")
     public ResponseEntity<String> getAuthenticationTestGerente() {
         return new ResponseEntity<>("Autenticado com  gerente", HttpStatus.OK);
     }
 
-    @Operation(summary = "lista funcionários cadastrados", description = "lista todos os users")
+    @Operation(summary = "Listar funcionários")
     @GetMapping("crud")
     public ResponseEntity<List<FuncionarioResponse>> listar() {
         //serviço
@@ -65,7 +68,7 @@ public class FuncionarioController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Busca usuario pelo id", description = "busca usuario especificando pelo id")
+    @Operation(summary = "Buscar funcionário por ID")
     @GetMapping("crud/{id}")
     public ResponseEntity<FuncionarioResponse> buscarPorId(@PathVariable Integer id) {
         //servico
@@ -78,7 +81,8 @@ public class FuncionarioController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @Operation(summary = "Atualiza usuario", description = "atualiza informações sobre o usuario")
+    @Operation(summary = "Atualizar funcionário", description = "Atualiza informações do funcionário")
+    @ApiResponse(responseCode = "200", description = "Funcionário atualizado com sucesso")
     @PutMapping("crud/{id}")
     public ResponseEntity<FuncionarioResponse> atualizar(@PathVariable Integer id, @RequestBody @Valid FuncionarioRequest dto) {
         //dto
@@ -93,7 +97,8 @@ public class FuncionarioController {
         //retorno
         return ResponseEntity.ok(responseDto);
     }
-    @Operation(summary = "Remove funcionário", description = "remove user funcionario pelo id")
+    @Operation(summary = "Deletar funcionário")
+    @ApiResponse(responseCode = "204", description = "Funcionário deletado com sucesso")
     @DeleteMapping("crud/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Integer id) {
         funcionarioService.deletarFuncionario(id);

@@ -1,6 +1,7 @@
 package school.sptech.KentoCafe.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jmx.export.annotation.ManagedOperationParameter;
@@ -14,7 +15,7 @@ import school.sptech.KentoCafe.service.IngredienteService;
 
 import javax.swing.plaf.SeparatorUI;
 import java.util.List;
-@Tag(name = "Ingredientes", description = "orquestrador das requisições que envolvem engredientes")
+@Tag(name = "Ingredientes", description = "Gerenciamento de ingredientes dos produtos")
 @RestController
 @RequestMapping("/ingredientes")
 public class IngredienteController {
@@ -25,7 +26,7 @@ public class IngredienteController {
         this.ingredienteService = ingredienteService;
     }
 
-    @Operation(summary = "Lista ingredientes disponiveis")
+    @Operation(summary = "Listar ingredientes")
     @GetMapping
     public ResponseEntity<List<IngredienteResponse>> listarIngredientes(){
         List<Ingrediente> ingredientes = ingredienteService.buscarIngredientes();
@@ -35,7 +36,8 @@ public class IngredienteController {
         return ResponseEntity.status(200).body(IngredienteMapper.toResponseList(ingredientes));
     }
 
-    @Operation(summary = "Busca ingredientes Por id")
+    @Operation(summary = "Buscar ingrediente por ID")
+    @ApiResponse(responseCode = "200", description = "Ingrediente encontrado")
     @GetMapping("/{id}")
     public ResponseEntity<IngredienteResponse> buscarIngredientePorId(
             @RequestParam Integer id
@@ -47,7 +49,8 @@ public class IngredienteController {
         return ResponseEntity.status(200).body(IngredienteMapper.toResponse(ingrediente));
     }
 
-    @Operation(summary = "Cria novos ingredientes", description = "cria novos ingredientes que serão consumidos por produtos")
+    @Operation(summary = "Criar ingrediente")
+    @ApiResponse(responseCode = "201", description = "Ingrediente criado com sucesso")
     @PostMapping
     public ResponseEntity<IngredienteResponse> criarIngrediente(
             @RequestBody IngredienteRequest req
@@ -60,7 +63,8 @@ public class IngredienteController {
         return ResponseEntity.status(400).build();
     }
 
-    @Operation(summary = "Atualiza ingredientes", description = "atualiza informações de um ingrediente por seu id")
+    @Operation(summary = "Atualizar ingrediente")
+    @ApiResponse(responseCode = "200", description = "Ingrediente atualizado com sucesso")
     @PutMapping("/{id}")
     public ResponseEntity<IngredienteResponse> atualizarIngrediente(
             @RequestBody IngredienteRequest req,
@@ -73,7 +77,8 @@ public class IngredienteController {
         return ResponseEntity.status(200).body(IngredienteMapper.toResponse(ingrediente));
     }
 
-    @Operation(summary = "Deleta ingrediente")
+    @Operation(summary = "Deletar ingrediente")
+    @ApiResponse(responseCode = "204", description = "Ingrediente deletado com sucesso")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarPorId(
             @RequestParam Integer id
@@ -85,7 +90,8 @@ public class IngredienteController {
         return ResponseEntity.status(204).build();
     }
 
-    @Operation(summary = "busca ingredientes por produto", description = "busca ingredientes a partir do id de um produto")
+    @Operation(summary = "Buscar ingredientes por produto", description = "Lista todos os ingredientes de um produto específico")
+    @ApiResponse(responseCode = "200", description = "Ingredientes encontrados")
     @GetMapping("/por-produto/{produtoId}")
     public ResponseEntity<List<IngredienteResponse>> buscarIngredientesPorProduto(
             @RequestParam Integer produtoId
