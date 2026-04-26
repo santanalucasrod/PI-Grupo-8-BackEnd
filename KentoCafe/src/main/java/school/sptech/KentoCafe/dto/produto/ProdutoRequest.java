@@ -1,22 +1,28 @@
 package school.sptech.KentoCafe.dto.produto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 
+@Schema(description = "Dados para criação ou atualização de produto")
 public class ProdutoRequest {
 
+    @Schema(description = "Nome do produto", example = "Cappuccino")
     @NotBlank(message = "Nome é obrigatório")
-    @Size(max = 45, message = "Nome deve ter no máximo 45 caracteres")
+    @Size(max = 45)
     private String nome;
 
-    @DecimalMin(value = "0.01", message = "Preço deve ser maior que zero")
+    @Schema(description = "Preço unitário do produto", example = "12.50")
+    @DecimalMin(value = "0.01")
     private Double precoUnidade;
 
-    @NotBlank(message = "Descrição é obrigatória")
-    @Size(max = 200, message = "Descrição deve ter no máximo 200 caracteres")
+    @Schema(description = "Descrição do produto", example = "Café espresso com leite vaporizado")
+    @NotBlank
+    @Size(max = 200)
     private String descricao;
 
-    @NotBlank(message = "Path da foto é obrigatório")
-    @Size(max = 45, message = "Path da foto deve ter no máximo 45 caracteres")
+    @Schema(description = "Caminho da foto do produto", example = "cappuccino.jpg")
+    @NotBlank
+    @Size(max = 45)
     private String pathFt;
 
     private Categoria categoria;
