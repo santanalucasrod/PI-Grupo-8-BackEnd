@@ -1,10 +1,10 @@
 package school.sptech.KentoCafe.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,7 +21,7 @@ public class Pedido {
     private String status;
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
-    private List<Venda> itens;
+    private List<Venda> itens = new ArrayList<>();
 
     public Integer getId() {
         return id;
