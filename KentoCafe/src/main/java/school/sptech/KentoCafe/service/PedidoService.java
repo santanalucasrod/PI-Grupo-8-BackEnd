@@ -8,8 +8,8 @@ import school.sptech.KentoCafe.dto.pedido.pedido.PedidoResponse;
 import school.sptech.KentoCafe.entity.Pedido;
 import school.sptech.KentoCafe.entity.Produto;
 import school.sptech.KentoCafe.entity.Venda;
-import school.sptech.KentoCafe.exceptions.CarrinhoVazioException;
-import school.sptech.KentoCafe.exceptions.ProdutoNaoEncontradoException;
+import school.sptech.KentoCafe.exception.CarrinhoVazioException;
+import school.sptech.KentoCafe.exception.ProdutoNaoEncontradoException;
 import school.sptech.KentoCafe.mapper.PedidoMapper;
 import school.sptech.KentoCafe.repository.PedidoRepository;
 import school.sptech.KentoCafe.repository.ProdutoRepository;
@@ -34,6 +34,7 @@ public class PedidoService {
 
         Pedido novoPedido = new Pedido();
         novoPedido.setDtHrPedido(LocalDateTime.now());
+        novoPedido.setDtHrPronto(LocalDateTime.now());
         novoPedido.setStatus("PENDENTE");
         novoPedido.setInfoAdicional(request.getInfoAdicional());
 
