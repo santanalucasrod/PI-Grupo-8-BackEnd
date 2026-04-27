@@ -1,4 +1,4 @@
-package school.sptech.KentoCafe.exceptions;
+package school.sptech.KentoCafe.exception;
 
 public class CarrinhoVazioException extends RuntimeException {
     public CarrinhoVazioException() {
