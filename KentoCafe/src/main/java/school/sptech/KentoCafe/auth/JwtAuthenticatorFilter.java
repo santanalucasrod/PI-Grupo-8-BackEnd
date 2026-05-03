@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import school.sptech.KentoCafe.entity.Funcionario;
+import school.sptech.KentoCafe.exception.NotAuthorizedException;
 import school.sptech.KentoCafe.repository.FuncionarioRepository;
 
 import java.io.IOException;
@@ -40,23 +41,24 @@ public class JwtAuthenticatorFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        // Verifica se o endpoint requer autenticação antes de processar a requisição
-        if (checkIfEndpointIsNotPublic(request)) {
-            System.out.println("URI: " + request.getRequestURI());
-            System.out.println("requisição privada");
-            String token = recoveryToken(request); // Recupera o token do cabeçalho Authorization da requisição
-            if (token != null) {
-                String subject = jwtTokenService.getSubjectFromToken(token); // Obtém o assunto (neste caso, o nome de usuário) do token
-                Funcionario user = funcionarioRepository.findByEmail(subject).get(); // Busca o usuário pelo email (que é o assunto do token)
-                UserDetailsImpl userDetails = new UserDetailsImpl(user); // Cria um UserDetails com o usuário encontrado
+        try{
+            // Verifica se o endpoint requer autenticação antes de processar a requisição
+            if (checkIfEndpointIsNotPublic(request)) {
+                System.out.println("URI: " + request.getRequestURI());
+                System.out.println("requisição privada");
+                String token = recoveryToken(request); // Recupera o token do cabeçalho Authorization da requisição
+                if (token != null) {
+                    String subject = jwtTokenService.getSubjectFromToken(token); // Obtém o assunto (neste caso, o nome de usuário) do token
+                    Funcionario user = funcionarioRepository.findByEmail(subject).get(); // Busca o usuário pelo email (que é o assunto do token)
+                    UserDetailsImpl userDetails = new UserDetailsImpl(user); // Cria um UserDetails com o usuário encontrado
 
-                // Cria um objeto de autenticação do Spring Security
-                Authentication authentication =
-                        new UsernamePasswordAuthenticationToken(userDetails, null,userDetails.getAuthorities());
+                    // Cria um objeto de autenticação do Spring Security
+                    Authentication authentication =
+                            new UsernamePasswordAuthenticationToken(userDetails, null,userDetails.getAuthorities());
 
-                // Define o objeto de autenticação no contexto de segurança do Spring Security
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
+                    // Define o objeto de autenticação no contexto de segurança do Spring Security
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
 //            else {
 //                //exception
 //                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);//erro de 401 status
@@ -64,8 +66,15 @@ public class JwtAuthenticatorFilter extends OncePerRequestFilter {
 //                response.getWriter().write("{\"error\": \"Token ausente\"}");//escreve oq ta no json
 //                return;
 //            }
+            }
+            filterChain.doFilter(request, response); // Continua o processamento da requisição
         }
-        filterChain.doFilter(request, response); // Continua o processamento da requisição
+        catch (NotAuthorizedException error){ //se o token estiver invalido ou expirado informe na resposta
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"erro\": \"" + error.getMessage() + "\"}");
+        }
+
     }
 
     // Recupera o token do cabeçalho Authorization da requisição

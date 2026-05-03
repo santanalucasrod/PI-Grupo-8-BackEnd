@@ -7,6 +7,8 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+import school.sptech.KentoCafe.exception.EntidadeNaoEncontradoException;
+import school.sptech.KentoCafe.exception.NotAuthorizedException;
 
 import java.time.Instant;
 
@@ -45,8 +47,8 @@ public class JwtService {
                     .build()
                     .verify(token) // Verifica a validade do token
                     .getSubject(); // Obtém o assunto (neste caso, o nome de usuário) do token
-        } catch (JWTVerificationException exception){
-            throw new BadCredentialsException("Token inválido ou expirado.");
+        } catch (Exception error){
+            throw new NotAuthorizedException("Token inválido ou expirado.");
         }
     }
 

@@ -17,11 +17,17 @@ public class GlobalExceptionHandler {
                 .body(ex.getMessage());
     }
 
-    // erro genérico
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleRuntime(RuntimeException ex) {
+    @ExceptionHandler(EntidadeNaoEncontradoException.class)
+    public ResponseEntity<String> handleNaoEncontrada(EntidadeNaoEncontradoException ex) {
         return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ex.getMessage());
+                .status(HttpStatus.NOT_FOUND)
+                .build();
     }
+
+//    @ExceptionHandler(NotAuthorizedException.class)
+//    public ResponseEntity<String> handleAutorizado(NotAuthorizedException ex) {
+//        return ResponseEntity
+//                .status(HttpStatus.UNAUTHORIZED)
+//                .body(ex.getMessage());
+//    }
 }

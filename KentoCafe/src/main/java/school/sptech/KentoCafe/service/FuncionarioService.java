@@ -93,7 +93,7 @@ public class FuncionarioService {
 
     public void deletarFuncionario(Integer id){
         if (!repository.existsById(id)){
-            throw new RuntimeException("sem id");
+            throw new EntidadeNaoEncontradoException("sem id");
         }
         repository.deleteById(id);
     }
