@@ -39,6 +39,11 @@ CREATE TABLE IF NOT EXISTS `cafeteria`.`ingrediente` (
   PRIMARY KEY (`id`)
   );
 
+-- Tabela de informações adicionais
+create table if not exists `cafeteria`.`info_adicional` (
+    `id` int primary key auto_increment,
+    `descricao` varchar(60) not null
+);
 
 -- Tabela de Pedidos
 CREATE TABLE IF NOT EXISTS `cafeteria`.`pedido` (
@@ -47,9 +52,13 @@ CREATE TABLE IF NOT EXISTS `cafeteria`.`pedido` (
   `dt_hr_pronto` DATETIME NOT NULL,
   `info_adicional` VARCHAR(200) NULL,
   `status` VARCHAR(11) NOT NULL,
+  `nome` Varchar(45) not null,
+  `funcionario_id` int not null,
+  `info_adicional_id` int not null,
+  CONSTRAINT `fk_pedido_funcionario` FOREIGN KEY (`funcionario_id`) REFERENCES funcionario(`id`),
+  CONSTRAINT `fk_pedido_info_adicional` FOREIGN KEY (`info_adicional_id`) REFERENCES info_adicional(`id`),
   PRIMARY KEY (`id`)
 );
-
 
 --  Tabela de Venda
 CREATE TABLE IF NOT EXISTS `cafeteria`.`venda` (
@@ -119,4 +128,26 @@ INSERT INTO produto_ingrediente (produto_id, ingrediente_id) VALUES
 (6, 4), 
 (6, 6), 
 (6, 7); 
+
+INSERT INTO info_adicional (descricao) VALUES
+('Sem açúcar'),
+('Com gelo'),
+('Extra quente'),
+('Sem lactose'),
+('Adicionar chantilly');
+
+INSERT INTO pedido (dt_hr_pedido, dt_hr_pronto, info_adicional, status, nome, funcionario_id, info_adicional_id)
+VALUES
+('2026-05-12 10:00:00', '2026-05-12 10:10:00', 'Cliente pediu sem açúcar', 'Pronto', 'Gabriela', 1, 1),
+('2026-05-12 11:30:00', '2026-05-12 11:40:00', 'Com gelo no suco', 'Pronto', 'Carlos', 1, 2),
+('2026-05-12 15:00:00', '2026-05-12 15:20:00', 'Extra quente', 'Em preparo', 'Mariana', 1, 3),
+('2026-05-12 16:45:00', '2026-05-12 17:00:00', 'Sem lactose', 'Pronto', 'João', 1, 4),
+('2026-05-12 18:00:00', '2026-05-12 18:15:00', 'Adicionar chantilly', 'Pronto', 'Ana', 1, 5);
+
+INSERT INTO venda (produto_id, pedido_id, quantidade) VALUES
+(1, 1, 2), 
+(4, 2, 1), 
+(2, 3, 1), 
+(5, 4, 2), 
+(3, 5, 1); 
 
