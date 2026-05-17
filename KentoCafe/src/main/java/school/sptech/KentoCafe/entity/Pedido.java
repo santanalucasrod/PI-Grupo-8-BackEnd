@@ -17,11 +17,13 @@ public class Pedido {
     private LocalDateTime dtHrPedido;
     @Column(name = "dt_hr_pronto")
     private LocalDateTime dtHrPronto;
-    private String infoAdicional;
     private String status;
-
+    @ManyToOne
+    private Funcionario funcionario;
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
     private List<Venda> itens = new ArrayList<>();
+    @ManyToOne
+    private InfoAdicional infoAdicional;
 
     public Integer getId() {
         return id;
@@ -47,14 +49,6 @@ public class Pedido {
         this.dtHrPronto = dtHrPronto;
     }
 
-    public String getInfoAdicional() {
-        return infoAdicional;
-    }
-
-    public void setInfoAdicional(String infoAdicional) {
-        this.infoAdicional = infoAdicional;
-    }
-
     public String getStatus() {
         return status;
     }
@@ -69,5 +63,21 @@ public class Pedido {
 
     public void setItens(List<Venda> itens) {
         this.itens = itens;
+    }
+
+    public Funcionario getFuncionario() {
+        return funcionario;
+    }
+
+    public void setFuncionario(Funcionario funcionario) {
+        this.funcionario = funcionario;
+    }
+
+    public InfoAdicional getInfoAdicional() {
+        return infoAdicional;
+    }
+
+    public void setInfoAdicional(InfoAdicional infoAdicional) {
+        this.infoAdicional = infoAdicional;
     }
 }

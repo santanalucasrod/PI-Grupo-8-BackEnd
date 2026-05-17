@@ -1,8 +1,11 @@
 package school.sptech.KentoCafe.dto.pedido.pedido;
 
 import school.sptech.KentoCafe.dto.pedido.item.ItemResponse;
+import school.sptech.KentoCafe.entity.InfoAdicional;
+import school.sptech.KentoCafe.entity.Ingrediente;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PedidoResponse {
@@ -10,8 +13,8 @@ public class PedidoResponse {
     private LocalDateTime dataHora;
     private String status;
     private Double valorTotal;
-    private String observacao;
     private List<ItemResponse> itens;
+    private String descricao;
 
     public Integer getId() {
         return id;
@@ -45,12 +48,12 @@ public class PedidoResponse {
         this.valorTotal = valorTotal;
     }
 
-    public String getObservacao() {
-        return observacao;
+    public String getDescricao() {
+        return descricao;
     }
 
-    public void setObservacao(String observacao) {
-        this.observacao = observacao;
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
 
     public List<ItemResponse> getItens() {

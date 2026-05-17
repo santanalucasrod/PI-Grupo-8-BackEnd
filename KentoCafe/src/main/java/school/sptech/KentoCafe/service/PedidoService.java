@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import school.sptech.KentoCafe.dto.pedido.item.ItemRequest;
 import school.sptech.KentoCafe.dto.pedido.pedido.PedidoRequest;
 import school.sptech.KentoCafe.dto.pedido.pedido.PedidoResponse;
+import school.sptech.KentoCafe.entity.InfoAdicional;
 import school.sptech.KentoCafe.entity.Pedido;
 import school.sptech.KentoCafe.entity.Produto;
 import school.sptech.KentoCafe.entity.Venda;
@@ -36,6 +37,7 @@ public class PedidoService {
         novoPedido.setDtHrPedido(LocalDateTime.now());
         novoPedido.setDtHrPronto(LocalDateTime.now());
         novoPedido.setStatus("PENDENTE");
+        novoPedido.setFuncionario(request.getFuncionario());
         novoPedido.setInfoAdicional(request.getInfoAdicional());
 
         double totalAcumulado = 0.0;

@@ -1,7 +1,9 @@
 package school.sptech.KentoCafe.mapper;
 
+import school.sptech.KentoCafe.dto.pedido.InfoAdicional.InfoAdicionalResponse;
 import school.sptech.KentoCafe.dto.pedido.item.ItemResponse;
 import school.sptech.KentoCafe.dto.pedido.pedido.PedidoResponse;
+import school.sptech.KentoCafe.entity.InfoAdicional;
 import school.sptech.KentoCafe.entity.Pedido;
 
 import java.util.List;
@@ -14,9 +16,8 @@ public class PedidoMapper {
         resp.setId(pedido.getId());
         resp.setDataHora(pedido.getDtHrPedido());
         resp.setStatus(pedido.getStatus());
-        resp.setObservacao(pedido.getInfoAdicional());
         resp.setValorTotal(total);
-
+        resp.setDescricao(pedido.getInfoAdicional().getDescricao());
         List<ItemResponse> itensResp = pedido.getItens().stream().map(venda -> {
             ItemResponse item = new ItemResponse();
             item.setNomeProduto(venda.getProduto().getNome());
