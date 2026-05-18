@@ -5,13 +5,13 @@ import org.springframework.stereotype.Service;
 import school.sptech.KentoCafe.dto.pedido.item.ItemRequest;
 import school.sptech.KentoCafe.dto.pedido.pedido.PedidoRequest;
 import school.sptech.KentoCafe.dto.pedido.pedido.PedidoResponse;
-import school.sptech.KentoCafe.entity.InfoAdicional;
-import school.sptech.KentoCafe.entity.Pedido;
-import school.sptech.KentoCafe.entity.Produto;
-import school.sptech.KentoCafe.entity.Venda;
+import school.sptech.KentoCafe.entity.*;
 import school.sptech.KentoCafe.exception.CarrinhoVazioException;
+import school.sptech.KentoCafe.exception.EntidadeNaoEncontradoException;
 import school.sptech.KentoCafe.exception.ProdutoNaoEncontradoException;
 import school.sptech.KentoCafe.mapper.PedidoMapper;
+import school.sptech.KentoCafe.repository.FuncionarioRepository;
+import school.sptech.KentoCafe.repository.InfoAdicionalRepository;
 import school.sptech.KentoCafe.repository.PedidoRepository;
 import school.sptech.KentoCafe.repository.ProdutoRepository;
 
@@ -21,10 +21,14 @@ import java.time.LocalDateTime;
 public class PedidoService {
     private final PedidoRepository pedidoRepository;
     private final ProdutoRepository produtoRepository;
+    private final InfoAdicionalRepository infoAdicionalRepository;
+    private final FuncionarioRepository funcionarioRepository;
 
-    public PedidoService(PedidoRepository pedidoRepository, ProdutoRepository produtoRepository) {
+    public PedidoService(PedidoRepository pedidoRepository, ProdutoRepository produtoRepository, InfoAdicionalRepository infoAdicionalRepository, FuncionarioRepository funcionarioRepository) {
         this.pedidoRepository = pedidoRepository;
         this.produtoRepository = produtoRepository;
+        this.infoAdicionalRepository = infoAdicionalRepository;
+        this.funcionarioRepository = funcionarioRepository;
     }
 
     @Transactional
@@ -37,10 +41,30 @@ public class PedidoService {
         novoPedido.setDtHrPedido(LocalDateTime.now());
         novoPedido.setDtHrPronto(LocalDateTime.now());
         novoPedido.setStatus("PENDENTE");
+
+        if (request.getFuncionario() == null || request.getFuncionario().getId() == null) {
+            throw new EntidadeNaoEncontradoException("O funcionário responsável pelo pedido é obrigatório.");
+        }
+
+        Funcionario funcionario = funcionarioRepository.findById(request.getFuncionario().getId())
+                .orElseThrow(() -> new EntidadeNaoEncontradoException("Funcionário não encontrado"));
+
+        novoPedido.setFuncionario(funcionario);
+
         novoPedido.setFuncionario(request.getFuncionario());
-        novoPedido.setInfoAdicional(request.getInfoAdicional());
+        novoPedido.setNome(request.getNome());
+
+        if (request.getInfoAdicional() == null || request.getInfoAdicional().getId() == null) {
+            throw new EntidadeNaoEncontradoException("A informação adicional é obrigatória.");
+        }
+
+        InfoAdicional info = infoAdicionalRepository.findById(request.getInfoAdicional().getId())
+                .orElseThrow(() -> new EntidadeNaoEncontradoException("Informação adicional não encontrada no banco."));
+
+        novoPedido.setInfoAdicional(info);
 
         double totalAcumulado = 0.0;
+
 
         for (ItemRequest item : request.getItens()) {
             Produto p = produtoRepository.findById(item.getProdutoId())
