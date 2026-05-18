@@ -50,7 +50,6 @@ CREATE TABLE IF NOT EXISTS `cafeteria`.`pedido` (
   `id` INT NOT NULL auto_increment,
   `dt_hr_pedido` DATETIME NOT NULL,
   `dt_hr_pronto` DATETIME NOT NULL,
-  `info_adicional` VARCHAR(200) NULL,
   `status` VARCHAR(11) NOT NULL,
   `nome` Varchar(45) not null,
   `funcionario_id` int not null,
@@ -136,13 +135,13 @@ INSERT INTO info_adicional (descricao) VALUES
 ('Sem lactose'),
 ('Adicionar chantilly');
 
-INSERT INTO pedido (dt_hr_pedido, dt_hr_pronto, info_adicional, status, nome, funcionario_id, info_adicional_id)
+INSERT INTO pedido (dt_hr_pedido, dt_hr_pronto, status, nome, funcionario_id, info_adicional_id)
 VALUES
-('2026-05-12 10:00:00', '2026-05-12 10:10:00', 'Cliente pediu sem açúcar', 'Pronto', 'Gabriela', 1, 1),
-('2026-05-12 11:30:00', '2026-05-12 11:40:00', 'Com gelo no suco', 'Pronto', 'Carlos', 1, 2),
-('2026-05-12 15:00:00', '2026-05-12 15:20:00', 'Extra quente', 'Em preparo', 'Mariana', 1, 3),
-('2026-05-12 16:45:00', '2026-05-12 17:00:00', 'Sem lactose', 'Pronto', 'João', 1, 4),
-('2026-05-12 18:00:00', '2026-05-12 18:15:00', 'Adicionar chantilly', 'Pronto', 'Ana', 1, 5);
+('2026-05-12 10:00:00', '2026-05-12 10:10:00', 'Pronto', 'Gabriela', 1, 1),
+('2026-05-12 11:30:00', '2026-05-12 11:40:00', 'Pronto', 'Carlos', 1, 2),
+('2026-05-12 15:00:00', '2026-05-12 15:20:00', 'Em preparo', 'Mariana', 1, 3),
+('2026-05-12 16:45:00', '2026-05-12 17:00:00', 'Pronto', 'João', 1, 4),
+('2026-05-12 18:00:00', '2026-05-12 18:15:00', 'Pronto', 'Ana', 1, 5);
 
 INSERT INTO venda (produto_id, pedido_id, quantidade) VALUES
 (1, 1, 2), 
