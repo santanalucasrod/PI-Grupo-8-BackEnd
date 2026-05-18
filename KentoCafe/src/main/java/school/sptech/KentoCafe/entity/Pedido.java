@@ -18,11 +18,14 @@ public class Pedido {
     @Column(name = "dt_hr_pronto")
     private LocalDateTime dtHrPronto;
     private String status;
+    private String nome;
     @ManyToOne
+    @JoinColumn(name = "funcionario_id", nullable = false)
     private Funcionario funcionario;
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
     private List<Venda> itens = new ArrayList<>();
     @ManyToOne
+    @JoinColumn(name = "info_adicional_id", nullable = false)
     private InfoAdicional infoAdicional;
 
     public Integer getId() {
@@ -55,6 +58,14 @@ public class Pedido {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public List<Venda> getItens() {
