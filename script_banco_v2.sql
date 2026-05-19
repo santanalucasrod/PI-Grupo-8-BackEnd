@@ -1,6 +1,5 @@
 CREATE SCHEMA IF NOT EXISTS `cafeteria` ;
 USE `cafeteria` ;
-
 -- Tabela de Funcionarios
 CREATE TABLE IF NOT EXISTS `cafeteria`.`funcionario` (
   `id` INT NOT NULL auto_increment,
@@ -42,7 +41,8 @@ CREATE TABLE IF NOT EXISTS `cafeteria`.`ingrediente` (
 -- Tabela de informações adicionais
 create table if not exists `cafeteria`.`info_adicional` (
     `id` int primary key auto_increment,
-    `descricao` varchar(60) not null
+    `descricao` varchar(60) not null,
+    `preferencia_individual` varchar(50)
 );
 
 -- Tabela de Pedidos
@@ -80,10 +80,12 @@ CREATE TABLE IF NOT EXISTS `cafeteria`.`produto_ingrediente` (
   CONSTRAINT `fk_produto_has_ingrediente_ingrediente1` FOREIGN KEY (`ingrediente_id`) REFERENCES ingrediente(`id`)
 );
 
-DROP USER IF EXISTS "developer";
-CREATE USER "developer" IDENTIFIED BY "sptech";
-GRANT ALL PRIVILEGES on cafeteria.* TO "developer";
-FLUSH PRIVILEGES;
+-- somente para quem não criou ainda
+-- utilizado como configuração do env
+-- DROP USER IF EXISTS "developer";
+-- CREATE USER "developer" IDENTIFIED BY "sptech";
+-- GRANT ALL PRIVILEGES on cafeteria.* TO "developer";
+-- FLUSH PRIVILEGES;
 
 insert into funcionario(nome, senha, email, gerente)
 values ("Raika", "senha123", "raika@gmail.com", 1);

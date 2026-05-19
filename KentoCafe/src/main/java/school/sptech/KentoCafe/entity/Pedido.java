@@ -25,7 +25,6 @@ public class Pedido {
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
     private List<Venda> itens = new ArrayList<>();
     @ManyToOne
-    @JoinColumn(name = "info_adicional_id", nullable = false)
     private InfoAdicional infoAdicional;
 
     public Integer getId() {
