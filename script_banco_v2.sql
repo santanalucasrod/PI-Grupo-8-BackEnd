@@ -151,4 +151,3 @@ INSERT INTO venda (produto_id, pedido_id, quantidade) VALUES
 (2, 3, 1), 
 (5, 4, 2), 
 (3, 5, 1); 
-
