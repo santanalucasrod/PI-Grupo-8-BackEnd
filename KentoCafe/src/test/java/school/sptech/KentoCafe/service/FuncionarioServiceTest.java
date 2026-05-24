@@ -183,7 +183,7 @@ class FuncionarioServiceTest {
             );
 
             Mockito.verify(repository)
-                    .deleteById(1);
+                    .deleteById(1); 
         }
 
         @Test
