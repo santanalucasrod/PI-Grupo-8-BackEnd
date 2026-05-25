@@ -1,6 +1,5 @@
 CREATE SCHEMA IF NOT EXISTS `cafeteria` ;
 USE `cafeteria` ;
-
 -- Tabela de Funcionarios
 CREATE TABLE IF NOT EXISTS `cafeteria`.`funcionario` (
   `id` INT NOT NULL auto_increment,
@@ -39,20 +38,46 @@ CREATE TABLE IF NOT EXISTS `cafeteria`.`ingrediente` (
   PRIMARY KEY (`id`)
   );
 
+-- Tabela de status possíveis
+CREATE TABLE IF NOT EXISTS `cafeteria`.`status` (
+	`id` INT NOT NULL auto_increment,
+	`nome` VARCHAR(12) NOT NULL,
+	PRIMARY KEY (`id`)
+);
+
+insert into status(nome) values("Em preparo"), ("Pronto"), ("Cancelado");
 
 -- Tabela de Pedidos
 CREATE TABLE IF NOT EXISTS `cafeteria`.`pedido` (
   `id` INT NOT NULL auto_increment,
   `dt_hr_pedido` DATETIME NOT NULL,
   `dt_hr_pronto` DATETIME NOT NULL,
-  `info_adicional` VARCHAR(200) NULL,
-  `status` VARCHAR(11) NOT NULL,
+  `valor_total` decimal(6,2),
+  `nome` Varchar(45) not null,
+  `funcionario_id` int not null,
+  CONSTRAINT `fk_pedido_funcionario` FOREIGN KEY (`funcionario_id`) REFERENCES funcionario(`id`),
   PRIMARY KEY (`id`)
 );
 
+-- tabela de pedido_status
+CREATE TABLE IF NOT EXISTS `cafeteria`.`pedido_status` (
+  `id_status` INT NOT NULL,
+  `id_pedido` INT NOT NULL,
+  CONSTRAINT `fk_pedido_status` FOREIGN KEY (`id_pedido`) REFERENCES pedido(`id`),
+  CONSTRAINT `fk_status_pedido` FOREIGN KEY (`id_status`) REFERENCES status(`id`)
+);
+
+-- Tabela de informações adicionais
+create table if not exists `cafeteria`.`info_adicional` (
+    `id` int primary key auto_increment,
+    `descricao` varchar(60) not null,
+    `preferencia_individual` varchar(50),
+    `pedido_id` int not null,
+	CONSTRAINT `fk_pedido_info_adicional` FOREIGN KEY (`pedido_id`) REFERENCES pedido(`id`)
+);
 
 --  Tabela de Venda
-CREATE TABLE IF NOT EXISTS `cafeteria`.`venda` (
+CREATE TABLE IF NOT EXISTS `cafeteria`.`itemPedido` (
   `id` INT PRIMARY KEY AUTO_INCREMENT,
   `produto_id` INT NOT NULL,
   `pedido_id` INT NOT NULL,

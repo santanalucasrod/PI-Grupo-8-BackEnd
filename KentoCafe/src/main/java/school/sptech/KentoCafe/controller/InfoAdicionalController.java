@@ -26,28 +26,28 @@ public class InfoAdicionalController {
        InfoAdicional criado = infoAdicionalService.criar(request);
         InfoAdicionalResponse response = new InfoAdicionalResponse();
         response.setDescricao(criado.getDescricao());
-       return ResponseEntity.status(200).body(response);
+        response.setPreferenciaIndividual(criado.getPreferenciaIndividual());
+       return ResponseEntity.status(201).body(response);
     }
 
     @PutMapping("/editar/{id}")
-    public ResponseEntity<InfoAdicionalResponse> editarPorId(@PathVariable Long id,@RequestBody InfoAdicionalRequest request){
+    public ResponseEntity<InfoAdicionalResponse> editarPorId(@PathVariable Integer id,@RequestBody InfoAdicionalRequest request){
         if(request == null){
             throw new IllegalArgumentException();
         }
-        InfoAdicional editado = infoAdicionalService.criar(request);
+        InfoAdicional editado = infoAdicionalService.editar(id,request);
         InfoAdicionalResponse response = new InfoAdicionalResponse();
         response.setDescricao(editado.getDescricao());
+        response.setPreferenciaIndividual(editado.getPreferenciaIndividual());
         return ResponseEntity.status(200).body(response);
     }
 
-    @PostMapping("/excluir")
-    public ResponseEntity<InfoAdicionalResponse> excluir(@RequestBody InfoAdicionalRequest request){
-        if(request == null){
+    @PostMapping("/excluir/{id}")
+    public ResponseEntity<Void> excluirPorId(@PathVariable Integer id){
+        if(id == null){
             throw new IllegalArgumentException();
         }
-        InfoAdicional excluido = infoAdicionalService.criar(request);
-        InfoAdicionalResponse response = new InfoAdicionalResponse();
-        response.setDescricao(excluido.getDescricao());
-        return ResponseEntity.status(200).body(response);
+        infoAdicionalService.excluir(id);
+        return ResponseEntity.status(204).build();
     }
 }
