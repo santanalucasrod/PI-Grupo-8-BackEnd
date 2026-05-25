@@ -58,7 +58,7 @@ public class PedidoService {
             throw new EntidadeNaoEncontradoException("A informação adicional é obrigatória.");
         }
 
-        InfoAdicional info = infoAdicionalRepository.findById(request.getInfoAdicional().getId())
+        InfoAdicionalService info = infoAdicionalRepository.findById(request.getInfoAdicional().getId())
                 .orElseThrow(() -> new EntidadeNaoEncontradoException("Informação adicional não encontrada no banco."));
 
         novoPedido.setInfoAdicional(info);
