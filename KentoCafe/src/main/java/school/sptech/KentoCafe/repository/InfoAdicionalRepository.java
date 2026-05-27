@@ -6,4 +6,5 @@ import school.sptech.KentoCafe.entity.InfoAdicional;
 
 @Repository
 public interface InfoAdicionalRepository extends JpaRepository<InfoAdicional, Integer> {
+    Boolean existsByDescricao(String descricao);
 }
