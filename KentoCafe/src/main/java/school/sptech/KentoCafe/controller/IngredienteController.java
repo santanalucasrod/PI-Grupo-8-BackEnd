@@ -3,6 +3,7 @@ package school.sptech.KentoCafe.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jmx.export.annotation.ManagedOperationParameter;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -27,81 +28,73 @@ public class IngredienteController {
     }
 
     @Operation(summary = "Listar ingredientes")
+    @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso")
+    @ApiResponse(responseCode = "204", description = "Nenhum ingrediente cadastrado")
     @GetMapping
-    public ResponseEntity<List<IngredienteResponse>> listarIngredientes(){
-        List<Ingrediente> ingredientes = ingredienteService.buscarIngredientes();
-        if (ingredientes.isEmpty()){
-            return ResponseEntity.status(204).build();
+    public ResponseEntity<List<IngredienteResponse>> listarTodos() {
+        List<Ingrediente> ingredientes = ingredienteService.buscarTodos();
+        if (ingredientes.isEmpty()) {
+            return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.status(200).body(IngredienteMapper.toResponseList(ingredientes));
+        return ResponseEntity.ok(IngredienteMapper.toResponseList(ingredientes));
     }
 
     @Operation(summary = "Buscar ingrediente por ID")
     @ApiResponse(responseCode = "200", description = "Ingrediente encontrado")
+    @ApiResponse(responseCode = "404", description = "Ingrediente não encontrado")
     @GetMapping("/{id}")
-    public ResponseEntity<IngredienteResponse> buscarIngredientePorId(
-            @RequestParam Integer id
-    ){
-        Ingrediente ingrediente = ingredienteService.buscarIngredientePorId(id);
-        if (ingrediente == null){
-            return ResponseEntity.status(404).build();
-        }
-        return ResponseEntity.status(200).body(IngredienteMapper.toResponse(ingrediente));
+    public ResponseEntity<IngredienteResponse> buscarPorId(
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(IngredienteMapper.toResponse(ingredienteService.buscarPorId(id)));
     }
 
     @Operation(summary = "Criar ingrediente")
     @ApiResponse(responseCode = "201", description = "Ingrediente criado com sucesso")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos")
     @PostMapping
-    public ResponseEntity<IngredienteResponse> criarIngrediente(
-            @RequestBody IngredienteRequest req
-    ){
-        if (req.getNome() != null && !req.getNome().isBlank()){
-            Ingrediente ingrediente = IngredienteMapper.toEntity(req);
-            Ingrediente ingredienteCriado = ingredienteService.criarIngrediente(ingrediente);
-            return ResponseEntity.status(201).body(IngredienteMapper.toResponse(ingredienteCriado));
-        }
-        return ResponseEntity.status(400).build();
+    public ResponseEntity<IngredienteResponse> criar(
+            @RequestBody @Valid IngredienteRequest req
+    ) {
+        Ingrediente ingrediente = IngredienteMapper.toEntity(req);
+        Ingrediente criado = ingredienteService.criar(ingrediente);
+        return ResponseEntity.status(201).body(IngredienteMapper.toResponse(criado));
     }
 
     @Operation(summary = "Atualizar ingrediente")
     @ApiResponse(responseCode = "200", description = "Ingrediente atualizado com sucesso")
+    @ApiResponse(responseCode = "404", description = "Ingrediente não encontrado")
     @PutMapping("/{id}")
-    public ResponseEntity<IngredienteResponse> atualizarIngrediente(
-            @RequestBody IngredienteRequest req,
-            @RequestParam Integer id
-    ){
-        if (ingredienteService.buscarIngredientePorId(id) == null){
-            return ResponseEntity.status(404).build();
-        }
-        Ingrediente ingrediente = ingredienteService.atualizarIngrediente(id, req);
-        return ResponseEntity.status(200).body(IngredienteMapper.toResponse(ingrediente));
+    public ResponseEntity<IngredienteResponse> atualizar(
+            @PathVariable Long id,
+            @RequestBody @Valid IngredienteRequest req
+    ) {
+        return ResponseEntity.ok(IngredienteMapper.toResponse(ingredienteService.atualizar(id, req)));
     }
 
     @Operation(summary = "Deletar ingrediente")
     @ApiResponse(responseCode = "204", description = "Ingrediente deletado com sucesso")
+    @ApiResponse(responseCode = "404", description = "Ingrediente não encontrado")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarPorId(
-            @RequestParam Integer id
-    ){
-        if (ingredienteService.buscarIngredientePorId(id) == null){
-            return ResponseEntity.status(404).build();
-        }
-        ingredienteService.deletarPorId(id);
-        return ResponseEntity.status(204).build();
+    public ResponseEntity<Void> deletar(
+            @PathVariable Long id
+    ) {
+        ingredienteService.deletar(id);
+        return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Buscar ingredientes por produto", description = "Lista todos os ingredientes de um produto específico")
+    @Operation(summary = "Buscar ingredientes por produto")
     @ApiResponse(responseCode = "200", description = "Ingredientes encontrados")
+    @ApiResponse(responseCode = "204", description = "Nenhum ingrediente encontrado")
     @GetMapping("/por-produto/{produtoId}")
-    public ResponseEntity<List<IngredienteResponse>> buscarIngredientesPorProduto(
-            @RequestParam Integer produtoId
-    ){
-        List<Ingrediente> ingredientes = ingredienteService.buscarIngredientePorProdutoId(produtoId);
-        if (ingredientes.isEmpty()){
-            return ResponseEntity.status(404).build();
+    public ResponseEntity<List<IngredienteResponse>> buscarPorProduto(
+            @PathVariable Long produtoId
+    ) {
+        List<Ingrediente> ingredientes = ingredienteService.buscarIngredientesPorProduto(produtoId);
+        if (ingredientes.isEmpty()) {
+            return ResponseEntity.noContent().build();
         }
-
-        return ResponseEntity.status(200).body(IngredienteMapper.toResponseList(ingredientes));
+        return ResponseEntity.ok(IngredienteMapper.toResponseList(ingredientes));
     }
 
 }
