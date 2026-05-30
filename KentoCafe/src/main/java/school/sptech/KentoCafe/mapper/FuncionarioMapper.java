@@ -1,7 +1,5 @@
 package school.sptech.KentoCafe.mapper;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import school.sptech.KentoCafe.auth.SecurityConfig;
 import school.sptech.KentoCafe.dto.funcionario.FuncionarioRequest;
 import school.sptech.KentoCafe.dto.funcionario.FuncionarioResponse;
 import school.sptech.KentoCafe.entity.Funcionario;
@@ -9,9 +7,6 @@ import school.sptech.KentoCafe.entity.Funcionario;
 import java.util.List;
 
 public class FuncionarioMapper {
-
-    @Autowired
-    private static SecurityConfig securityConfiguration;
 
     // RequestDto -> Entity
     public static Funcionario toEntity(FuncionarioRequest dto) {
