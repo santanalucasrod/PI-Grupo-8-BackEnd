@@ -3,6 +3,8 @@ package school.sptech.KentoCafe.dto.produto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 
+import java.math.BigDecimal;
+
 @Schema(description = "Dados para criação ou atualização de produto")
 public class ProdutoRequest {
 
@@ -13,7 +15,7 @@ public class ProdutoRequest {
 
     @Schema(description = "Preço unitário do produto", example = "12.50")
     @DecimalMin(value = "0.01")
-    private Double precoUnidade;
+    private BigDecimal precoUnidade;
 
     @Schema(description = "Descrição do produto", example = "Café espresso com leite vaporizado")
     @NotBlank
@@ -28,14 +30,14 @@ public class ProdutoRequest {
     private Categoria categoria;
 
     public static class Categoria{
-        private Integer id;
+        private Long id;
         private String nome;
 
-        public Integer getId() {
+        public Long getId() {
             return id;
         }
 
-        public void setId(Integer id) {
+        public void setId(Long id) {
             this.id = id;
         }
 
@@ -47,7 +49,7 @@ public class ProdutoRequest {
             this.nome = nome;
         }
 
-        public Categoria(Integer id, String nome) {
+        public Categoria(Long id, String nome) {
             this.id = id;
             this.nome = nome;
         }
@@ -64,7 +66,7 @@ public class ProdutoRequest {
         this.categoria = categoria;
     }
 
-    public ProdutoRequest(String nome, Double precoUnidade, String descricao, String pathFt, Categoria categoria) {
+    public ProdutoRequest(String nome, BigDecimal precoUnidade, String descricao, String pathFt, Categoria categoria) {
         this.nome = nome;
         this.precoUnidade = precoUnidade;
         this.descricao = descricao;
@@ -75,8 +77,12 @@ public class ProdutoRequest {
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
 
-    public Double getPrecoUnidade() { return precoUnidade; }
-    public void setPrecoUnidade(Double precoUnidade) { this.precoUnidade = precoUnidade; }
+    public BigDecimal getPrecoUnidade() {
+        return precoUnidade;
+    }
+    public void setPrecoUnidade(BigDecimal precoUnidade) {
+        this.precoUnidade = precoUnidade;
+    }
 
     public String getDescricao() { return descricao; }
     public void setDescricao(String descricao) { this.descricao = descricao; }

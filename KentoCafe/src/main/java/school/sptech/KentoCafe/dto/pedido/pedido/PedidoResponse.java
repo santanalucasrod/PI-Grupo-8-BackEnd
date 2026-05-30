@@ -1,35 +1,50 @@
 package school.sptech.KentoCafe.dto.pedido.pedido;
 
 import school.sptech.KentoCafe.dto.pedido.item.ItemResponse;
-import school.sptech.KentoCafe.entity.InfoAdicional;
-import school.sptech.KentoCafe.entity.Ingrediente;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 public class PedidoResponse {
-    private Integer id;
-    private LocalDateTime dataHora;
+    private Long id;
+    private String nomeCliente;
+    private LocalDateTime dtHrPedido;
+    private LocalDateTime dtHrPronto;
     private String status;
-    private Double valorTotal;
+    private BigDecimal valorTotal;
     private List<ItemResponse> itens;
-    private String descricao;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public LocalDateTime getDataHora() {
-        return dataHora;
+    public String getNomeCliente() {
+        return nomeCliente;
     }
 
-    public void setDataHora(LocalDateTime dataHora) {
-        this.dataHora = dataHora;
+    public void setNomeCliente(String nomeCliente) {
+        this.nomeCliente = nomeCliente;
+    }
+
+    public LocalDateTime getDtHrPedido() {
+        return dtHrPedido;
+    }
+
+    public void setDtHrPedido(LocalDateTime dtHrPedido) {
+        this.dtHrPedido = dtHrPedido;
+    }
+
+    public LocalDateTime getDtHrPronto() {
+        return dtHrPronto;
+    }
+
+    public void setDtHrPronto(LocalDateTime dtHrPronto) {
+        this.dtHrPronto = dtHrPronto;
     }
 
     public String getStatus() {
@@ -40,20 +55,12 @@ public class PedidoResponse {
         this.status = status;
     }
 
-    public Double getValorTotal() {
+    public BigDecimal getValorTotal() {
         return valorTotal;
     }
 
-    public void setValorTotal(Double valorTotal) {
+    public void setValorTotal(BigDecimal valorTotal) {
         this.valorTotal = valorTotal;
-    }
-
-    public String getDescricao() {
-        return descricao;
-    }
-
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
     }
 
     public List<ItemResponse> getItens() {

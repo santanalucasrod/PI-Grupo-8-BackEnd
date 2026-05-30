@@ -1,36 +1,58 @@
 package school.sptech.KentoCafe.dto.pedido.pedido;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import school.sptech.KentoCafe.dto.pedido.item.ItemRequest;
-import school.sptech.KentoCafe.entity.Funcionario;
-import school.sptech.KentoCafe.entity.InfoAdicional;
-import school.sptech.KentoCafe.entity.Pedido;
 
 import java.util.List;
 
 @Schema(description = "Dados para criação de um pedido")
 public class PedidoRequest {
 
-    @Schema(description = "Informações adicionais do pedido")
-    private InfoAdicional infoAdicional;
+    @Schema(description = "Nome do cliente", example = "Gabriela")
+    @NotBlank(message = "Nome do cliente é obrigatório")
+    private String nomeCliente;
+
+    @Schema(description = "ID do funcionário que registrou o pedido", example = "1")
+    @NotNull(message = "Funcionário é obrigatório")
+    private Long funcionarioId;
 
     @Schema(description = "Lista de itens do pedido")
+    @NotEmpty(message = "O pedido deve ter pelo menos um item")
     private List<ItemRequest> itens;
 
-    private Funcionario funcionario;
+    public PedidoRequest(String nomeCliente, Long funcionarioId, List<ItemRequest> itens) {
+        this.nomeCliente = nomeCliente;
+        this.funcionarioId = funcionarioId;
+        this.itens = itens;
+    }
 
-    @Schema(description = "Nome do cliente do pedido", example = "Gabriela")
-    private String nome;
+    public PedidoRequest() {
+    }
 
-    public InfoAdicional getInfoAdicional() { return infoAdicional; }
-    public void setInfoAdicional(InfoAdicional infoAdicional) { this.infoAdicional = infoAdicional; }
+    public String getNomeCliente() {
+        return nomeCliente;
+    }
 
-    public List<ItemRequest> getItens() { return itens; }
-    public void setItens(List<ItemRequest> itens) { this.itens = itens; }
+    public void setNomeCliente(String nomeCliente) {
+        this.nomeCliente = nomeCliente;
+    }
 
-    public Funcionario getFuncionario() { return funcionario; }
-    public void setFuncionario(Funcionario funcionario) { this.funcionario = funcionario; }
+    public Long getFuncionarioId() {
+        return funcionarioId;
+    }
 
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
+    public void setFuncionarioId(Long funcionarioId) {
+        this.funcionarioId = funcionarioId;
+    }
+
+    public List<ItemRequest> getItens() {
+        return itens;
+    }
+
+    public void setItens(List<ItemRequest> itens) {
+        this.itens = itens;
+    }
 }

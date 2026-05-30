@@ -3,24 +3,35 @@ package school.sptech.KentoCafe.dto.pedido.item;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+
+import java.util.List;
 
 @Schema(description = "Item de um pedido")
 public class ItemRequest {
-    @Schema(description = "ID do produto", example = "1")
-    @NotNull
-    @Positive
-    private Integer produtoId;
+    @NotNull(message = "Produto é obrigatório")
+    private Long produtoId;
 
-    @Schema(description = "Quantidade do produto", example = "2")
-    @Min(value = 1, message = "A quantidade mínima é 1")
+    @NotNull(message = "Quantidade é obrigatória")
+    @Min(value = 1, message = "Quantidade mínima é 1")
     private Integer quantidade;
 
-    public Integer getProdutoId() {
+    @Schema(description = "IDs das personalizações escolhidas", example = "[1, 3]")
+    private List<Long> personalizacaoIds;
+
+    public ItemRequest(Long produtoId, Integer quantidade, List<Long> personalizacaoIds) {
+        this.produtoId = produtoId;
+        this.quantidade = quantidade;
+        this.personalizacaoIds = personalizacaoIds;
+    }
+
+    public ItemRequest() {
+    }
+
+    public Long getProdutoId() {
         return produtoId;
     }
 
-    public void setProdutoId(Integer produtoId) {
+    public void setProdutoId(Long produtoId) {
         this.produtoId = produtoId;
     }
 
@@ -30,5 +41,13 @@ public class ItemRequest {
 
     public void setQuantidade(Integer quantidade) {
         this.quantidade = quantidade;
+    }
+
+    public List<Long> getPersonalizacaoIds() {
+        return personalizacaoIds;
+    }
+
+    public void setPersonalizacaoIds(List<Long> personalizacaoIds) {
+        this.personalizacaoIds = personalizacaoIds;
     }
 }
