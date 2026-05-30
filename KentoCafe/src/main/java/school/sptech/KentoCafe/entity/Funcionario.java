@@ -2,24 +2,36 @@ package school.sptech.KentoCafe.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "funcionario")
-public class Funcionario {
+public class Funcionario implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
+
+    @Column(nullable = false, length = 50)
     private String nome;
-    @NotBlank
-    private String senha;
-    @NotBlank
+
+    @Column(nullable = false, length = 254, unique = true)
     private String email;
+
+    @Column(nullable = false, length = 128)
+    private String senha;
+
+    @Column(nullable = false, columnDefinition = "TINYINT")
     private Boolean gerente;
 
     public Funcionario() {
     }
 
-    public Funcionario(Integer id, String nome, String senha, String email, Boolean gerente) {
+    public Funcionario(Long id, String nome, String senha, String email, Boolean gerente) {
         this.id = id;
         this.nome = nome;
         this.senha = senha;
@@ -27,11 +39,11 @@ public class Funcionario {
         this.gerente = gerente;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -65,5 +77,41 @@ public class Funcionario {
 
     public void setGerente(Boolean gerente) {
         this.gerente = gerente;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        String role = Boolean.TRUE.equals(gerente) ? "ROLE_ADMIN" : "ROLE_USER";
+        return List.of(new SimpleGrantedAuthority(role));
+    }
+
+    @Override
+    public String getPassword() {
+        return senha;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }
