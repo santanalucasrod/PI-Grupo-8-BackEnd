@@ -31,7 +31,7 @@ public class FuncionarioController {
     public ResponseEntity<FuncionarioResponse> criarFuncionario(@RequestBody FuncionarioRequest funcionarioRequest) {
         Funcionario funcionario=FuncionarioMapper.toEntity(funcionarioRequest);
 
-        Funcionario funcionarioCriado=funcionarioService.criarFuncionario(funcionario);
+        Funcionario funcionarioCriado = funcionarioService.criar(funcionario);
 
         FuncionarioResponse responseDto= FuncionarioMapper.toResponse(funcionarioCriado);
         return ResponseEntity.status(201).body(responseDto);
@@ -59,7 +59,7 @@ public class FuncionarioController {
     @GetMapping("crud")
     public ResponseEntity<List<FuncionarioResponse>> listar() {
         //serviço
-        List<Funcionario> funcionarios = funcionarioService.listarFuncionario();
+        List<Funcionario> funcionarios = funcionarioService.listarTodos();
 
         //dto
         List<FuncionarioResponse> response = FuncionarioMapper.toResponseDto(funcionarios);
@@ -70,9 +70,9 @@ public class FuncionarioController {
 
     @Operation(summary = "Buscar funcionário por ID")
     @GetMapping("crud/{id}")
-    public ResponseEntity<FuncionarioResponse> buscarPorId(@PathVariable Integer id) {
+    public ResponseEntity<FuncionarioResponse> buscarPorId(@PathVariable Long id) {
         //servico
-        Funcionario funcionario = funcionarioService.buscarFuncionario(id);
+        Funcionario funcionario = funcionarioService.buscarPorId(id);
 
         //dto
         FuncionarioResponse responseDto= FuncionarioMapper.toResponse(funcionario);
@@ -84,12 +84,12 @@ public class FuncionarioController {
     @Operation(summary = "Atualizar funcionário", description = "Atualiza informações do funcionário")
     @ApiResponse(responseCode = "200", description = "Funcionário atualizado com sucesso")
     @PutMapping("crud/{id}")
-    public ResponseEntity<FuncionarioResponse> atualizar(@PathVariable Integer id, @RequestBody @Valid FuncionarioRequest dto) {
+    public ResponseEntity<FuncionarioResponse> atualizar(@PathVariable Long id, @RequestBody @Valid FuncionarioRequest dto) {
         //dto
         Funcionario funcionario = FuncionarioMapper.toEntity(dto);
 
         //servico
-        Funcionario salvo = funcionarioService.atualizarFuncionario(funcionario,id);
+        Funcionario salvo = funcionarioService.atualizar(id, funcionario);
 
         //dto
         FuncionarioResponse responseDto=FuncionarioMapper.toResponse(salvo);
@@ -100,8 +100,8 @@ public class FuncionarioController {
     @Operation(summary = "Deletar funcionário")
     @ApiResponse(responseCode = "204", description = "Funcionário deletado com sucesso")
     @DeleteMapping("crud/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
-        funcionarioService.deletarFuncionario(id);
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+        funcionarioService.deletar(id);
         return ResponseEntity.noContent().build();
     }
 }
