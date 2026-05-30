@@ -2,6 +2,7 @@ package school.sptech.KentoCafe.entity;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -10,28 +11,53 @@ import java.util.List;
 @Entity
 @Table(name = "pedido")
 public class Pedido {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-    @Column(name = "dt_hr_pedido")
+    private Long id;
+
+    @Column(name = "nome_cliente", nullable = false, length = 45)
+    private String nomeCliente;
+
+    @Column(name = "dt_hr_pedido", nullable = false)
     private LocalDateTime dtHrPedido;
+
     @Column(name = "dt_hr_pronto")
     private LocalDateTime dtHrPronto;
-    private String status;
-    private String nome;
+
+    @Column(name = "valor_total", precision = 6, scale = 2)
+    private BigDecimal valorTotal;
+
+    @ManyToOne
+    @JoinColumn(name = "status_id", nullable = false)
+    private Status status;
+
     @ManyToOne
     @JoinColumn(name = "funcionario_id", nullable = false)
     private Funcionario funcionario;
-    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
-    private List<Venda> itens = new ArrayList<>();
-    @ManyToOne
-    private InfoAdicional infoAdicional;
 
-    public Integer getId() {
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
+    private List<ItemPedido> itens;
+
+    public Pedido(Long id, String nomeCliente, LocalDateTime dtHrPedido, LocalDateTime dtHrPronto, BigDecimal valorTotal, Status status, Funcionario funcionario, List<ItemPedido> itens) {
+        this.id = id;
+        this.nomeCliente = nomeCliente;
+        this.dtHrPedido = dtHrPedido;
+        this.dtHrPronto = dtHrPronto;
+        this.valorTotal = valorTotal;
+        this.status = status;
+        this.funcionario = funcionario;
+        this.itens = itens;
+    }
+
+    public Pedido() {
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -51,27 +77,27 @@ public class Pedido {
         this.dtHrPronto = dtHrPronto;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
-    public String getNome() {
-        return nome;
+    public String getNomeCliente() {
+        return nomeCliente;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setNomeCliente(String nomeCliente) {
+        this.nomeCliente = nomeCliente;
     }
 
-    public List<Venda> getItens() {
+    public List<ItemPedido> getItens() {
         return itens;
     }
 
-    public void setItens(List<Venda> itens) {
+    public void setItens(List<ItemPedido> itens) {
         this.itens = itens;
     }
 
@@ -83,11 +109,11 @@ public class Pedido {
         this.funcionario = funcionario;
     }
 
-    public InfoAdicional getInfoAdicional() {
-        return infoAdicional;
+    public BigDecimal getValorTotal() {
+        return valorTotal;
     }
 
-    public void setInfoAdicional(InfoAdicional infoAdicional) {
-        this.infoAdicional = infoAdicional;
+    public void setValorTotal(BigDecimal valorTotal) {
+        this.valorTotal = valorTotal;
     }
 }

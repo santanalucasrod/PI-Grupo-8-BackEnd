@@ -2,20 +2,37 @@ package school.sptech.KentoCafe.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+
+import java.util.List;
+
 @Entity
 @Table(name = "ingrediente")
 public class Ingrediente {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-    @NotBlank
+    private Long id;
+
+    @Column(nullable = false, length = 70)
     private String nome;
 
-    public Integer getId() {
+    @ManyToMany(mappedBy = "ingredientes")
+    private List<Produto> produtos;
+
+    public Ingrediente(Long id, String nome, List<Produto> produtos) {
+        this.id = id;
+        this.nome = nome;
+        this.produtos = produtos;
+    }
+
+    public Ingrediente() {
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -27,11 +44,11 @@ public class Ingrediente {
         this.nome = nome;
     }
 
-    public Ingrediente(Integer id, String nome) {
-        this.id = id;
-        this.nome = nome;
+    public List<Produto> getProdutos() {
+        return produtos;
     }
 
-    public Ingrediente() {
+    public void setProdutos(List<Produto> produtos) {
+        this.produtos = produtos;
     }
 }
