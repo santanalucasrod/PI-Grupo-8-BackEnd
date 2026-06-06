@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -29,6 +30,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
@@ -57,7 +59,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/ingredientes/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers(HttpMethod.GET, "/personalizacoes/**").hasAnyRole("ADMIN", "USER")
 
-                        .requestMatchers("/pedidos/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers("/pedidos/**").permitAll()
 
                         .anyRequest().authenticated()
                 )
