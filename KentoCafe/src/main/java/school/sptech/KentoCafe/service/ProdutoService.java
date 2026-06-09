@@ -76,14 +76,12 @@ public class ProdutoService {
                     HttpStatus.NOT_FOUND, "Produto não encontrado");
         }
 
-        // ✅ verifica se o produto está em algum pedido
         if (itemPedidoRepository.existsByProdutoId(id)) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Produto não pode ser deletado pois está vinculado a pedidos existentes");
         }
 
-        // remove vínculos com ingredientes e deleta
         produtoRepository.removerTodosIngredientesDoProduto(id);
         produtoRepository.deleteById(id);
     }
