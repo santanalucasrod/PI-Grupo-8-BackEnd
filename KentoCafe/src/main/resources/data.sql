@@ -112,7 +112,7 @@ CREATE TABLE IF NOT EXISTS `item_pedido_personalizacao` (
 -- FLUSH PRIVILEGES;
 
 INSERT INTO funcionario (nome, senha, email, gerente) VALUES
-                                                          ("Raika",		   '$2a$10$CcdT4yBJ39B9KJbplgpXQeqdWl8WVXyLd7iwnfQP5.XMavMkvrsxG', "raika@gmail.com", 			  1),
+                                                          ('Raika',		   '$2a$10$CcdT4yBJ39B9KJbplgpXQeqdWl8WVXyLd7iwnfQP5.XMavMkvrsxG', 'raika@gmail.com', 			  1),
                                                           ('Ana Lima',       '$2a$10$CcdT4yBJ39B9KJbplgpXQeqdWl8WVXyLd7iwnfQP5.XMavMkvrsxG', 'ana.lima@cafeteria.com',       1),
                                                           ('Bruno Costa',    '$2a$10$CcdT4yBJ39B9KJbplgpXQeqdWl8WVXyLd7iwnfQP5.XMavMkvrsxG', 'bruno.costa@cafeteria.com',    0),
                                                           ('Carla Souza',    '$2a$10$CcdT4yBJ39B9KJbplgpXQeqdWl8WVXyLd7iwnfQP5.XMavMkvrsxG', 'carla.souza@cafeteria.com',    0),
