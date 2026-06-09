@@ -21,6 +21,10 @@ public class Status {
     public Status() {
     }
 
+    public Status(String nome) {
+        this.nome = nome;
+    }
+
     public Long getId() {
         return id;
     }
