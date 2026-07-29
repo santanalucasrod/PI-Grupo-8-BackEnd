@@ -88,7 +88,6 @@ CREATE TABLE IF NOT EXISTS `produto_ingrediente` (
 CREATE TABLE IF NOT EXISTS `personalizacao` (
   `id`       BIGINT          NOT NULL AUTO_INCREMENT,
   `nome`     VARCHAR(60)  NOT NULL,
-  `tipo`     VARCHAR(30)  NULL,
   PRIMARY KEY (`id`),
   UNIQUE (`nome`)
 );
@@ -408,14 +407,14 @@ INSERT INTO item_pedido (produto_id, pedido_id, quantidade, preco_unidade) VALUE
 -- Pedido 20: Mocha (13.00) + Iced Latte (13.00) + Croissant Frango (15.00) + Cheesecake (16.00) + Café Natural 250g (38.00) + Pão de Mel (8.00)
 (5, 20, 1, 13.00),(18, 20, 1, 13.00),(34, 20, 1, 15.00),(44, 20, 1, 16.00),(32, 20, 1, 38.00),(48, 20, 1, 8.00);
 
-INSERT INTO `personalizacao` (`nome`, `tipo`) VALUES
-  ('Sem açúcar',         'açúcar'),
-  ('Adoçante',           'açúcar'),
-  ('Açúcar adicional',   'açúcar'),
-  ('Leite vegetal',      'leite'),
-  ('Sem leite',          'leite'),
-  ('Mais café',          'café'),
-  ('Café fraco',         'café');
+INSERT INTO `personalizacao` (`nome`) VALUES
+  ('Sem açúcar'),
+  ('Adoçante'),
+  ('Açúcar adicional'),
+  ('Leite vegetal'),
+  ('Sem leite'),
+  ('Mais café'),
+  ('Café fraco');
 
 -- Todas as bebidas com café (categorias 1 e 2, que tenham ingrediente Café Espresso = id 1)
 INSERT INTO produto_personalizacao (produto_id, personalizacao_id)
