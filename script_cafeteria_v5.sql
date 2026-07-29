@@ -104,6 +104,17 @@ CREATE TABLE IF NOT EXISTS `item_pedido_personalizacao` (
   CONSTRAINT `fk_ip_personalizacao` FOREIGN KEY (`personalizacao_id`) REFERENCES `personalizacao`(`id`)
 );
 
+-- Vínculo entre produto e as personalizações escolhidas
+CREATE TABLE IF NOT EXISTS `produto_personalizacao` (
+  `id`               BIGINT NOT NULL AUTO_INCREMENT,
+  `produto_id`       BIGINT NOT NULL,
+  `personalizacao_id` BIGINT NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE (`produto_id`, `personalizacao_id`),
+  CONSTRAINT `fk_pp_produto`        FOREIGN KEY (`produto_id`)        REFERENCES `produto`(`id`),
+  CONSTRAINT `fk_pp_personalizacao` FOREIGN KEY (`personalizacao_id`) REFERENCES `personalizacao`(`id`)
+);
+
 -- somente para quem não criou ainda
 -- utilizado como configuração do env
 -- DROP USER IF EXISTS "developer";
@@ -405,3 +416,28 @@ INSERT INTO `personalizacao` (`nome`, `tipo`) VALUES
   ('Sem leite',          'leite'),
   ('Mais café',          'café'),
   ('Café fraco',         'café');
+
+-- Todas as bebidas com café (categorias 1 e 2, que tenham ingrediente Café Espresso = id 1)
+INSERT INTO produto_personalizacao (produto_id, personalizacao_id)
+SELECT pi.produto_id, p.id
+FROM produto_ingrediente pi
+JOIN produto pr ON pr.id = pi.produto_id
+CROSS JOIN personalizacao p
+WHERE pi.ingrediente_id = 1        -- Café Espresso
+  AND p.tipo = 'café';
+
+-- Produtos com leite podem receber personalizações de tipo 'leite'
+INSERT INTO produto_personalizacao (produto_id, personalizacao_id)
+SELECT pi.produto_id, p.id
+FROM produto_ingrediente pi
+CROSS JOIN personalizacao p
+WHERE pi.ingrediente_id IN (2,3,32,33) -- leites (integral, desnatado, aveia, amêndoas)
+  AND p.tipo = 'leite';
+
+-- Açúcar: qualquer bebida quente/fria (categorias 1 e 2)
+INSERT INTO produto_personalizacao (produto_id, personalizacao_id)
+SELECT pr.id, p.id
+FROM produto pr
+CROSS JOIN personalizacao p
+WHERE pr.categoria_id IN (1,2)
+  AND p.tipo = 'açúcar';
