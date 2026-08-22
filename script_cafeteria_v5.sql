@@ -416,27 +416,41 @@ INSERT INTO `personalizacao` (`nome`) VALUES
   ('Mais café'),
   ('Café fraco');
 
--- Todas as bebidas com café (categorias 1 e 2, que tenham ingrediente Café Espresso = id 1)
-INSERT INTO produto_personalizacao (produto_id, personalizacao_id)
-SELECT pi.produto_id, p.id
-FROM produto_ingrediente pi
-JOIN produto pr ON pr.id = pi.produto_id
-CROSS JOIN personalizacao p
-WHERE pi.ingrediente_id = 1        -- Café Espresso
-  AND p.tipo = 'café';
+-- Bebidas com Café (1-7, 13-25): Sem açúcar, Adoçante, Açúcar adicional, Mais café, Café fraco
+INSERT INTO produto_personalizacao (produto_id, personalizacao_id) VALUES
+(1, 1), (1, 2), (1, 3), (1, 6), (1, 7),
+(2, 1), (2, 2), (2, 3), (2, 6), (2, 7),
+(3, 1), (3, 2), (3, 3), (3, 6), (3, 7),
+(4, 1), (4, 2), (4, 3), (4, 6), (4, 7),
+(5, 1), (5, 2), (5, 3), (5, 6), (5, 7),
+(6, 1), (6, 2), (6, 3), (6, 6), (6, 7),
+(7, 1), (7, 2), (7, 3), (7, 6), (7, 7),
+(13, 1), (13, 2), (13, 3), (13, 6), (13, 7),
+(14, 1), (14, 2), (14, 3), (14, 6), (14, 7),
+(15, 1), (15, 2), (15, 3), (15, 6), (15, 7),
+(16, 1), (16, 2), (16, 3), (16, 6), (16, 7),
+(17, 1), (17, 2), (17, 3), (17, 6), (17, 7),
+(18, 1), (18, 2), (18, 3), (18, 6), (18, 7),
+(19, 1), (19, 2), (19, 3), (19, 6), (19, 7),
+(20, 1), (20, 2), (20, 3), (20, 6), (20, 7),
+(24, 1), (24, 2), (24, 3), (24, 6), (24, 7),
+(25, 1), (25, 2), (25, 3), (25, 6), (25, 7);
 
--- Produtos com leite podem receber personalizações de tipo 'leite'
-INSERT INTO produto_personalizacao (produto_id, personalizacao_id)
-SELECT pi.produto_id, p.id
-FROM produto_ingrediente pi
-CROSS JOIN personalizacao p
-WHERE pi.ingrediente_id IN (2,3,32,33) -- leites (integral, desnatado, aveia, amêndoas)
-  AND p.tipo = 'leite';
+-- Bebidas com Leite (3-6, 12-15, 17-19, 20, 21, 24): Leite vegetal, Sem leite
+INSERT INTO produto_personalizacao (produto_id, personalizacao_id) VALUES
+(3, 4), (3, 5),
+(4, 4), (4, 5),
+(5, 4), (5, 5),
+(6, 4), (6, 5),
+(8, 4), (8, 5),
+(12, 4), (12, 5),
+(13, 4), (13, 5),
+(14, 4), (14, 5),
+(15, 4), (15, 5),
+(17, 4), (17, 5),
+(18, 4), (18, 5),
+(19, 4), (19, 5),
+(20, 4), (20, 5),
+(21, 4), (21, 5),
+(24, 4), (24, 5);
 
--- Açúcar: qualquer bebida quente/fria (categorias 1 e 2)
-INSERT INTO produto_personalizacao (produto_id, personalizacao_id)
-SELECT pr.id, p.id
-FROM produto pr
-CROSS JOIN personalizacao p
-WHERE pr.categoria_id IN (1,2)
-  AND p.tipo = 'açúcar';
