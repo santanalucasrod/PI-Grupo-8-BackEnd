@@ -14,6 +14,13 @@ import java.util.Date;
 
 @Service
 public class JwtService {
+    /**
+     * AVISO DE SEGURANÇA PARA PRODUÇÃO:
+     * A variável injetada ${jwt.secret} deve ser uma string com no mínimo 256 bits (32 caracteres).
+     * Nunca defina um valor "hardcoded" no código.
+     * Na AWS, utilize o AWS Secrets Manager ou Parameter Store para injetar essa variável
+     * com uma chave forte (ex: gerada via 'openssl rand -base64 32').
+     */
     @Value("${jwt.secret}")
     private String secret;
 
