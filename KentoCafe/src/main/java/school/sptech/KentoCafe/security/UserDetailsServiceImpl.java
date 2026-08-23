@@ -1,5 +1,7 @@
 package school.sptech.KentoCafe.security;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -9,6 +11,7 @@ import school.sptech.KentoCafe.repository.FuncionarioRepository;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
+    private static final Logger log = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
     private final FuncionarioRepository repository;
 
     public UserDetailsServiceImpl(FuncionarioRepository repository) {
@@ -20,8 +23,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         Funcionario funcionario = repository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Funcionário não encontrado: " + email));
 
-        System.out.println("✅ Usuário encontrado: " + funcionario.getEmail());
-        System.out.println("✅ Senha no banco: " + funcionario.getSenha());
+        log.debug("Dados do usuário {} carregados com sucesso para o contexto de segurança.", email);
 
         return funcionario;
     }
