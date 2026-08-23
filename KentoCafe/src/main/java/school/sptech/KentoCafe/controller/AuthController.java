@@ -3,7 +3,7 @@ package school.sptech.KentoCafe.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.sptech.KentoCafe.dto.token.LoginRequestDto;
-import school.sptech.KentoCafe.dto.token.LoginUserDto;
-import school.sptech.KentoCafe.dto.token.RecoveryJwtTokenDto;
 import school.sptech.KentoCafe.entity.Funcionario;
 import school.sptech.KentoCafe.security.JwtService;
 import school.sptech.KentoCafe.service.FuncionarioService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -25,6 +25,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
     private final FuncionarioService funcionarioService;
     private final JwtService jwtService;
@@ -42,8 +43,7 @@ public class AuthController {
     @ApiResponse(responseCode = "401", description = "Email ou senha incorretos")
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDto request) {
-        System.out.println("📧 Email recebido: " + request.getEmail());
-        System.out.println("🔑 Senha recebida: " + request.getSenha());
+        log.info("Tentativa de login para o usuário: {}", request.getEmail());
 
         try {
             authManager.authenticate(
@@ -52,14 +52,19 @@ public class AuthController {
                             request.getSenha()
                     )
             );
+        } catch (org.springframework.security.core.AuthenticationException e) {
+            log.warn("Falha de autenticação para o usuário: {}", request.getEmail());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");
         } catch (Exception e) {
-            System.out.println("❌ Erro no authenticate: " + e.getClass().getName());
-            System.out.println("❌ Mensagem: " + e.getMessage());
-            throw e;
+            log.error("Erro interno durante o processamento do login", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno no servidor");
         }
 
         Funcionario funcionario = funcionarioService.buscarPorEmail(request.getEmail());
         String token = jwtService.gerarToken(funcionario);
+
+        log.info("Login realizado com sucesso para: {}", request.getEmail());
+
         return ResponseEntity.ok(Map.of(
                 "token", token,
                 "gerente", funcionario.getGerente(),
