@@ -20,7 +20,7 @@ import java.util.List;
 
 @Tag(name = "Funcionários", description = "Gerenciamento de funcionários e autenticação de acesso")
 @Controller
-@RequestMapping("/funcionario")
+@RequestMapping("/funcionarios")
 public class FuncionarioController {
     @Autowired
     private FuncionarioService funcionarioService;
@@ -28,12 +28,11 @@ public class FuncionarioController {
     @Operation(summary = "Cadastrar funcionário", description = "Cria um novo funcionário no sistema")
     @ApiResponse(responseCode = "201", description = "Funcionário cadastrado com sucesso")
     @PostMapping("/cadastro")
-    public ResponseEntity<FuncionarioResponse> criarFuncionario(@RequestBody FuncionarioRequest funcionarioRequest) {
-        Funcionario funcionario=FuncionarioMapper.toEntity(funcionarioRequest);
-
+    public ResponseEntity<FuncionarioResponse> criarFuncionario(@RequestBody @Valid FuncionarioRequest funcionarioRequest) {
+        Funcionario funcionario = FuncionarioMapper.toEntity(funcionarioRequest);
         Funcionario funcionarioCriado = funcionarioService.criar(funcionario);
+        FuncionarioResponse responseDto = FuncionarioMapper.toResponse(funcionarioCriado);
 
-        FuncionarioResponse responseDto= FuncionarioMapper.toResponse(funcionarioCriado);
         return ResponseEntity.status(201).body(responseDto);
     }
 
@@ -85,16 +84,9 @@ public class FuncionarioController {
     @ApiResponse(responseCode = "200", description = "Funcionário atualizado com sucesso")
     @PutMapping("crud/{id}")
     public ResponseEntity<FuncionarioResponse> atualizar(@PathVariable Long id, @RequestBody @Valid FuncionarioRequest dto) {
-        //dto
-        Funcionario funcionario = FuncionarioMapper.toEntity(dto);
+        Funcionario salvo = funcionarioService.atualizar(id, dto);
+        FuncionarioResponse responseDto = FuncionarioMapper.toResponse(salvo);
 
-        //servico
-        Funcionario salvo = funcionarioService.atualizar(id, funcionario);
-
-        //dto
-        FuncionarioResponse responseDto=FuncionarioMapper.toResponse(salvo);
-
-        //retorno
         return ResponseEntity.ok(responseDto);
     }
     @Operation(summary = "Deletar funcionário")
