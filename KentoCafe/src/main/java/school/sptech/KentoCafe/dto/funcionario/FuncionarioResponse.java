@@ -1,19 +1,18 @@
 package school.sptech.KentoCafe.dto.funcionario;
 
 public class FuncionarioResponse {
+
     private Long id;
     private String nome;
-    private String senha;
     private String email;
     private Boolean gerente;
 
     public FuncionarioResponse() {
     }
 
-    public FuncionarioResponse(Long id, String nome, String senha, String email, Boolean gerente) {
+    public FuncionarioResponse(Long id, String nome, String email, Boolean gerente) {
         this.id = id;
         this.nome = nome;
-        this.senha = senha;
         this.email = email;
         this.gerente = gerente;
     }
@@ -32,14 +31,6 @@ public class FuncionarioResponse {
 
     public void setNome(String nome) {
         this.nome = nome;
-    }
-
-    public String getSenha() {
-        return senha;
-    }
-
-    public void setSenha(String senha) {
-        this.senha = senha;
     }
 
     public String getEmail() {
