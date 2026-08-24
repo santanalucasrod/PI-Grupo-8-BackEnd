@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import school.sptech.KentoCafe.dto.funcionario.FuncionarioRequest;
 import school.sptech.KentoCafe.dto.token.LoginUserDto;
 import school.sptech.KentoCafe.dto.token.RecoveryJwtTokenDto;
 import school.sptech.KentoCafe.entity.Funcionario;
@@ -56,6 +57,8 @@ public class FuncionarioService {
                     HttpStatus.CONFLICT, "Já existe um funcionário com esse email");
         }
         funcionario.setSenha(passwordEncoder.encode(funcionario.getSenha()));
+        funcionario.setGerente(false);
+
         return repository.save(funcionario);
     }
 
@@ -75,14 +78,20 @@ public class FuncionarioService {
                         HttpStatus.NOT_FOUND, "Funcionário não encontrado"));
     }
 
-    public Funcionario atualizar(Long id, Funcionario funcionario) {
-        if (!repository.existsById(id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Funcionário não encontrado");
+    public Funcionario atualizar(Long id, FuncionarioRequest dto) {
+        Funcionario funcionarioExistente = repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Funcionário não encontrado"));
+
+        funcionarioExistente.setNome(dto.getNome());
+
+        if (!funcionarioExistente.getEmail().equals(dto.getEmail())) {
+            if (repository.findByEmail(dto.getEmail()).isPresent()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Email já em uso por outro funcionário");
+            }
+            funcionarioExistente.setEmail(dto.getEmail());
         }
-        funcionario.setId(id);
-        funcionario.setSenha(passwordEncoder.encode(funcionario.getSenha()));
-        return repository.save(funcionario);
+
+        return repository.save(funcionarioExistente);
     }
 
     public void deletar(Long id) {
