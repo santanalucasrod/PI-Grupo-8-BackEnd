@@ -21,6 +21,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
+import school.sptech.KentoCafe.dto.funcionario.FuncionarioRequest;
 import school.sptech.KentoCafe.dto.token.LoginUserDto;
 import school.sptech.KentoCafe.dto.token.RecoveryJwtTokenDto;
 import school.sptech.KentoCafe.entity.Funcionario;
@@ -171,7 +172,7 @@ class FuncionarioServiceTest {
         @Test
         @DisplayName("Deve lançar NOT_FOUND se tentar atualizar funcionário inexistente (Cenário 4.1)")
         void atualizarInexistente() {
-            Funcionario f = new Funcionario();
+            FuncionarioRequest f = new FuncionarioRequest();
             when(repository.existsById(1L)).thenReturn(false);
 
             ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> funcionarioService.atualizar(1L, f));
@@ -182,20 +183,29 @@ class FuncionarioServiceTest {
         @Test
         @DisplayName("Deve atualizar ID, criptografar nova senha e salvar com sucesso (Cenário 4.2)")
         void atualizarComSucesso() {
-            Long id = 10L;
-            Funcionario req = new Funcionario();
-            req.setSenha("novaSenha");
+            Long id = 1L;
+            Funcionario funcionarioExistente = new Funcionario();
+            funcionarioExistente.setId(id);
+            funcionarioExistente.setNome("Antigo Nome");
+            funcionarioExistente.setEmail("antigo@email.com");
 
-            when(repository.existsById(id)).thenReturn(true);
-            when(passwordEncoder.encode("novaSenha")).thenReturn("novaSenhaCripto");
-            when(repository.save(req)).thenAnswer(i -> i.getArgument(0));
+            FuncionarioRequest dto = new FuncionarioRequest();
+            dto.setNome("Novo Nome");
+            dto.setEmail("novo@email.com");
 
-            Funcionario resultado = funcionarioService.atualizar(id, req);
+            when(repository.findById(id)).thenReturn(Optional.of(funcionarioExistente));
+            when(repository.findByEmail(dto.getEmail())).thenReturn(Optional.empty());
+            when(repository.save(any(Funcionario.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-            assertNotNull(resultado);
-            assertEquals(id, resultado.getId());
-            assertEquals("novaSenhaCripto", resultado.getSenha());
-            verify(repository, times(1)).save(req);
+            Funcionario atualizado = funcionarioService.atualizar(id, dto);
+
+            assertNotNull(atualizado);
+            assertEquals("Novo Nome", atualizado.getNome());
+            assertEquals("novo@email.com", atualizado.getEmail());
+
+            verify(repository).findById(id);
+            verify(repository).findByEmail(dto.getEmail());
+            verify(repository).save(funcionarioExistente);
         }
     }
 
