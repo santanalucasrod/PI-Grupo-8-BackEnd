@@ -14,6 +14,7 @@ import school.sptech.KentoCafe.service.ProdutoIngredienteService;
 import java.util.List;
 @Tag(name = "Produto-Ingrediente", description = "Relacionamento entre produtos e seus ingredientes")
 @RestController
+@RequestMapping("/produto-ingrediente")
 public class ProdutoIngredienteController {
 
     final ProdutoIngredienteService produtoIngredienteService;
