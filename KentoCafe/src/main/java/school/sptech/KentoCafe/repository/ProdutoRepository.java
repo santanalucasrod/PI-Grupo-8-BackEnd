@@ -33,4 +33,7 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
             nativeQuery = true)
     void removerIngredienteDoProduto(@Param("produtoId") Long produtoId,
                                      @Param("ingredienteId") Long ingredienteId);
+
+    List<Produto> findByAtivoTrue();
+    List<Produto> findByCategoriaIdAndAtivoTrue(Long categoriaId);
 }

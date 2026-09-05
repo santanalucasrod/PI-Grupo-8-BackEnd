@@ -11,8 +11,4 @@ import java.util.List;
 @Repository
 public interface PersonalizacaoRepository extends JpaRepository<Personalizacao, Long> {
 
-    List<Personalizacao> findByTipo(String tipo);
-
-    @Query("SELECT DISTINCT p.tipo FROM Personalizacao p WHERE p.tipo IS NOT NULL")
-    List<String> findTiposDisponiveis();
 }
