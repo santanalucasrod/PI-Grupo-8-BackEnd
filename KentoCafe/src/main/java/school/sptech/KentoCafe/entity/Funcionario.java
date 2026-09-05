@@ -28,6 +28,9 @@ public class Funcionario implements UserDetails {
     @Column(nullable = false, columnDefinition = "TINYINT")
     private Boolean gerente;
 
+    @Column(nullable = false, columnDefinition = "TINYINT")
+    private Boolean ativo = true;
+
     public Funcionario() {
     }
 
@@ -38,6 +41,9 @@ public class Funcionario implements UserDetails {
         this.email = email;
         this.gerente = gerente;
     }
+
+    public Boolean getAtivo() { return ativo; }
+    public void setAtivo(Boolean ativo) { this.ativo = ativo; }
 
     public Long getId() {
         return id;
@@ -112,6 +118,6 @@ public class Funcionario implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return Boolean.TRUE.equals(ativo);
     }
 }
