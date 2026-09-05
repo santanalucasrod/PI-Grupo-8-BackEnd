@@ -12,7 +12,10 @@ import school.sptech.KentoCafe.dto.produto.ProdutoRequest;
 import school.sptech.KentoCafe.dto.produto.ProdutoRequest;
 import school.sptech.KentoCafe.dto.produto.ProdutoResponse;
 import school.sptech.KentoCafe.dto.produto.ProdutoResponse;
+import school.sptech.KentoCafe.dto.tamanho.produtotamanho.ProdutoTamanhoRequest;
+import school.sptech.KentoCafe.dto.tamanho.produtotamanho.ProdutoTamanhoResponse;
 import school.sptech.KentoCafe.entity.Ingrediente;
+import school.sptech.KentoCafe.entity.Personalizacao;
 import school.sptech.KentoCafe.entity.Produto;
 import school.sptech.KentoCafe.mapper.IngredienteMapper;
 import school.sptech.KentoCafe.mapper.ProdutoMapper;
@@ -141,5 +144,58 @@ public class ProdutoController {
             @RequestBody List<Long> ingredienteIds) {
         Produto produto = produtoService.atualizarIngredientes(id, ingredienteIds);
         return ResponseEntity.ok(ProdutoMapper.toResponse(produto));
+    }
+
+    @Operation(summary = "Reativar produto", description = "Reverte um soft delete")
+    @ApiResponse(responseCode = "200", description = "Produto reativado com sucesso")
+    @PatchMapping("/{id}/reativar")
+    public ResponseEntity<ProdutoResponse> reativar(@PathVariable Long id) {
+        return ResponseEntity.ok(produtoService.reativar(id));
+    }
+
+    @Operation(summary = "Listar personalizações disponíveis para um produto")
+    @GetMapping("/{id}/personalizacoes")
+    public ResponseEntity<List<Personalizacao>> listarPersonalizacoes(@PathVariable Long id) {
+        return ResponseEntity.ok(produtoService.buscarPersonalizacoesPorProduto(id));
+    }
+
+    @Operation(summary = "Vincular personalização ao produto", description = "Somente gerentes")
+    @ApiResponse(responseCode = "409", description = "Personalização já vinculada")
+    @PostMapping("/{id}/personalizacoes/{personalizacaoId}")
+    public ResponseEntity<ProdutoResponse> adicionarPersonalizacao(@PathVariable Long id, @PathVariable Long personalizacaoId) {
+        return ResponseEntity.ok(ProdutoMapper.toResponse(produtoService.adicionarPersonalizacao(id, personalizacaoId)));
+    }
+
+    @Operation(summary = "Remover personalização do produto")
+    @DeleteMapping("/{id}/personalizacoes/{personalizacaoId}")
+    public ResponseEntity<Void> removerPersonalizacao(@PathVariable Long id, @PathVariable Long personalizacaoId) {
+        produtoService.removerPersonalizacao(id, personalizacaoId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Substituir todas as personalizações do produto")
+    @PutMapping("/{id}/personalizacoes")
+    public ResponseEntity<ProdutoResponse> atualizarPersonalizacoes(@PathVariable Long id, @RequestBody List<Long> personalizacaoIds) {
+        return ResponseEntity.ok(ProdutoMapper.toResponse(produtoService.atualizarPersonalizacoes(id, personalizacaoIds)));
+    }
+
+    @Operation(summary = "Listar tamanhos e preços de um produto")
+    @GetMapping("/{id}/tamanhos")
+    public ResponseEntity<List<ProdutoTamanhoResponse>> listarTamanhos(@PathVariable Long id) {
+        return ResponseEntity.ok(produtoService.buscarTamanhosPorProduto(id));
+    }
+
+    @Operation(summary = "Adicionar tamanho ao produto", description = "Somente gerentes")
+    @ApiResponse(responseCode = "409", description = "Esse tamanho já está cadastrado para esse produto")
+    @PostMapping("/{id}/tamanhos")
+    public ResponseEntity<ProdutoTamanhoResponse> adicionarTamanho(@PathVariable Long id, @RequestBody @Valid ProdutoTamanhoRequest dto) {
+        return ResponseEntity.status(201).body(produtoService.adicionarTamanho(id, dto));
+    }
+
+    @Operation(summary = "Remover tamanho do produto")
+    @DeleteMapping("/{id}/tamanhos/{tamanhoId}")
+    public ResponseEntity<Void> removerTamanho(@PathVariable Long id, @PathVariable Long tamanhoId) {
+        produtoService.removerTamanho(id, tamanhoId);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -42,26 +42,6 @@ public class PersonalizacaoController {
         return ResponseEntity.ok(personalizacaoService.buscarPorId(id));
     }
 
-    @Operation(summary = "Listar personalizações por tipo",
-            description = "Filtra por tipo — ex: 'açúcar', 'leite', 'café'")
-    @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso")
-    @ApiResponse(responseCode = "204", description = "Nenhuma personalização encontrada")
-    @GetMapping("/tipo/{tipo}")
-    public ResponseEntity<List<Personalizacao>> buscarPorTipo(@PathVariable String tipo) {
-        List<Personalizacao> personalizacoes = personalizacaoService.buscarPorTipo(tipo);
-        return personalizacoes.isEmpty()
-                ? ResponseEntity.noContent().build()
-                : ResponseEntity.ok(personalizacoes);
-    }
-
-    @Operation(summary = "Listar tipos disponíveis",
-            description = "Retorna os tipos cadastrados — ex: ['açúcar', 'leite', 'café']")
-    @ApiResponse(responseCode = "200", description = "Tipos retornados com sucesso")
-    @GetMapping("/tipos")
-    public ResponseEntity<List<String>> buscarTipos() {
-        return ResponseEntity.ok(personalizacaoService.buscarTiposDisponiveis());
-    }
-
     @Operation(summary = "Criar personalização",
             description = "Somente gerentes podem cadastrar novas opções")
     @ApiResponse(responseCode = "201", description = "Personalização criada com sucesso")
