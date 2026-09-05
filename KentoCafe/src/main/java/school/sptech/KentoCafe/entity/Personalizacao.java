@@ -16,17 +16,24 @@ public class Personalizacao {
     @Column(nullable = false, length = 60, unique = true)
     private String nome;
 
-    @Column(length = 30)
-    private String tipo;
-
     @JsonIgnore
     @ManyToMany(mappedBy = "personalizacoes")
     private List<ItemPedido> itensPedido;
 
-    public Personalizacao(Long id, String nome, String tipo, List<ItemPedido> itensPedido) {
+    @JsonIgnore
+    @ManyToMany(mappedBy = "personalizacoes")
+    private List<Produto> produtos;
+
+    public Personalizacao(Long id, String nome, List<ItemPedido> itensPedido, List<Produto> produtos) {
         this.id = id;
         this.nome = nome;
-        this.tipo = tipo;
+        this.itensPedido = itensPedido;
+        this.produtos = produtos;
+    }
+
+    public Personalizacao(Long id, String nome, List<ItemPedido> itensPedido) {
+        this.id = id;
+        this.nome = nome;
         this.itensPedido = itensPedido;
     }
 
@@ -49,14 +56,6 @@ public class Personalizacao {
         this.nome = nome;
     }
 
-    public String getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
-    }
-
     public List<ItemPedido> getItensPedido() {
         return itensPedido;
     }
@@ -64,4 +63,7 @@ public class Personalizacao {
     public void setItensPedido(List<ItemPedido> itensPedido) {
         this.itensPedido = itensPedido;
     }
+
+    public List<Produto> getProdutos() { return produtos; }
+    public void setProdutos(List<Produto> produtos) { this.produtos = produtos; }
 }

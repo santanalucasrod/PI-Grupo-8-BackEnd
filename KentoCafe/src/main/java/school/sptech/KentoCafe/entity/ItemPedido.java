@@ -35,6 +35,20 @@ public class ItemPedido {
     )
     private List<Personalizacao> personalizacoes;
 
+    @ManyToOne
+    @JoinColumn(name = "tamanho_id", nullable = true)
+    private Tamanho tamanho;
+
+    public ItemPedido(Long id, Pedido pedido, Produto produto, Integer quantidade, BigDecimal precoUnidade, List<Personalizacao> personalizacoes, Tamanho tamanho) {
+        this.id = id;
+        this.pedido = pedido;
+        this.produto = produto;
+        this.quantidade = quantidade;
+        this.precoUnidade = precoUnidade;
+        this.personalizacoes = personalizacoes;
+        this.tamanho = tamanho;
+    }
+
     public ItemPedido(Long id, Pedido pedido, Produto produto, Integer quantidade, BigDecimal precoUnidade, List<Personalizacao> personalizacoes) {
         this.id = id;
         this.pedido = pedido;
@@ -94,4 +108,7 @@ public class ItemPedido {
     public void setPersonalizacoes(List<Personalizacao> personalizacoes) {
         this.personalizacoes = personalizacoes;
     }
+
+    public Tamanho getTamanho() { return tamanho; }
+    public void setTamanho(Tamanho tamanho) { this.tamanho = tamanho; }
 }
