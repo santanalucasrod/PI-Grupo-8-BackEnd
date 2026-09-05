@@ -1,5 +1,6 @@
 package school.sptech.KentoCafe.service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -66,6 +67,10 @@ public class FuncionarioService {
         return repository.findAll();
     }
 
+    public List<Funcionario> listarTodosPositivo() {
+        return repository.findByAtivoTrue();
+    }
+
     public Funcionario buscarPorId(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -94,11 +99,22 @@ public class FuncionarioService {
         return repository.save(funcionarioExistente);
     }
 
+    @Transactional
     public void deletar(Long id) {
-        if (!repository.existsById(id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Funcionário não encontrado");
-        }
-        repository.deleteById(id);
+        Funcionario funcionario = buscarEntidadePorId(id);
+        funcionario.setAtivo(false);
+        repository.save(funcionario);
+    }
+
+    public Funcionario reativar(Long id) {
+        Funcionario funcionario = buscarEntidadePorId(id);
+        funcionario.setAtivo(true);
+        return repository.save(funcionario);
+    }
+
+    private Funcionario buscarEntidadePorId(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Funcionário não encontrado"));
     }
 }
