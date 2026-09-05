@@ -96,4 +96,12 @@ public class FuncionarioController {
         funcionarioService.deletar(id);
         return ResponseEntity.noContent().build();
     }
+
+    @Operation(summary = "Reativar funcionário", description = "Reverte um soft delete — somente gerentes")
+    @ApiResponse(responseCode = "200", description = "Funcionário reativado com sucesso")
+    @ApiResponse(responseCode = "403", description = "Acesso negado — somente gerentes")
+    @PatchMapping("/{id}/reativar")
+    public ResponseEntity<Funcionario> reativar(@PathVariable Long id) {
+        return ResponseEntity.ok(funcionarioService.reativar(id));
+    }
 }

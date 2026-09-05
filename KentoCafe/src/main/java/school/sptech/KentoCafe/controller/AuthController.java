@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,7 +53,7 @@ public class AuthController {
                             request.getSenha()
                     )
             );
-        } catch (org.springframework.security.core.AuthenticationException e) {
+        } catch (AuthenticationException e) {
             log.warn("Falha de autenticação para o usuário: {}", request.getEmail());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");
         } catch (Exception e) {
@@ -66,6 +67,7 @@ public class AuthController {
         log.info("Login realizado com sucesso para: {}", request.getEmail());
 
         return ResponseEntity.ok(Map.of(
+                "id", funcionario.getId(),
                 "token", token,
                 "gerente", funcionario.getGerente(),
                 "nome", funcionario.getNome()
