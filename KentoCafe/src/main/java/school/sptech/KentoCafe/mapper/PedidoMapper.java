@@ -39,6 +39,11 @@ public class PedidoMapper {
                         itemResp.setPersonalizacoes(personalizacoes);
                     }
 
+                    if (item.getTamanho() != null) {
+                        itemResp.setTamanho(item.getTamanho().getNome());
+                        itemResp.setVolumeMl(item.getTamanho().getVolumeMl());
+                    }
+
                     return itemResp;
                 })
                 .collect(Collectors.toList());
