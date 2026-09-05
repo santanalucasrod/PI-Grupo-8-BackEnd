@@ -82,42 +82,6 @@ class PersonalizacaoServiceTest {
     }
 
     @Nested
-    @DisplayName("Cenários do método buscarPorTipo")
-    class BuscarPorTipoTests {
-
-        @Test
-        @DisplayName("Deve retornar a lista de personalizações filtradas por tipo")
-        void deveRetornarPersonalizacoesPorTipo() {
-            String tipo = "Borda";
-            List<Personalizacao> listaSimulada = List.of(new Personalizacao());
-            when(personalizacaoRepository.findByTipo(tipo)).thenReturn(listaSimulada);
-
-            List<Personalizacao> resultado = personalizacaoService.buscarPorTipo(tipo);
-
-            assertEquals(1, resultado.size());
-            verify(personalizacaoRepository, times(1)).findByTipo(tipo);
-        }
-    }
-
-    @Nested
-    @DisplayName("Cenários do método buscarTiposDisponiveis")
-    class BuscarTiposDisponiveisTests {
-
-        @Test
-        @DisplayName("Deve retornar a lista de strings com os tipos únicos disponíveis")
-        void deveRetornarTiposDisponiveis() {
-            List<String> tiposSimulados = List.of("Borda", "Ingrediente Extra");
-            when(personalizacaoRepository.findTiposDisponiveis()).thenReturn(tiposSimulados);
-
-            List<String> resultado = personalizacaoService.buscarTiposDisponiveis();
-
-            assertEquals(2, resultado.size());
-            assertTrue(resultado.contains("Borda"));
-            verify(personalizacaoRepository, times(1)).findTiposDisponiveis();
-        }
-    }
-
-    @Nested
     @DisplayName("Cenários do método criar")
     class CriarTests {
 
@@ -152,11 +116,9 @@ class PersonalizacaoServiceTest {
             Personalizacao existente = new Personalizacao();
             existente.setId(id);
             existente.setNome("Nome Antigo");
-            existente.setTipo("Tipo Antigo");
 
             Personalizacao request = new Personalizacao();
             request.setNome("Nome Novo");
-            request.setTipo("Tipo Novo");
 
             // Mock do buscarPorId interno e do save
             when(personalizacaoRepository.findById(id)).thenReturn(Optional.of(existente));
@@ -165,7 +127,6 @@ class PersonalizacaoServiceTest {
             Personalizacao resultado = personalizacaoService.atualizar(id, request);
 
             assertEquals("Nome Novo", resultado.getNome());
-            assertEquals("Tipo Novo", resultado.getTipo());
             assertEquals(id, resultado.getId());
         }
     }

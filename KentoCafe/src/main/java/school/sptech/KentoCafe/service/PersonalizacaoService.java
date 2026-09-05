@@ -27,13 +27,6 @@ public class PersonalizacaoService {
                         HttpStatus.NOT_FOUND, "Personalização não encontrada"));
     }
 
-    public List<Personalizacao> buscarPorTipo(String tipo) {
-        return personalizacaoRepository.findByTipo(tipo);
-    }
-
-    public List<String> buscarTiposDisponiveis() {
-        return personalizacaoRepository.findTiposDisponiveis();
-    }
 
     public Personalizacao criar(Personalizacao personalizacao) {
         return personalizacaoRepository.save(personalizacao);
@@ -42,7 +35,6 @@ public class PersonalizacaoService {
     public Personalizacao atualizar(Long id, Personalizacao request) {
         Personalizacao existente = buscarPorId(id);
         existente.setNome(request.getNome());
-        existente.setTipo(request.getTipo());
         return personalizacaoRepository.save(existente);
     }
 
