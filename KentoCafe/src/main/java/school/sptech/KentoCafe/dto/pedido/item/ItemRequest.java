@@ -18,6 +18,16 @@ public class ItemRequest {
     @Schema(description = "IDs das personalizações escolhidas", example = "[1, 3]")
     private List<Long> personalizacaoIds;
 
+    @Schema(description = "ID do tamanho escolhido", example = "2")
+    private Long tamanhoId;
+
+    public ItemRequest(Long produtoId, Integer quantidade, List<Long> personalizacaoIds, Long tamanhoId) {
+        this.produtoId = produtoId;
+        this.quantidade = quantidade;
+        this.personalizacaoIds = personalizacaoIds;
+        this.tamanhoId = tamanhoId;
+    }
+
     public ItemRequest(Long produtoId, Integer quantidade, List<Long> personalizacaoIds) {
         this.produtoId = produtoId;
         this.quantidade = quantidade;
@@ -50,4 +60,7 @@ public class ItemRequest {
     public void setPersonalizacaoIds(List<Long> personalizacaoIds) {
         this.personalizacaoIds = personalizacaoIds;
     }
+
+    public Long getTamanhoId() { return tamanhoId; }
+    public void setTamanhoId(Long tamanhoId) { this.tamanhoId = tamanhoId; }
 }

@@ -10,6 +10,7 @@ public class ProdutoResponse {
     private BigDecimal precoUnidade;
     private String descricao;
     private String pathFt;
+    private Boolean ativo;
 
     public static class Categoria{
         private Long id;
@@ -74,4 +75,12 @@ public class ProdutoResponse {
 
     public String getPathFt() { return pathFt; }
     public void setPathFt(String pathFt) { this.pathFt = pathFt; }
+
+    public Boolean getAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        this.ativo = ativo;
+    }
 }

@@ -9,6 +9,8 @@ public class ItemResponse {
     private BigDecimal precoUnitario;
     private BigDecimal subtotal;
     private List<String> personalizacoes;
+    private String tamanho;
+    private Integer volumeMl;
 
     public String getNomeProduto() {
         return nomeProduto;
@@ -48,5 +50,21 @@ public class ItemResponse {
 
     public void setPersonalizacoes(List<String> personalizacoes) {
         this.personalizacoes = personalizacoes;
+    }
+
+    public String getTamanho() {
+        return tamanho;
+    }
+
+    public void setTamanho(String tamanho) {
+        this.tamanho = tamanho;
+    }
+
+    public Integer getVolumeMl() {
+        return volumeMl;
+    }
+
+    public void setVolumeMl(Integer volumeMl) {
+        this.volumeMl = volumeMl;
     }
 }
