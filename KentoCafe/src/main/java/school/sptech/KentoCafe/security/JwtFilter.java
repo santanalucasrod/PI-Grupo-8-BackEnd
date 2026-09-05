@@ -50,6 +50,14 @@ public class JwtFilter extends OncePerRequestFilter {
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails user = userDetailsService.loadUserByUsername(email);
 
+                if (!user.isEnabled()) {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"erro\": \"Conta desativada\"}");
+                    response.getWriter().flush();
+                    return;
+                }
+
                 if (jwtService.tokenValido(token, user)) {
                     UsernamePasswordAuthenticationToken auth =
                             new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
