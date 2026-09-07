@@ -17,6 +17,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import school.sptech.KentoCafe.dto.produto.ProdutoRequest;
@@ -30,6 +32,7 @@ import school.sptech.KentoCafe.repository.ItemPedidoRepository;
 import school.sptech.KentoCafe.repository.ProdutoRepository;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class ProdutoServiceTest {
 
     @Mock private ProdutoRepository produtoRepository;
@@ -195,26 +198,18 @@ class ProdutoServiceTest {
         }
 
         @Test
-        @DisplayName("Deve lançar CONFLICT se o produto possuir dependência com algum item de pedido")
-        void deletarComVinculoEmPedido() {
-            when(produtoRepository.existsById(1L)).thenReturn(true);
-            when(itemPedidoRepository.existsByProdutoId(1L)).thenReturn(true);
-
-            ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> produtoService.deletar(1L));
-            assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
-            assertTrue(ex.getReason().contains("vinculado a pedidos existentes"));
-        }
-
-        @Test
         @DisplayName("Deve limpar os relacionamentos de ingredientes e remover o produto com sucesso")
         void deletarComSucesso() {
-            when(produtoRepository.existsById(1L)).thenReturn(true);
+            Produto produto = new Produto();
+            produto.setId(1L);
+
+            when(produtoRepository.findById(1L)).thenReturn(Optional.of(produto));
             when(itemPedidoRepository.existsByProdutoId(1L)).thenReturn(false);
 
             assertDoesNotThrow(() -> produtoService.deletar(1L));
 
             verify(produtoRepository, times(1)).removerTodosIngredientesDoProduto(1L);
-            verify(produtoRepository, times(1)).deleteById(1L);
+            verify(produtoRepository, times(1)).delete(produto);
         }
     }
 

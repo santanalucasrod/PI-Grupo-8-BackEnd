@@ -227,10 +227,13 @@ class FuncionarioServiceTest {
         @Test
         @DisplayName("Deve deletar o funcionário com sucesso (Cenário 5.2)")
         void deletarComSucesso() {
-            when(repository.existsById(1L)).thenReturn(true);
+            Funcionario funcionario = new Funcionario();
+            funcionario.setId(1L);
+
+            when(repository.findById(1L)).thenReturn(Optional.of(funcionario));
 
             assertDoesNotThrow(() -> funcionarioService.deletar(1L));
-            verify(repository, times(1)).deleteById(1L);
+            verify(repository, times(1)).delete(funcionario);
         }
     }
 }
