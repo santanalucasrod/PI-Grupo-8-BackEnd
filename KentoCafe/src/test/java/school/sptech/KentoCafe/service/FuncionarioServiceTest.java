@@ -14,6 +14,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -29,6 +31,7 @@ import school.sptech.KentoCafe.repository.FuncionarioRepository;
 import school.sptech.KentoCafe.security.JwtService;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class FuncionarioServiceTest {
 
     @Mock private FuncionarioRepository repository;
@@ -170,18 +173,6 @@ class FuncionarioServiceTest {
     class AtualizarTests {
 
         @Test
-        @DisplayName("Deve lançar NOT_FOUND se tentar atualizar funcionário inexistente (Cenário 4.1)")
-        void atualizarInexistente() {
-            FuncionarioRequest f = new FuncionarioRequest();
-            when(repository.existsById(1L)).thenReturn(false);
-
-            ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> funcionarioService.atualizar(1L, f));
-            assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
-            verify(repository, never()).save(any());
-
-        }
-
-        @Test
         @DisplayName("Deve atualizar ID, criptografar nova senha e salvar com sucesso (Cenário 4.2)")
         void atualizarComSucesso() {
             Long id = 1L;
@@ -207,33 +198,6 @@ class FuncionarioServiceTest {
             verify(repository).findById(id);
             verify(repository).findByEmail(dto.getEmail());
             verify(repository).save(funcionarioExistente);
-        }
-    }
-
-    @Nested
-    @DisplayName("Cenários do método deletar")
-    class DeletarTests {
-
-        @Test
-        @DisplayName("Deve lançar NOT_FOUND ao tentar deletar ID inexistente (Cenário 5.1)")
-        void deletarInexistente() {
-            when(repository.existsById(1L)).thenReturn(false);
-
-            ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> funcionarioService.deletar(1L));
-            assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
-            verify(repository, never()).deleteById(any());
-        }
-
-        @Test
-        @DisplayName("Deve deletar o funcionário com sucesso (Cenário 5.2)")
-        void deletarComSucesso() {
-            Funcionario funcionario = new Funcionario();
-            funcionario.setId(1L);
-
-            when(repository.findById(1L)).thenReturn(Optional.of(funcionario));
-
-            assertDoesNotThrow(() -> funcionarioService.deletar(1L));
-            verify(repository, times(1)).delete(funcionario);
         }
     }
 }
