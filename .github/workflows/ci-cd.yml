@@ -40,7 +40,7 @@ jobs:
     - name: Popular Banco de Dados
       run: |
         sudo apt-get update && sudo apt-get install -y mysql-client
-        mysql -h 127.0.0.1 -u root -p"${{ secrets.TEST_DB_ROOT_PASSWORD }}" cafeteria < ./script_cafeteria_v7.sql
+        mysql -h 127.0.0.1 -u root -p"${{ secrets.TEST_DB_ROOT_PASSWORD }}" cafeteria < ./kentocafe_banco_v7.sql
 
     - name: Build and Test with Maven
       run: mvn clean install
