@@ -14,10 +14,10 @@
 
 -- somente para quem não criou ainda
 -- utilizado como configuração do env
-DROP USER IF EXISTS "developer";
-SET GLOBAL validate_password.policy = 0;
-CREATE USER 'developer'@'%' IDENTIFIED BY "sptech@2026";
-GRANT ALL PRIVILEGES on cafeteria.* TO "developer";
+DROP USER IF EXISTS 'developer'@'%';
+-- SET GLOBAL validate_password.policy = 0;
+CREATE USER 'developer'@'%' IDENTIFIED BY 'sptech@2026';
+GRANT ALL PRIVILEGES ON cafeteria.* TO 'developer'@'%';
 FLUSH PRIVILEGES;
 
 CREATE SCHEMA IF NOT EXISTS `cafeteria`;
