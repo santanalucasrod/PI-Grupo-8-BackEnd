@@ -87,7 +87,7 @@ public class ProdutoIngredienteService {
         ProdutoIngrediente produtoIngrediente = new ProdutoIngrediente();
         produtoIngrediente.setProduto(produtoEntidade);
         produtoIngrediente.setIngrediente(IngredienteEntidade);
-        return produtoIngrediente;
+        return produtoIngredienteRepository.save(produtoIngrediente);
     }
 
     public ProdutoIngrediente editarProdutoIngrediente(Integer id, ProdutoIngredienteRequest req){
