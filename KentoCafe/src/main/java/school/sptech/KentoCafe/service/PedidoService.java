@@ -1,87 +1,154 @@
 package school.sptech.KentoCafe.service;
 
 import jakarta.transaction.Transactional;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import school.sptech.KentoCafe.dto.pedido.item.ItemRequest;
 import school.sptech.KentoCafe.dto.pedido.pedido.PedidoRequest;
-import school.sptech.KentoCafe.dto.pedido.pedido.PedidoResponse;
 import school.sptech.KentoCafe.entity.*;
-import school.sptech.KentoCafe.exception.CarrinhoVazioException;
-import school.sptech.KentoCafe.exception.EntidadeNaoEncontradoException;
-import school.sptech.KentoCafe.exception.ProdutoNaoEncontradoException;
-import school.sptech.KentoCafe.mapper.PedidoMapper;
-import school.sptech.KentoCafe.repository.FuncionarioRepository;
-import school.sptech.KentoCafe.repository.InfoAdicionalRepository;
-import school.sptech.KentoCafe.repository.PedidoRepository;
-import school.sptech.KentoCafe.repository.ProdutoRepository;
+import school.sptech.KentoCafe.repository.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class PedidoService {
-    private final PedidoRepository pedidoRepository;
-    private final ProdutoRepository produtoRepository;
-    private final InfoAdicionalRepository infoAdicionalRepository;
-    private final FuncionarioRepository funcionarioRepository;
 
-    public PedidoService(PedidoRepository pedidoRepository, ProdutoRepository produtoRepository, InfoAdicionalRepository infoAdicionalRepository, FuncionarioRepository funcionarioRepository) {
+    private final PedidoRepository pedidoRepository;
+    private final StatusRepository statusRepository;
+    private final FuncionarioRepository funcionarioRepository;
+    private final ProdutoRepository produtoRepository;
+    private final PersonalizacaoRepository personalizacaoRepository;
+
+    public PedidoService(PedidoRepository pedidoRepository,
+                         StatusRepository statusRepository,
+                         FuncionarioRepository funcionarioRepository,
+                         ProdutoRepository produtoRepository,
+                         PersonalizacaoRepository personalizacaoRepository) {
         this.pedidoRepository = pedidoRepository;
-        this.produtoRepository = produtoRepository;
-        this.infoAdicionalRepository = infoAdicionalRepository;
+        this.statusRepository = statusRepository;
         this.funcionarioRepository = funcionarioRepository;
+        this.produtoRepository = produtoRepository;
+        this.personalizacaoRepository = personalizacaoRepository;
     }
 
     @Transactional
-    public PedidoResponse finalizarPedido(PedidoRequest request) {
-        if (request.getItens() == null || request.getItens().isEmpty()) {
-            throw new CarrinhoVazioException();
+    public Pedido criar(PedidoRequest request) {
+
+        Status emPreparo = statusRepository.findByNome("Em preparo")
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Status 'Em preparo' não encontrado"));
+
+        Funcionario funcionario = funcionarioRepository.findById(request.getFuncionarioId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Funcionário não encontrado"));
+
+        Pedido pedido = new Pedido();
+        pedido.setNomeCliente(request.getNomeCliente());
+        pedido.setDtHrPedido(LocalDateTime.now());
+        pedido.setDtHrPronto(null);
+        pedido.setStatus(emPreparo);
+        pedido.setFuncionario(funcionario);
+
+        List<ItemPedido> itens = new ArrayList<>();
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (ItemRequest itemReq : request.getItens()) {
+
+            Produto produto = produtoRepository.findById(itemReq.getProdutoId())
+                    .orElseThrow(() -> new ResponseStatusException(
+                            HttpStatus.NOT_FOUND, "Produto não encontrado: id " + itemReq.getProdutoId()));
+
+            ItemPedido item = new ItemPedido();
+            item.setPedido(pedido);
+            item.setProduto(produto);
+            item.setQuantidade(itemReq.getQuantidade());
+            item.setPrecoUnidade(produto.getPrecoUnidade());
+
+            if (itemReq.getPersonalizacaoIds() != null && !itemReq.getPersonalizacaoIds().isEmpty()) {
+                List<Personalizacao> personalizacoes = personalizacaoRepository
+                        .findAllById(itemReq.getPersonalizacaoIds());
+                item.setPersonalizacoes(personalizacoes);
+            }
+
+            total = total.add(
+                    produto.getPrecoUnidade().multiply(BigDecimal.valueOf(itemReq.getQuantidade()))
+            );
+
+            itens.add(item);
         }
 
-        Pedido novoPedido = new Pedido();
-        novoPedido.setDtHrPedido(LocalDateTime.now());
-        novoPedido.setDtHrPronto(LocalDateTime.now());
-        novoPedido.setStatus("PENDENTE");
+        pedido.setItens(itens);
+        pedido.setValorTotal(total);
 
-        if (request.getFuncionario() == null || request.getFuncionario().getId() == null) {
-            throw new EntidadeNaoEncontradoException("O funcionário responsável pelo pedido é obrigatório.");
-        }
-
-        Funcionario funcionario = funcionarioRepository.findById(request.getFuncionario().getId())
-                .orElseThrow(() -> new EntidadeNaoEncontradoException("Funcionário não encontrado"));
-
-        novoPedido.setFuncionario(funcionario);
-
-        novoPedido.setFuncionario(request.getFuncionario());
-        novoPedido.setNome(request.getNome());
-
-        if (request.getInfoAdicional() == null || request.getInfoAdicional().getId() == null) {
-            throw new EntidadeNaoEncontradoException("A informação adicional é obrigatória.");
-        }
-
-        InfoAdicional info = infoAdicionalRepository.findById(request.getInfoAdicional().getId())
-                .orElseThrow(() -> new EntidadeNaoEncontradoException("Informação adicional não encontrada no banco."));
-
-        novoPedido.setInfoAdicional(info);
-
-        double totalAcumulado = 0.0;
-
-
-        for (ItemRequest item : request.getItens()) {
-            Produto p = produtoRepository.findById(item.getProdutoId())
-                    .orElseThrow(ProdutoNaoEncontradoException::new);
-
-            Venda venda = new Venda();
-            venda.setProduto(p);
-            venda.setQuantidade(item.getQuantidade());
-            venda.setPedido(novoPedido);
-
-            totalAcumulado += p.getPrecoUnidade() * item.getQuantidade();
-
-            novoPedido.getItens().add(venda);
-        }
-
-        Pedido pedidoSalvo = pedidoRepository.save(novoPedido);
-        return PedidoMapper.toResponse(pedidoSalvo, totalAcumulado);
+        return pedidoRepository.save(pedido);
     }
 
+    @Transactional
+    public Pedido concluir(Long id) {
+        Pedido pedido = buscarOuLancarErro(id);
+
+        if (pedido.getStatus().getNome().equals("Cancelado")) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "Pedido cancelado não pode ser concluído");
+        }
+
+        if (pedido.getStatus().getNome().equals("Pronto")) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "Pedido já está pronto");
+        }
+
+        Status pronto = statusRepository.findByNome("Pronto")
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Status 'Pronto' não encontrado"));
+
+        pedido.setStatus(pronto);
+        pedido.setDtHrPronto(LocalDateTime.now());
+
+        return pedidoRepository.save(pedido);
+    }
+
+    @Transactional
+    public Pedido cancelar(Long id) {
+        Pedido pedido = buscarOuLancarErro(id);
+
+        if (pedido.getStatus().getNome().equals("Pronto")) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "Pedido já concluído não pode ser cancelado");
+        }
+
+        if (pedido.getStatus().getNome().equals("Cancelado")) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "Pedido já está cancelado");
+        }
+
+        Status cancelado = statusRepository.findByNome("Cancelado")
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Status 'Cancelado' não encontrado"));
+
+        pedido.setStatus(cancelado);
+
+        return pedidoRepository.save(pedido);
+    }
+
+    public List<Pedido> listarTodos() {
+        return pedidoRepository.findAll();
+    }
+
+    public List<Pedido> listarPorStatus(String statusNome) {
+        return pedidoRepository.findByStatusNome(statusNome);
+    }
+
+    public Pedido buscarPorId(Long id) {
+        return buscarOuLancarErro(id);
+    }
+
+    private Pedido buscarOuLancarErro(Long id) {
+        return pedidoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Pedido não encontrado"));
+    }
 }

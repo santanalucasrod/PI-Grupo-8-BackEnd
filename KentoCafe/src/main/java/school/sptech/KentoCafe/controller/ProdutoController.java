@@ -7,14 +7,19 @@ import jakarta.validation.Valid;
 import org.hibernate.sql.ast.tree.expression.Summarization;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import school.sptech.KentoCafe.dto.ingrediente.IngredienteResponse;
 import school.sptech.KentoCafe.dto.produto.ProdutoRequest;
 import school.sptech.KentoCafe.dto.produto.ProdutoRequest;
 import school.sptech.KentoCafe.dto.produto.ProdutoResponse;
 import school.sptech.KentoCafe.dto.produto.ProdutoResponse;
+import school.sptech.KentoCafe.dto.tamanho.produtotamanho.ProdutoTamanhoRequest;
+import school.sptech.KentoCafe.dto.tamanho.produtotamanho.ProdutoTamanhoResponse;
 import school.sptech.KentoCafe.entity.Ingrediente;
+import school.sptech.KentoCafe.entity.Personalizacao;
 import school.sptech.KentoCafe.entity.Produto;
 import school.sptech.KentoCafe.mapper.IngredienteMapper;
 import school.sptech.KentoCafe.mapper.ProdutoMapper;
+import school.sptech.KentoCafe.service.IngredienteService;
 import school.sptech.KentoCafe.service.ProdutoService;
 
 import java.util.List;
@@ -25,9 +30,11 @@ import java.util.Map;
 public class ProdutoController {
 
     private final ProdutoService produtoService;
+    private final IngredienteService ingredienteService;
 
-    public ProdutoController(ProdutoService produtoService) {
+    public ProdutoController(ProdutoService produtoService, IngredienteService ingredienteService) {
         this.produtoService = produtoService;
+        this.ingredienteService = ingredienteService;
     }
     @Operation(summary = "Criar produto")
     @ApiResponse(responseCode = "201", description = "Produto criado com sucesso")
@@ -44,8 +51,9 @@ public class ProdutoController {
 
     @Operation(summary = "Buscar produto por ID")
     @ApiResponse(responseCode = "200", description = "Produto encontrado")
+    @ApiResponse(responseCode = "404", description = "Produto não encontrado")
     @GetMapping("/{id}")
-    public ResponseEntity<ProdutoResponse> buscarPorId(@PathVariable Integer id) {
+    public ResponseEntity<ProdutoResponse> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(produtoService.buscarPorId(id));
     }
 
@@ -53,44 +61,141 @@ public class ProdutoController {
     @ApiResponse(responseCode = "200", description = "Produto atualizado com sucesso")
     @PutMapping("/{id}")
     public ResponseEntity<ProdutoResponse> atualizar(
-            @PathVariable Integer id,
+            @PathVariable Long id,
             @RequestBody @Valid ProdutoRequest dto) {
         return ResponseEntity.ok(produtoService.atualizar(id, dto));
     }
+
     @Operation(summary = "Deletar produto")
     @ApiResponse(responseCode = "204", description = "Produto deletado com sucesso")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
         produtoService.deletar(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Listar produtos por categoria")
+    @ApiResponse(responseCode = "200", description = "Produtos encontrados")
+    @ApiResponse(responseCode = "204", description = "Nenhum produto encontrado")
+    @GetMapping("/categoria/{id}")
+    public ResponseEntity<List<ProdutoResponse>> listarPorCategoria(@PathVariable Long id) {
+        List<ProdutoResponse> produtos = produtoService.listarPorCategoria(id);
+        return produtos.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(produtos);
+    }
+
+    @Operation(summary = "Listar produtos agrupados por categoria")
+    @ApiResponse(responseCode = "200", description = "Produtos agrupados retornados com sucesso")
+    @GetMapping("/agrupados")
+    public ResponseEntity<Map<String, List<ProdutoResponse>>> listarAgrupados() {
+        return ResponseEntity.ok(produtoService.listarPorCategoriaAgrupados());
+    }
+
+    @Operation(summary = "Buscar ingredientes de um produto")
+    @ApiResponse(responseCode = "200", description = "Ingredientes encontrados")
+    @ApiResponse(responseCode = "204", description = "Nenhum ingrediente encontrado")
+    @GetMapping("/{id}/ingredientes")
+    public ResponseEntity<List<IngredienteResponse>> buscarIngredientes(
+            @PathVariable Long id) {
+        List<Ingrediente> ingredientes = produtoService.buscarIngredientesPorProduto(id);
+        return ingredientes.isEmpty()
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.ok(IngredienteMapper.toResponseList(ingredientes));
+    }
+
+    @Operation(summary = "Adicionar ingrediente ao produto")
+    @ApiResponse(responseCode = "200", description = "Ingrediente adicionado com sucesso")
+    @PostMapping("/{id}/ingredientes/{ingredienteId}")
+    public ResponseEntity<ProdutoResponse> adicionarIngrediente(
+            @PathVariable Long id,
+            @PathVariable Long ingredienteId) {
+        Produto produto = produtoService.adicionarIngrediente(id, ingredienteId);
+        return ResponseEntity.ok(ProdutoMapper.toResponse(produto));
+    }
+
+    @Operation(summary = "Remover ingrediente do produto")
+    @ApiResponse(responseCode = "204", description = "Ingrediente removido com sucesso")
+    @DeleteMapping("/{id}/ingredientes/{ingredienteId}")
+    public ResponseEntity<Void> removerIngrediente(
+            @PathVariable Long id,
+            @PathVariable Long ingredienteId) {
+        produtoService.removerIngredienteDoProduto(id, ingredienteId);
         return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Buscar produtos por ingrediente")
     @ApiResponse(responseCode = "200", description = "Produtos encontrados")
+    @ApiResponse(responseCode = "204", description = "Nenhum produto encontrado")
     @GetMapping("/por-ingrediente/{ingredienteId}")
-    public ResponseEntity<List<ProdutoResponse>> buscarProdutosPorIngrediente(
-            @RequestParam Integer ingredienteId
-    ){
-        List<Produto> produtos = produtoService.buscarProdutosPorIngredienteId(ingredienteId);
-        if (produtos.isEmpty()){
-            return ResponseEntity.status(404).build();
-        }
-        return ResponseEntity.status(200).body(ProdutoMapper.toResponseList(produtos));
+    public ResponseEntity<List<ProdutoResponse>> buscarPorIngrediente(
+            @PathVariable Long ingredienteId) {
+        List<Produto> produtos = ingredienteService.buscarProdutosPorIngrediente(ingredienteId);
+        return produtos.isEmpty()
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.ok(ProdutoMapper.toResponseList(produtos));
     }
 
-    @Operation(summary = "Listar produtos por categoria")
-    @ApiResponse(responseCode = "200", description = "Produtos encontrados")
-    @GetMapping("/categoria/{id}")
-    public ResponseEntity<List<ProdutoResponse>> listarPorCategoria(@PathVariable Integer id) {
-        List<ProdutoResponse> produtos = produtoService.listarPorCategoria(id);
-        return produtos.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(produtos);
+    @Operation(summary = "Atualizar todos os ingredientes de um produto",
+            description = "Substitui toda a lista de ingredientes do produto")
+    @ApiResponse(responseCode = "200", description = "Ingredientes atualizados")
+    @ApiResponse(responseCode = "404", description = "Produto ou ingrediente não encontrado")
+    @PutMapping("/{id}/ingredientes")
+    public ResponseEntity<ProdutoResponse> atualizarIngredientes(
+            @PathVariable Long id,
+            @RequestBody List<Long> ingredienteIds) {
+        Produto produto = produtoService.atualizarIngredientes(id, ingredienteIds);
+        return ResponseEntity.ok(ProdutoMapper.toResponse(produto));
     }
 
-    @Operation(summary = "Listar produtos agrupados por categoria", description = "Retorna um mapa com categorias como chave e lista de produtos como valor")
-    @ApiResponse(responseCode = "200", description = "Produtos agrupados retornados com sucesso")
-    @GetMapping("/agrupados")
-    public ResponseEntity<Map<String, List<ProdutoResponse>>> listarAgrupados() {
-        Map<String, List<ProdutoResponse>> agrupados = produtoService.listarPorCategoriaAgrupados();
-        return ResponseEntity.ok(agrupados);
+    @Operation(summary = "Reativar produto", description = "Reverte um soft delete")
+    @ApiResponse(responseCode = "200", description = "Produto reativado com sucesso")
+    @PatchMapping("/{id}/reativar")
+    public ResponseEntity<ProdutoResponse> reativar(@PathVariable Long id) {
+        return ResponseEntity.ok(produtoService.reativar(id));
+    }
+
+    @Operation(summary = "Listar personalizações disponíveis para um produto")
+    @GetMapping("/{id}/personalizacoes")
+    public ResponseEntity<List<Personalizacao>> listarPersonalizacoes(@PathVariable Long id) {
+        return ResponseEntity.ok(produtoService.buscarPersonalizacoesPorProduto(id));
+    }
+
+    @Operation(summary = "Vincular personalização ao produto", description = "Somente gerentes")
+    @ApiResponse(responseCode = "409", description = "Personalização já vinculada")
+    @PostMapping("/{id}/personalizacoes/{personalizacaoId}")
+    public ResponseEntity<ProdutoResponse> adicionarPersonalizacao(@PathVariable Long id, @PathVariable Long personalizacaoId) {
+        return ResponseEntity.ok(ProdutoMapper.toResponse(produtoService.adicionarPersonalizacao(id, personalizacaoId)));
+    }
+
+    @Operation(summary = "Remover personalização do produto")
+    @DeleteMapping("/{id}/personalizacoes/{personalizacaoId}")
+    public ResponseEntity<Void> removerPersonalizacao(@PathVariable Long id, @PathVariable Long personalizacaoId) {
+        produtoService.removerPersonalizacao(id, personalizacaoId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Substituir todas as personalizações do produto")
+    @PutMapping("/{id}/personalizacoes")
+    public ResponseEntity<ProdutoResponse> atualizarPersonalizacoes(@PathVariable Long id, @RequestBody List<Long> personalizacaoIds) {
+        return ResponseEntity.ok(ProdutoMapper.toResponse(produtoService.atualizarPersonalizacoes(id, personalizacaoIds)));
+    }
+
+    @Operation(summary = "Listar tamanhos e preços de um produto")
+    @GetMapping("/{id}/tamanhos")
+    public ResponseEntity<List<ProdutoTamanhoResponse>> listarTamanhos(@PathVariable Long id) {
+        return ResponseEntity.ok(produtoService.buscarTamanhosPorProduto(id));
+    }
+
+    @Operation(summary = "Adicionar tamanho ao produto", description = "Somente gerentes")
+    @ApiResponse(responseCode = "409", description = "Esse tamanho já está cadastrado para esse produto")
+    @PostMapping("/{id}/tamanhos")
+    public ResponseEntity<ProdutoTamanhoResponse> adicionarTamanho(@PathVariable Long id, @RequestBody @Valid ProdutoTamanhoRequest dto) {
+        return ResponseEntity.status(201).body(produtoService.adicionarTamanho(id, dto));
+    }
+
+    @Operation(summary = "Remover tamanho do produto")
+    @DeleteMapping("/{id}/tamanhos/{tamanhoId}")
+    public ResponseEntity<Void> removerTamanho(@PathVariable Long id, @PathVariable Long tamanhoId) {
+        produtoService.removerTamanho(id, tamanhoId);
+        return ResponseEntity.noContent().build();
     }
 }

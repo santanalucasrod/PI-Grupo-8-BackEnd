@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import school.sptech.KentoCafe.entity.Categoria;
 
 @Repository
-public interface CategoriaRepository extends JpaRepository<Categoria, Integer> {
+public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
 }

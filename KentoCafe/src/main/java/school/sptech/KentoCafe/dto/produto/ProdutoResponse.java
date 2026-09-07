@@ -1,23 +1,26 @@
 package school.sptech.KentoCafe.dto.produto;
 
+import java.math.BigDecimal;
+
 public class ProdutoResponse {
 
-    private Integer id;
+    private Long id;
     private String nome;
     private Categoria categoria;
-    private Double precoUnidade;
+    private BigDecimal precoUnidade;
     private String descricao;
     private String pathFt;
+    private Boolean ativo;
 
     public static class Categoria{
-        private Integer id;
+        private Long id;
         private String nome;
 
-        public Integer getId() {
+        public Long getId() {
             return id;
         }
 
-        public void setId(Integer id) {
+        public void setId(Long id) {
             this.id = id;
         }
 
@@ -29,7 +32,7 @@ public class ProdutoResponse {
             this.nome = nome;
         }
 
-        public Categoria(Integer id, String nome) {
+        public Categoria(Long id, String nome) {
             this.id = id;
             this.nome = nome;
         }
@@ -46,7 +49,7 @@ public class ProdutoResponse {
         this.categoria = categoria;
     }
 
-    public ProdutoResponse(Integer id, String nome, Categoria categoria, Double precoUnidade, String descricao, String pathFt) {
+    public ProdutoResponse(Long id, String nome, Categoria categoria, BigDecimal precoUnidade, String descricao, String pathFt) {
         this.id = id;
         this.nome = nome;
         this.categoria = categoria;
@@ -58,18 +61,26 @@ public class ProdutoResponse {
     public ProdutoResponse() {
     }
 
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
 
-    public Double getPrecoUnidade() { return precoUnidade; }
-    public void setPrecoUnidade(Double precoUnidade) { this.precoUnidade = precoUnidade; }
+    public BigDecimal getPrecoUnidade() { return precoUnidade; }
+    public void setPrecoUnidade(BigDecimal precoUnidade) { this.precoUnidade = precoUnidade; }
 
     public String getDescricao() { return descricao; }
     public void setDescricao(String descricao) { this.descricao = descricao; }
 
     public String getPathFt() { return pathFt; }
     public void setPathFt(String pathFt) { this.pathFt = pathFt; }
+
+    public Boolean getAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        this.ativo = ativo;
+    }
 }

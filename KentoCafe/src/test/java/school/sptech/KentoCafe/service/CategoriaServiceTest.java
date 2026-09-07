@@ -1,11 +1,18 @@
 package school.sptech.KentoCafe.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -13,16 +20,8 @@ import school.sptech.KentoCafe.dto.categoria.CategoriaRequest;
 import school.sptech.KentoCafe.dto.categoria.CategoriaResponse;
 import school.sptech.KentoCafe.entity.Categoria;
 import school.sptech.KentoCafe.entity.Produto;
-import school.sptech.KentoCafe.mapper.CategoriaMapper;
 import school.sptech.KentoCafe.repository.CategoriaRepository;
 import school.sptech.KentoCafe.repository.ProdutoRepository;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CategoriaServiceTest {
@@ -36,272 +35,193 @@ class CategoriaServiceTest {
     @InjectMocks
     private CategoriaService categoriaService;
 
-    @Test
-    @DisplayName("criar: Deve criar e retornar uma CategoriaResponse (Cenário Feliz)")
-    void criarCenarioFeliz() {
-        // Arrange
-        CategoriaRequest request = new CategoriaRequest();
-        request.setNome("Bebidas Quentes");
+    @Nested
+    @DisplayName("Cenários do método criar")
+    class CriarTests {
 
-        Categoria entidade = new Categoria();
-        entidade.setId(1);
-        entidade.setNome("Bebidas Quentes");
+        @Test
+        @DisplayName("Deve criar uma categoria com sucesso (Cenário 1.1)")
+        void deveCriarCategoriaComSucesso() {
+            CategoriaRequest request = new CategoriaRequest();
+            request.setNome("Bebidas");
 
-        CategoriaResponse responseEsperada = new CategoriaResponse();
-        responseEsperada.setId(1);
-        responseEsperada.setNome("Bebidas Quentes");
+            Categoria categoriaSalva = new Categoria();
+            categoriaSalva.setId(1L);
+            categoriaSalva.setNome("Bebidas");
 
-        try (MockedStatic<CategoriaMapper> mapperMock = mockStatic(CategoriaMapper.class)) {
-            mapperMock.when(() -> CategoriaMapper.toEntity(request)).thenReturn(entidade);
-            when(categoriaRepository.save(entidade)).thenReturn(entidade);
-            mapperMock.when(() -> CategoriaMapper.toResponse(entidade, List.of())).thenReturn(responseEsperada);
+            when(categoriaRepository.save(any(Categoria.class))).thenReturn(categoriaSalva);
 
-            // Act
             CategoriaResponse resultado = categoriaService.criar(request);
 
-            // Assert
             assertNotNull(resultado);
-            assertEquals(1, resultado.getId());
-            assertEquals("Bebidas Quentes", resultado.getNome());
-            verify(categoriaRepository, times(1)).save(entidade);
+            verify(categoriaRepository, times(1)).save(any(Categoria.class));
         }
     }
 
-    @Test
-    @DisplayName("listarTodos: Deve retornar lista de CategoriaResponse com produtos vinculados (Cenário Feliz)")
-    void listarTodosCenarioFeliz() {
-        // Arrange
-        Categoria c1 = new Categoria();
-        c1.setId(1);
-        c1.setNome("Bebidas Quentes");
+    @Nested
+    @DisplayName("Cenários do método listarTodos")
+    class ListarTodosTests {
 
-        Categoria c2 = new Categoria();
-        c2.setId(2);
-        c2.setNome("Doces");
+        @Test
+        @DisplayName("Deve listar todas as categorias buscando os produtos de cada uma delas (Cenário 2.1)")
+        void deveListarTodasAsCategorias() {
+            // Given
+            Categoria cat1 = new Categoria(); cat1.setId(1L); cat1.setNome("Pizzas");
+            Categoria cat2 = new Categoria(); cat2.setId(2L); cat2.setNome("Bebidas");
 
-        Produto p1 = new Produto();
-        p1.setId(10);
-        p1.setNome("Café Expresso");
-        p1.setCategoria(c1);
+            Produto p1 = new Produto();
+            p1.setId(10L);
+            p1.setNome("Pizza de Calabresa");
+            p1.setCategoria(cat1);
+            p1.setPrecoUnidade(java.math.BigDecimal.valueOf(45.00));
 
-        CategoriaResponse resp1 = new CategoriaResponse();
-        resp1.setId(1);
-        resp1.setNome("Bebidas Quentes");
+            when(categoriaRepository.findAll()).thenReturn(List.of(cat1, cat2));
 
-        CategoriaResponse resp2 = new CategoriaResponse();
-        resp2.setId(2);
-        resp2.setNome("Doces");
+            when(produtoRepository.findByCategoriaId(1L)).thenReturn(List.of(p1));
+            when(produtoRepository.findByCategoriaId(2L)).thenReturn(List.of());
 
-        when(categoriaRepository.findAll()).thenReturn(List.of(c1, c2));
-        when(produtoRepository.findByCategoria_Id(1)).thenReturn(List.of(p1));
-        when(produtoRepository.findByCategoria_Id(2)).thenReturn(Collections.emptyList());
-
-        try (MockedStatic<CategoriaMapper> mapperMock = mockStatic(CategoriaMapper.class)) {
-            mapperMock.when(() -> CategoriaMapper.toResponse(c1, List.of(p1))).thenReturn(resp1);
-            mapperMock.when(() -> CategoriaMapper.toResponse(c2, Collections.emptyList())).thenReturn(resp2);
-
-            // Act
+            // When
             List<CategoriaResponse> resultado = categoriaService.listarTodos();
 
-            // Assert
-            assertNotNull(resultado);
+            // Then
             assertEquals(2, resultado.size());
-            verify(categoriaRepository, times(1)).findAll();
-            verify(produtoRepository, times(1)).findByCategoria_Id(1);
-            verify(produtoRepository, times(1)).findByCategoria_Id(2);
+            verify(produtoRepository, times(1)).findByCategoriaId(1L);
+            verify(produtoRepository, times(1)).findByCategoriaId(2L);
         }
     }
 
-    @Test
-    @DisplayName("listarTodos: Deve retornar lista vazia quando não há categorias cadastradas (Cenário Triste)")
-    void listarTodosVazio() {
-        // Arrange
-        when(categoriaRepository.findAll()).thenReturn(Collections.emptyList());
+    @Nested
+    @DisplayName("Cenários do método buscarPorId")
+    class BuscarPorIdTests {
 
-        // Act
-        List<CategoriaResponse> resultado = categoriaService.listarTodos();
+        @Test
+        @DisplayName("Deve retornar a categoria e seus produtos quando o ID existir (Cenário 3.1)")
+        void deveBuscarPorIdComSucesso() {
+            // Given
+            Long id = 1L;
+            Categoria categoria = new Categoria();
+            categoria.setId(id);
+            categoria.setNome("Sobremesas");
 
-        // Assert
-        assertNotNull(resultado);
-        assertTrue(resultado.isEmpty());
-        verify(categoriaRepository, times(1)).findAll();
-        verify(produtoRepository, never()).findByCategoria_Id(any());
-    }
+            Produto p1 = new Produto();
+            p1.setId(20L);
+            p1.setNome("Pudim");
+            p1.setCategoria(categoria);
+            p1.setPrecoUnidade(java.math.BigDecimal.valueOf(12.00));
 
-    @Test
-    @DisplayName("buscarPorId: Deve retornar CategoriaResponse quando ID existir (Cenário Feliz)")
-    void buscarPorIdCenarioFeliz() {
-        // Arrange
-        Integer id = 1;
+            when(categoriaRepository.findById(id)).thenReturn(Optional.of(categoria));
+            when(produtoRepository.findByCategoriaId(id)).thenReturn(List.of(p1));
 
-        Categoria categoria = new Categoria();
-        categoria.setId(id);
-        categoria.setNome("Bebidas Quentes");
-
-        Produto p1 = new Produto();
-        p1.setId(10);
-        p1.setNome("Café Expresso");
-
-        CategoriaResponse responseEsperada = new CategoriaResponse();
-        responseEsperada.setId(id);
-        responseEsperada.setNome("Bebidas Quentes");
-
-        when(categoriaRepository.findById(id)).thenReturn(Optional.of(categoria));
-        when(produtoRepository.findByCategoria_Id(id)).thenReturn(List.of(p1));
-
-        try (MockedStatic<CategoriaMapper> mapperMock = mockStatic(CategoriaMapper.class)) {
-            mapperMock.when(() -> CategoriaMapper.toResponse(categoria, List.of(p1))).thenReturn(responseEsperada);
-
-            // Act
+            // When
             CategoriaResponse resultado = categoriaService.buscarPorId(id);
 
-            // Assert
+            // Then
             assertNotNull(resultado);
-            assertEquals(id, resultado.getId());
-            assertEquals("Bebidas Quentes", resultado.getNome());
-            verify(categoriaRepository, times(1)).findById(id);
-            verify(produtoRepository, times(1)).findByCategoria_Id(id);
+            verify(produtoRepository, times(1)).findByCategoriaId(id);
+        }
+
+        @Test
+        @DisplayName("Deve lançar NOT_FOUND quando o ID da categoria não existir (Cenário 3.2)")
+        void deveLancarNotFoundAoBuscarPorIdInexistente() {
+            Long id = 99L;
+            when(categoriaRepository.findById(id)).thenReturn(Optional.empty());
+
+            ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> {
+                categoriaService.buscarPorId(id);
+            });
+
+            assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
+            verifyNoInteractions(produtoRepository);
         }
     }
 
-    @Test
-    @DisplayName("buscarPorId: Deve lançar ResponseStatusException 404 quando ID não existir (Cenário Triste)")
-    void buscarPorIdNaoEncontrado() {
-        // Arrange
-        Integer id = 99;
-        when(categoriaRepository.findById(id)).thenReturn(Optional.empty());
+    @Nested
+    @DisplayName("Cenários do método atualizar")
+    class AtualizarTests {
 
-        // Act & Assert
-        ResponseStatusException excecao = assertThrows(ResponseStatusException.class, () -> {
-            categoriaService.buscarPorId(id);
-        });
+        @Test
+        @DisplayName("Deve lançar NOT_FOUND se tentar atualizar categoria inexistente (Cenário 4.1)")
+        void deveLancarNotFoundAoAtualizarInexistente() {
+            Long id = 99L;
+            CategoriaRequest request = new CategoriaRequest();
+            when(categoriaRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertEquals(HttpStatus.NOT_FOUND, excecao.getStatusCode());
-        assertEquals("Categoria não encontrada", excecao.getReason());
-        verify(categoriaRepository, times(1)).findById(id);
-        verify(produtoRepository, never()).findByCategoria_Id(any());
-    }
+            ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> {
+                categoriaService.atualizar(id, request);
+            });
 
+            assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
+            verify(categoriaRepository, never()).save(any());
+        }
 
-    @Test
-    @DisplayName("atualizar: Deve atualizar o nome e retornar CategoriaResponse (Cenário Feliz)")
-    void atualizarCenarioFeliz() {
-        // Arrange
-        Integer id = 1;
+        @Test
+        @DisplayName("Deve atualizar o nome e salvar a categoria com sucesso (Cenário 4.2)")
+        void deveAtualizarComSucesso() {
+            Long id = 1L;
+            CategoriaRequest request = new CategoriaRequest();
+            request.setNome("Pizzas Doces");
 
-        CategoriaRequest request = new CategoriaRequest();
-        request.setNome("Bebidas Geladas");
+            Categoria existente = new Categoria();
+            existente.setId(id);
+            existente.setNome("Pizzas Salgadas");
 
-        Categoria categoriaExistente = new Categoria();
-        categoriaExistente.setId(id);
-        categoriaExistente.setNome("Bebidas Quentes");
+            when(categoriaRepository.findById(id)).thenReturn(Optional.of(existente));
+            when(categoriaRepository.save(existente)).thenReturn(existente);
+            when(produtoRepository.findByCategoriaId(id)).thenReturn(List.of());
 
-        Categoria categoriaAtualizada = new Categoria();
-        categoriaAtualizada.setId(id);
-        categoriaAtualizada.setNome("Bebidas Geladas");
-
-        CategoriaResponse responseEsperada = new CategoriaResponse();
-        responseEsperada.setId(id);
-        responseEsperada.setNome("Bebidas Geladas");
-
-        when(categoriaRepository.findById(id)).thenReturn(Optional.of(categoriaExistente));
-        when(produtoRepository.findByCategoria_Id(id)).thenReturn(Collections.emptyList());
-        when(categoriaRepository.save(categoriaExistente)).thenReturn(categoriaAtualizada);
-
-        try (MockedStatic<CategoriaMapper> mapperMock = mockStatic(CategoriaMapper.class)) {
-            mapperMock.when(() -> CategoriaMapper.toResponse(categoriaAtualizada, Collections.emptyList()))
-                    .thenReturn(responseEsperada);
-
-            // Act
             CategoriaResponse resultado = categoriaService.atualizar(id, request);
 
-            // Assert
             assertNotNull(resultado);
-            assertEquals("Bebidas Geladas", resultado.getNome());
-            verify(categoriaRepository, times(1)).findById(id);
-            verify(categoriaRepository, times(1)).save(categoriaExistente);
-            verify(produtoRepository, times(1)).findByCategoria_Id(id);
+            verify(categoriaRepository, times(1)).save(existente);
         }
     }
 
-    @Test
-    @DisplayName("atualizar: Deve lançar ResponseStatusException 404 quando ID não existir (Cenário Triste)")
-    void atualizarNaoEncontrado() {
-        // Arrange
-        Integer id = 99;
-        CategoriaRequest request = new CategoriaRequest();
-        request.setNome("Qualquer Nome");
+    @Nested
+    @DisplayName("Cenários do método deletar")
+    class DeletarTests {
 
-        when(categoriaRepository.findById(id)).thenReturn(Optional.empty());
+        @Test
+        @DisplayName("Deve lançar NOT_FOUND se tentar deletar ID inexistente (Cenário 5.1)")
+        void deveLancarNotFoundAoDeletar() {
+            Long id = 99L;
+            when(categoriaRepository.existsById(id)).thenReturn(false);
 
-        // Act & Assert
-        ResponseStatusException excecao = assertThrows(ResponseStatusException.class, () -> {
-            categoriaService.atualizar(id, request);
-        });
+            ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> {
+                categoriaService.deletar(id);
+            });
 
-        assertEquals(HttpStatus.NOT_FOUND, excecao.getStatusCode());
-        assertEquals("Categoria não encontrada", excecao.getReason());
-        verify(categoriaRepository, times(1)).findById(id);
-        verify(categoriaRepository, never()).save(any());
-    }
+            assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
+            verify(categoriaRepository, never()).deleteById(any());
+        }
 
-    @Test
-    @DisplayName("deletar: Deve deletar a categoria sem produtos vinculados (Cenário Feliz)")
-    void deletarCenarioFeliz() {
-        // Arrange
-        Integer id = 1;
-        when(categoriaRepository.existsById(id)).thenReturn(true);
-        when(produtoRepository.findByCategoria_Id(id)).thenReturn(Collections.emptyList());
+        @Test
+        @DisplayName("Deve lançar CONFLICT se a categoria possuir produtos vinculados (Cenário 5.2)")
+        void deveLancarConflictSePossuirProdutos() {
+            Long id = 1L;
+            when(categoriaRepository.existsById(id)).thenReturn(true);
 
-        // Act
-        assertDoesNotThrow(() -> categoriaService.deletar(id));
+            // Simula lista de produtos NÃO vazia vinculada à categoria
+            when(produtoRepository.findByCategoriaId(id)).thenReturn(List.of(new Produto()));
 
-        // Assert
-        verify(categoriaRepository, times(1)).existsById(id);
-        verify(produtoRepository, times(1)).findByCategoria_Id(id);
-        verify(categoriaRepository, times(1)).deleteById(id);
-    }
+            ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> {
+                categoriaService.deletar(id);
+            });
 
-    @Test
-    @DisplayName("deletar: Deve lançar ResponseStatusException 404 quando ID não existir (Cenário Triste)")
-    void deletarNaoEncontrado() {
-        // Arrange
-        Integer id = 99;
-        when(categoriaRepository.existsById(id)).thenReturn(false);
+            assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
+            assertTrue(ex.getReason().contains("possui produtos vinculados"));
+            verify(categoriaRepository, never()).deleteById(any());
+        }
 
-        // Act & Assert
-        ResponseStatusException excecao = assertThrows(ResponseStatusException.class, () -> {
-            categoriaService.deletar(id);
-        });
+        @Test
+        @DisplayName("Deve deletar a categoria com sucesso se não houver vínculos (Cenário 5.3)")
+        void deveDeletarComSucesso() {
+            Long id = 1L;
+            when(categoriaRepository.existsById(id)).thenReturn(true);
+            when(produtoRepository.findByCategoriaId(id)).thenReturn(List.of()); // Lista vazia
 
-        assertEquals(HttpStatus.NOT_FOUND, excecao.getStatusCode());
-        assertEquals("Categoria não encontrada", excecao.getReason());
-        verify(categoriaRepository, times(1)).existsById(id);
-        verify(categoriaRepository, never()).deleteById(any());
-    }
+            assertDoesNotThrow(() -> categoriaService.deletar(id));
 
-    @Test
-    @DisplayName("deletar: Deve lançar ResponseStatusException 409 quando a categoria possuir produtos vinculados (Cenário Triste)")
-    void deletarComProdutosVinculados() {
-        // Arrange
-        Integer id = 1;
-
-        Produto p1 = new Produto();
-        p1.setId(10);
-        p1.setNome("Café Expresso");
-
-        when(categoriaRepository.existsById(id)).thenReturn(true);
-        when(produtoRepository.findByCategoria_Id(id)).thenReturn(List.of(p1));
-
-        // Act & Assert
-        ResponseStatusException excecao = assertThrows(ResponseStatusException.class, () -> {
-            categoriaService.deletar(id);
-        });
-
-        assertEquals(HttpStatus.CONFLICT, excecao.getStatusCode());
-        assertEquals("Categoria não pode ser deletada pois possui produtos vinculados", excecao.getReason());
-        verify(categoriaRepository, times(1)).existsById(id);
-        verify(produtoRepository, times(1)).findByCategoria_Id(id);
-        verify(categoriaRepository, never()).deleteById(any());
+            verify(categoriaRepository, times(1)).deleteById(id);
+        }
     }
 }

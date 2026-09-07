@@ -20,7 +20,7 @@ import java.util.List;
 
 @Tag(name = "Funcionários", description = "Gerenciamento de funcionários e autenticação de acesso")
 @Controller
-@RequestMapping("/funcionario")
+@RequestMapping("/funcionarios")
 public class FuncionarioController {
     @Autowired
     private FuncionarioService funcionarioService;
@@ -28,12 +28,11 @@ public class FuncionarioController {
     @Operation(summary = "Cadastrar funcionário", description = "Cria um novo funcionário no sistema")
     @ApiResponse(responseCode = "201", description = "Funcionário cadastrado com sucesso")
     @PostMapping("/cadastro")
-    public ResponseEntity<FuncionarioResponse> criarFuncionario(@RequestBody FuncionarioRequest funcionarioRequest) {
-        Funcionario funcionario=FuncionarioMapper.toEntity(funcionarioRequest);
+    public ResponseEntity<FuncionarioResponse> criarFuncionario(@RequestBody @Valid FuncionarioRequest funcionarioRequest) {
+        Funcionario funcionario = FuncionarioMapper.toEntity(funcionarioRequest);
+        Funcionario funcionarioCriado = funcionarioService.criar(funcionario);
+        FuncionarioResponse responseDto = FuncionarioMapper.toResponse(funcionarioCriado);
 
-        Funcionario funcionarioCriado=funcionarioService.criarFuncionario(funcionario);
-
-        FuncionarioResponse responseDto= FuncionarioMapper.toResponse(funcionarioCriado);
         return ResponseEntity.status(201).body(responseDto);
     }
 
@@ -59,7 +58,7 @@ public class FuncionarioController {
     @GetMapping("crud")
     public ResponseEntity<List<FuncionarioResponse>> listar() {
         //serviço
-        List<Funcionario> funcionarios = funcionarioService.listarFuncionario();
+        List<Funcionario> funcionarios = funcionarioService.listarTodos();
 
         //dto
         List<FuncionarioResponse> response = FuncionarioMapper.toResponseDto(funcionarios);
@@ -70,9 +69,9 @@ public class FuncionarioController {
 
     @Operation(summary = "Buscar funcionário por ID")
     @GetMapping("crud/{id}")
-    public ResponseEntity<FuncionarioResponse> buscarPorId(@PathVariable Integer id) {
+    public ResponseEntity<FuncionarioResponse> buscarPorId(@PathVariable Long id) {
         //servico
-        Funcionario funcionario = funcionarioService.buscarFuncionario(id);
+        Funcionario funcionario = funcionarioService.buscarPorId(id);
 
         //dto
         FuncionarioResponse responseDto= FuncionarioMapper.toResponse(funcionario);
@@ -84,24 +83,25 @@ public class FuncionarioController {
     @Operation(summary = "Atualizar funcionário", description = "Atualiza informações do funcionário")
     @ApiResponse(responseCode = "200", description = "Funcionário atualizado com sucesso")
     @PutMapping("crud/{id}")
-    public ResponseEntity<FuncionarioResponse> atualizar(@PathVariable Integer id, @RequestBody @Valid FuncionarioRequest dto) {
-        //dto
-        Funcionario funcionario = FuncionarioMapper.toEntity(dto);
+    public ResponseEntity<FuncionarioResponse> atualizar(@PathVariable Long id, @RequestBody @Valid FuncionarioRequest dto) {
+        Funcionario salvo = funcionarioService.atualizar(id, dto);
+        FuncionarioResponse responseDto = FuncionarioMapper.toResponse(salvo);
 
-        //servico
-        Funcionario salvo = funcionarioService.atualizarFuncionario(funcionario,id);
-
-        //dto
-        FuncionarioResponse responseDto=FuncionarioMapper.toResponse(salvo);
-
-        //retorno
         return ResponseEntity.ok(responseDto);
     }
     @Operation(summary = "Deletar funcionário")
     @ApiResponse(responseCode = "204", description = "Funcionário deletado com sucesso")
     @DeleteMapping("crud/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
-        funcionarioService.deletarFuncionario(id);
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+        funcionarioService.deletar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Reativar funcionário", description = "Reverte um soft delete — somente gerentes")
+    @ApiResponse(responseCode = "200", description = "Funcionário reativado com sucesso")
+    @ApiResponse(responseCode = "403", description = "Acesso negado — somente gerentes")
+    @PatchMapping("/{id}/reativar")
+    public ResponseEntity<Funcionario> reativar(@PathVariable Long id) {
+        return ResponseEntity.ok(funcionarioService.reativar(id));
     }
 }

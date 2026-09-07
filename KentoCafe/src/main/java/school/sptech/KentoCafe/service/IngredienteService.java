@@ -1,56 +1,70 @@
 package school.sptech.KentoCafe.service;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import school.sptech.KentoCafe.dto.ingrediente.IngredienteRequest;
 import school.sptech.KentoCafe.entity.Ingrediente;
+import school.sptech.KentoCafe.entity.Produto;
 import school.sptech.KentoCafe.mapper.IngredienteMapper;
 import school.sptech.KentoCafe.repository.IngredienteRepository;
-import school.sptech.KentoCafe.repository.ProdutoIngredienteRepository;
+import school.sptech.KentoCafe.repository.ProdutoRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class IngredienteService {
 
-    final IngredienteRepository ingredienteRepository;
-    final ProdutoIngredienteRepository produtoIngredienteRepository;
+    private final IngredienteRepository ingredienteRepository;
+    private final ProdutoRepository produtoRepository;
 
-    public IngredienteService(IngredienteRepository ingredienteRepository, ProdutoIngredienteRepository produtoIngredienteRepository) {
+    public IngredienteService(IngredienteRepository ingredienteRepository, ProdutoRepository produtoRepository) {
         this.ingredienteRepository = ingredienteRepository;
-        this.produtoIngredienteRepository = produtoIngredienteRepository;
+        this.produtoRepository = produtoRepository;
     }
 
-    public List<Ingrediente> buscarIngredientes() {
+    public List<Ingrediente> buscarTodos() {
         return ingredienteRepository.findAll();
     }
 
-    public Ingrediente buscarIngredientePorId(Integer id){
-        if (ingredienteRepository.existsById(id)){
-            Optional<Ingrediente> ingredienteOpt = ingredienteRepository.findById(id);
-            return ingredienteOpt.get();
-        }
-        return null;
+    public Ingrediente buscarPorId(Long id) {
+        return ingredienteRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Ingrediente não encontrado"));
     }
 
-    public Ingrediente criarIngrediente(Ingrediente ingrediente){
+    public Ingrediente criar(Ingrediente ingrediente) {
         return ingredienteRepository.save(ingrediente);
     }
 
-    public Ingrediente atualizarIngrediente(Integer id, IngredienteRequest req){
+    public Ingrediente atualizar(Long id, IngredienteRequest req) {
+        if (!ingredienteRepository.existsById(id)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Ingrediente não encontrado");
+        }
         Ingrediente ingredienteAtualizar = IngredienteMapper.toEntity(req);
         ingredienteAtualizar.setId(id);
         return ingredienteRepository.save(ingredienteAtualizar);
     }
 
-    public void deletarPorId(Integer id){
-        if (produtoIngredienteRepository.existsByIngredienteId(id) != 0){
-            produtoIngredienteRepository.deletarProdutoIngredientePorIngredienteId(id);
+    public void deletar(Long id) {
+        if (!ingredienteRepository.existsById(id)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Ingrediente não encontrado");
         }
+        ingredienteRepository.removerIngredienteDeTodosProdutos(id);
         ingredienteRepository.deleteById(id);
     }
 
-    public List<Ingrediente> buscarIngredientePorProdutoId(Integer id){
-        return ingredienteRepository.findByProdutoId(id);
+    public List<Ingrediente> buscarIngredientesPorProduto(Long produtoId) {
+        return ingredienteRepository.findIngredientesByProdutoId(produtoId);
+    }
+
+    public Boolean existeProdutosComIngrediente(Long ingredienteId) {
+        return produtoRepository.contarProdutosPorIngrediente(ingredienteId) != 0;
+    }
+
+    public List<Produto> buscarProdutosPorIngrediente(Long ingredienteId) {
+        return produtoRepository.findByIngredienteId(ingredienteId);
     }
 }

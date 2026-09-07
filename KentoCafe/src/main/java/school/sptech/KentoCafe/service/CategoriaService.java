@@ -35,37 +35,37 @@ public class CategoriaService {
         return categoriaRepository.findAll()
                 .stream()
                 .map(categoria -> {
-                    List<Produto> produtos = produtoRepository.findByCategoria_Id(categoria.getId());
+                    List<Produto> produtos = produtoRepository.findByCategoriaId(categoria.getId());
                     return CategoriaMapper.toResponse(categoria, produtos);
                 })
                 .toList();
     }
 
-    public CategoriaResponse buscarPorId(Integer id) {
+    public CategoriaResponse buscarPorId(Long id) {
         Categoria categoria = categoriaRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Categoria não encontrada"));
-        List<Produto> produtos = produtoRepository.findByCategoria_Id(id);
+        List<Produto> produtos = produtoRepository.findByCategoriaId(id);
         return CategoriaMapper.toResponse(categoria, produtos);
     }
 
-    public CategoriaResponse atualizar(Integer id, CategoriaRequest dto) {
+    public CategoriaResponse atualizar(Long id, CategoriaRequest dto) {
         Categoria categoria = categoriaRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Categoria não encontrada"));
 
         categoria.setNome(dto.getNome());
 
-        List<Produto> produtos = produtoRepository.findByCategoria_Id(id);
+        List<Produto> produtos = produtoRepository.findByCategoriaId(id);
         return CategoriaMapper.toResponse(categoriaRepository.save(categoria), produtos);
     }
 
-    public void deletar(Integer id) {
+    public void deletar(Long id) {
         if (!categoriaRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Categoria não encontrada");
         }
 
-        if (!produtoRepository.findByCategoria_Id(id).isEmpty()) {
+        if (!produtoRepository.findByCategoriaId(id).isEmpty()) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Categoria não pode ser deletada pois possui produtos vinculados");

@@ -40,14 +40,14 @@ public class CategoriaController {
     @Operation(summary = "Buscar categoria por ID")
     @ApiResponse(responseCode = "200", description = "Categoria encontrada")
     @GetMapping("/{id}")
-    public ResponseEntity<CategoriaResponse> buscarPorId(@PathVariable Integer id) {
+    public ResponseEntity<CategoriaResponse> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(categoriaService.buscarPorId(id));
     }
     @Operation(summary = "Atualizar categoria")
     @ApiResponse(responseCode = "200", description = "Categoria atualizada com sucesso")
     @PutMapping("/{id}")
     public ResponseEntity<CategoriaResponse> atualizar(
-            @PathVariable Integer id,
+            @PathVariable Long id,
             @RequestBody @Valid CategoriaRequest dto) {
         return ResponseEntity.ok(categoriaService.atualizar(id, dto));
     }
@@ -55,7 +55,7 @@ public class CategoriaController {
     @Operation(summary = "Deletar categoria")
     @ApiResponse(responseCode = "204", description = "Categoria deletada com sucesso")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
         categoriaService.deletar(id);
         return ResponseEntity.noContent().build();
     }

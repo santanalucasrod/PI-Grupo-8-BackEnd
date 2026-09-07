@@ -1,10 +1,10 @@
 package school.sptech.KentoCafe.dto.ingrediente;
 
 public class IngredienteResponse {
-    private Integer id;
+    private Long id;
     private String nome;
 
-    public IngredienteResponse(Integer id, String nome) {
+    public IngredienteResponse(Long id, String nome) {
         this.id = id;
         this.nome = nome;
     }
@@ -12,11 +12,11 @@ public class IngredienteResponse {
     public IngredienteResponse() {
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

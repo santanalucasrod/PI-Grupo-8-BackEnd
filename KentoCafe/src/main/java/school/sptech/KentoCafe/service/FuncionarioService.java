@@ -1,110 +1,120 @@
 package school.sptech.KentoCafe.service;
 
-import org.apache.coyote.Request;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import jakarta.transaction.Transactional;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import school.sptech.KentoCafe.auth.JwtService;
-import school.sptech.KentoCafe.auth.SecurityConfig;
-import school.sptech.KentoCafe.auth.UserDetailsImpl;
+import org.springframework.web.server.ResponseStatusException;
+
 import school.sptech.KentoCafe.dto.funcionario.FuncionarioRequest;
 import school.sptech.KentoCafe.dto.token.LoginUserDto;
 import school.sptech.KentoCafe.dto.token.RecoveryJwtTokenDto;
 import school.sptech.KentoCafe.entity.Funcionario;
-import school.sptech.KentoCafe.exception.EntidadeNaoEncontradoException;
-import school.sptech.KentoCafe.exception.FuncionarioConflitoException;
+
 import school.sptech.KentoCafe.repository.FuncionarioRepository;
+import school.sptech.KentoCafe.security.JwtService;
 
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 public class FuncionarioService {
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private JwtService jwtTokenService;
-
-    @Autowired
-    private SecurityConfig securityConfiguration;
 
     private final FuncionarioRepository repository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
-    public FuncionarioService(FuncionarioRepository repository, PasswordEncoder passwordEncoder) {
+    public FuncionarioService(FuncionarioRepository repository,
+                              PasswordEncoder passwordEncoder,
+                              AuthenticationManager authenticationManager,
+                              JwtService jwtService) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
+    }
+
+    public RecoveryJwtTokenDto autenticar(LoginUserDto loginUserDto) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginUserDto.getEmail(),
+                        loginUserDto.getPassword()
+                )
+        );
+
+        Funcionario funcionario = (Funcionario) authentication.getPrincipal();
+
+        return new RecoveryJwtTokenDto(jwtService.gerarToken(funcionario));
     }
 
 
-    // Métod responsável por autenticar um usuário e retornar um token JWT
-    public RecoveryJwtTokenDto authenticateUser(LoginUserDto loginUserDto) {
-        // Cria um objeto de autenticação com o email e a senha do usuário
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                new UsernamePasswordAuthenticationToken(loginUserDto.getEmail(), loginUserDto.getPassword());
-
-        // Autentica o usuário com as credenciais fornecidas
-        Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
-
-        // Obtém o objeto UserDetails do usuário autenticado
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
-        // Gera um token JWT para o usuário autenticado
-        return new RecoveryJwtTokenDto(jwtTokenService.generateToken(userDetails));
-    }
-
-    // Métod responsável por criar um usuário
-    public Funcionario criarFuncionario(Funcionario funcionario) {
-        Optional<Funcionario> existente = repository.findByEmail(funcionario.getEmail());
-
-        if (existente.isPresent()) {
-            throw new FuncionarioConflitoException("Usuário já existe com esse email.");
+    public Funcionario criar(Funcionario funcionario) {
+        if (repository.findByEmail(funcionario.getEmail()).isPresent()) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "Já existe um funcionário com esse email");
         }
-
         funcionario.setSenha(passwordEncoder.encode(funcionario.getSenha()));
+        funcionario.setGerente(false);
 
-        // Salva o novo usuário no banco de dados
         return repository.save(funcionario);
     }
 
-    public List<Funcionario> listarFuncionario(){
+    public List<Funcionario> listarTodos() {
         return repository.findAll();
     }
 
-    public Funcionario atualizarFuncionario(Funcionario funcionario, Integer id){
+    public List<Funcionario> listarTodosPositivo() {
+        return repository.findByAtivoTrue();
+    }
 
-        boolean existente = repository.existsById(id);
+    public Funcionario buscarPorId(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Funcionário não encontrado"));
+    }
 
-        if (!existente) {
-            throw new EntidadeNaoEncontradoException("Usuário não existe");
+    public Funcionario buscarPorEmail(String email) {
+        return repository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Funcionário não encontrado"));
+    }
+
+    public Funcionario atualizar(Long id, FuncionarioRequest dto) {
+        Funcionario funcionarioExistente = repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Funcionário não encontrado"));
+
+        funcionarioExistente.setNome(dto.getNome());
+
+        if (!funcionarioExistente.getEmail().equals(dto.getEmail())) {
+            if (repository.findByEmail(dto.getEmail()).isPresent()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Email já em uso por outro funcionário");
+            }
+            funcionarioExistente.setEmail(dto.getEmail());
         }
 
-        funcionario.setSenha(passwordEncoder.encode(funcionario.getSenha()));
-        funcionario.setId(id);
+        return repository.save(funcionarioExistente);
+    }
 
-        // Salva o novo usuário no banco de dados
+    @Transactional
+    public void deletar(Long id) {
+        Funcionario funcionario = buscarEntidadePorId(id);
+        funcionario.setAtivo(false);
+        repository.save(funcionario);
+    }
+
+    public Funcionario reativar(Long id) {
+        Funcionario funcionario = buscarEntidadePorId(id);
+        funcionario.setAtivo(true);
         return repository.save(funcionario);
     }
 
-    public void deletarFuncionario(Integer id){
-        if (!repository.existsById(id)){
-            throw new EntidadeNaoEncontradoException("sem id");
-        }
-        repository.deleteById(id);
+    private Funcionario buscarEntidadePorId(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Funcionário não encontrado"));
     }
-
-    public Funcionario buscarFuncionario(Integer id){
-        Optional<Funcionario> funcionarioOptional= repository.findById(id);
-
-        if (funcionarioOptional.isEmpty()){
-            throw new RuntimeException("entidade não existe");
-        }
-        return funcionarioOptional.get();
-    }
-
 }
