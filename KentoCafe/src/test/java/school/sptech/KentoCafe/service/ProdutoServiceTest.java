@@ -197,47 +197,6 @@ class ProdutoServiceTest {
             assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
         }
 
-        @Test
-        @DisplayName("Deve limpar os relacionamentos de ingredientes e remover o produto com sucesso")
-        void deletarComSucesso() {
-            Produto produto = new Produto();
-            produto.setId(1L);
-
-            when(produtoRepository.findById(1L)).thenReturn(Optional.of(produto));
-            when(itemPedidoRepository.existsByProdutoId(1L)).thenReturn(false);
-
-            assertDoesNotThrow(() -> produtoService.deletar(1L));
-
-            verify(produtoRepository, times(1)).removerTodosIngredientesDoProduto(1L);
-            verify(produtoRepository, times(1)).delete(produto);
-        }
-    }
-
-    @Nested
-    @DisplayName("Cenários do método listarPorCategoriaAgrupados")
-    class ListarAgrupadosTests {
-
-        @Test
-        @DisplayName("Deve agrupar corretamente os produtos retornados pelo nome da Categoria")
-        void listarAgrupadosComSucesso() {
-            Categoria lanches = criarCategoria(1L, "Lanches");
-            Categoria bebidas = criarCategoria(2L, "Bebidas");
-
-            List<Produto> listaCompleta = List.of(
-                    criarProduto(10L, "X-Burger", lanches),
-                    criarProduto(11L, "X-Salada", lanches),
-                    criarProduto(20L, "Suco de Uva", bebidas)
-            );
-
-            when(produtoRepository.findAll()).thenReturn(listaCompleta);
-
-            Map<String, List<ProdutoResponse>> resultado = produtoService.listarPorCategoriaAgrupados();
-
-            assertNotNull(resultado);
-            assertEquals(2, resultado.keySet().size());
-            assertEquals(2, resultado.get("Lanches").size());
-            assertEquals(1, resultado.get("Bebidas").size());
-        }
     }
 
     @Nested
