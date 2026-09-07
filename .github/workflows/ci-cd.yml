@@ -43,7 +43,7 @@ jobs:
         mysql -h 127.0.0.1 -u root -p"${{ secrets.TEST_DB_ROOT_PASSWORD }}" cafeteria < ./kentocafe_banco_v7.sql
 
     - name: Build and Test with Maven
-      run: mvn clean install -Dsurefire.useFile=false
+      run: mvn clean install -e -Dsurefire.useFile=false
       working-directory: ./KentoCafe
       env:
         SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/cafeteria?useSSL=false&serverTimezone=UTC
