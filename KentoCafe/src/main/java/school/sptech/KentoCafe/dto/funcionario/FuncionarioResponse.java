@@ -6,15 +6,25 @@ public class FuncionarioResponse {
     private String nome;
     private String email;
     private Boolean gerente;
+    private Boolean ativo;
 
     public FuncionarioResponse() {
     }
 
-    public FuncionarioResponse(Long id, String nome, String email, Boolean gerente) {
+    public FuncionarioResponse(Long id, String nome, String email, Boolean gerente, Boolean ativo) {
         this.id = id;
         this.nome = nome;
         this.email = email;
         this.gerente = gerente;
+        this.ativo = ativo;
+    }
+
+    public Boolean getAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        this.ativo = ativo;
     }
 
     public Long getId() {

@@ -31,6 +31,7 @@ public class FuncionarioMapper {
         dto.setNome(funcionario.getNome());
         dto.setEmail(funcionario.getEmail());
         dto.setGerente(funcionario.getGerente());
+        dto.setAtivo(funcionario.getAtivo());
 
         return dto;
     }
