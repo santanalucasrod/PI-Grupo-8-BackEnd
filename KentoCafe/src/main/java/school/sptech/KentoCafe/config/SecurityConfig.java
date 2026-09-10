@@ -64,6 +64,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/tamanhos/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET,    "/tamanhos/**").hasAnyRole("ADMIN", "USER")
 
+                        .requestMatchers(HttpMethod.GET, "/dashboard/**").hasRole("ADMIN")
+
                         .requestMatchers("/pedidos/**").permitAll()
 
                         .anyRequest().authenticated()
