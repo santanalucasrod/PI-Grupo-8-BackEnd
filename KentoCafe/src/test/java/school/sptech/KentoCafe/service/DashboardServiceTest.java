@@ -109,13 +109,13 @@ class DashboardServiceTest {
                             new Object[]{"Cappuccino", 25L},
                             new Object[]{"Latte", 10L}));
             when(pedidoRepository.buscarSerieDiaria(any(), any()))
-                    .thenReturn(List.of(new Object[]{
+                    .thenReturn(List.<Object[]>of(new Object[]{
                             Date.valueOf(LocalDate.of(2026, 1, 5)),
                             BigDecimal.valueOf(500.00),
                             3L
                     }));
             when(itemPedidoRepository.buscarFaturamentoPorCategoria(any(), any()))
-                    .thenReturn(List.of(new Object[]{"Bebidas", BigDecimal.valueOf(900.00)}));
+                    .thenReturn(List.<Object[]>of(new Object[]{"Bebidas", BigDecimal.valueOf(900.00)}));
 
             DashboardResponse resultado = dashboardService.buscarResumo(inicio, fim);
 
