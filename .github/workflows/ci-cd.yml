@@ -13,20 +13,6 @@ jobs:
   build-maven:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_DATABASE: cafeteria
-          MYSQL_ROOT_PASSWORD: ${{ secrets.TEST_DB_ROOT_PASSWORD }}
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
     - uses: actions/checkout@v4
 
@@ -37,18 +23,12 @@ jobs:
         distribution: 'temurin'
         cache: 'maven'
 
-    - name: Popular Banco de Dados
-      run: |
-        sudo apt-get update && sudo apt-get install -y mysql-client
-        mysql -h 127.0.0.1 -u root -p"${{ secrets.TEST_DB_ROOT_PASSWORD }}" cafeteria < ./kentocafe_banco_v7.sql
-
+    # Os testes do projeto são unitários (JUnit + Mockito) e usam H2 em memória
+    # (veja src/test/resources/application-test.properties). Não é necessário
+    # subir um MySQL real nem popular banco de dados para rodá-los no CI.
     - name: Build and Test with Maven
       run: mvn clean install -e -Dsurefire.useFile=false
       working-directory: ./KentoCafe
-      env:
-        SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/cafeteria?useSSL=false&serverTimezone=UTC
-        SPRING_DATASOURCE_USERNAME: root
-        SPRING_DATASOURCE_PASSWORD: ${{ secrets.TEST_DB_ROOT_PASSWORD }}
 
   build-docker:
     runs-on: ubuntu-latest
