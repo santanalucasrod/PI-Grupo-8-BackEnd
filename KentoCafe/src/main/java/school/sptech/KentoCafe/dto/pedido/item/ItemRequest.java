@@ -21,6 +21,9 @@ public class ItemRequest {
     @Schema(description = "ID do tamanho escolhido", example = "2")
     private Long tamanhoId;
 
+    @Schema(description = "Observação específica deste item (ex.: sem açúcar, leite de aveia)", example = "Sem açúcar")
+    private String observacao;
+
     public ItemRequest(Long produtoId, Integer quantidade, List<Long> personalizacaoIds, Long tamanhoId) {
         this.produtoId = produtoId;
         this.quantidade = quantidade;
@@ -63,4 +66,7 @@ public class ItemRequest {
 
     public Long getTamanhoId() { return tamanhoId; }
     public void setTamanhoId(Long tamanhoId) { this.tamanhoId = tamanhoId; }
+
+    public String getObservacao() { return observacao; }
+    public void setObservacao(String observacao) { this.observacao = observacao; }
 }

@@ -13,6 +13,7 @@ public class PedidoResponse {
     private LocalDateTime dtHrPronto;
     private String status;
     private BigDecimal valorTotal;
+    private String descricao;
     private List<ItemResponse> itens;
 
     public Long getId() {
@@ -69,5 +70,13 @@ public class PedidoResponse {
 
     public void setItens(List<ItemResponse> itens) {
         this.itens = itens;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
 }

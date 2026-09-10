@@ -27,6 +27,12 @@ public class ItemPedido {
     @Column(name = "preco_unidade", nullable = false, precision = 5, scale = 2)
     private BigDecimal precoUnidade;
 
+    @Column(name = "pronto", nullable = false)
+    private Boolean pronto = false;
+
+    @Column(name = "observacao", length = 255)
+    private String observacao;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "item_pedido_personalizacao",
@@ -111,4 +117,10 @@ public class ItemPedido {
 
     public Tamanho getTamanho() { return tamanho; }
     public void setTamanho(Tamanho tamanho) { this.tamanho = tamanho; }
+
+    public Boolean getPronto() { return pronto; }
+    public void setPronto(Boolean pronto) { this.pronto = pronto; }
+
+    public String getObservacao() { return observacao; }
+    public void setObservacao(String observacao) { this.observacao = observacao; }
 }

@@ -32,6 +32,7 @@ class PedidoServiceTest {
     @Mock private FuncionarioRepository funcionarioRepository;
     @Mock private ProdutoRepository produtoRepository;
     @Mock private PersonalizacaoRepository personalizacaoRepository;
+    @Mock private ItemPedidoRepository itemPedidoRepository;
 
     @InjectMocks private PedidoService pedidoService;
 
@@ -40,14 +41,14 @@ class PedidoServiceTest {
     class CriarPedidoTests {
 
         @Test
-        @DisplayName("Deve lançar NOT_FOUND quando status 'Em preparo' não existir (Cenário 1.1)")
+        @DisplayName("Deve lançar NOT_FOUND quando status 'Pendente' não existir (Cenário 1.1)")
         void statusNaoEncontrado() {
             PedidoRequest request = new PedidoRequest();
-            when(statusRepository.findByNome("Em preparo")).thenReturn(Optional.empty());
+            when(statusRepository.findByNome("Pendente")).thenReturn(Optional.empty());
 
             ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> pedidoService.criar(request));
             assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
-            assertTrue(ex.getReason().contains("Status 'Em preparo'"));
+            assertTrue(ex.getReason().contains("Status 'Pendente'"));
         }
 
         @Test
@@ -56,7 +57,7 @@ class PedidoServiceTest {
             PedidoRequest request = new PedidoRequest();
             request.setFuncionarioId(1L);
 
-            when(statusRepository.findByNome("Em preparo")).thenReturn(Optional.of(new Status("Em preparo")));
+            when(statusRepository.findByNome("Pendente")).thenReturn(Optional.of(new Status("Pendente")));
             when(funcionarioRepository.findById(1L)).thenReturn(Optional.empty());
 
             ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> pedidoService.criar(request));
@@ -73,7 +74,7 @@ class PedidoServiceTest {
             item.setProdutoId(50L);
             request.setItens(List.of(item));
 
-            when(statusRepository.findByNome("Em preparo")).thenReturn(Optional.of(new Status("Em preparo")));
+            when(statusRepository.findByNome("Pendente")).thenReturn(Optional.of(new Status("Pendente")));
             when(funcionarioRepository.findById(1L)).thenReturn(Optional.of(new Funcionario()));
             when(produtoRepository.findById(50L)).thenReturn(Optional.empty());
 
@@ -99,7 +100,7 @@ class PedidoServiceTest {
             produto.setId(10L);
             produto.setPrecoUnidade(new BigDecimal("15.50"));
 
-            when(statusRepository.findByNome("Em preparo")).thenReturn(Optional.of(new Status("Em preparo")));
+            when(statusRepository.findByNome("Pendente")).thenReturn(Optional.of(new Status("Pendente")));
             when(funcionarioRepository.findById(1L)).thenReturn(Optional.of(new Funcionario()));
             when(produtoRepository.findById(10L)).thenReturn(Optional.of(produto));
             when(pedidoRepository.save(any(Pedido.class))).thenAnswer(i -> i.getArgument(0));
@@ -134,7 +135,7 @@ class PedidoServiceTest {
             Personalizacao p1 = new Personalizacao();
             Personalizacao p2 = new Personalizacao();
 
-            when(statusRepository.findByNome("Em preparo")).thenReturn(Optional.of(status));
+            when(statusRepository.findByNome("Pendente")).thenReturn(Optional.of(status));
             when(funcionarioRepository.findById(1L)).thenReturn(Optional.of(funcionario));
             when(produtoRepository.findById(10L)).thenReturn(Optional.of(produto));
 
@@ -167,7 +168,7 @@ class PedidoServiceTest {
 
             List<Personalizacao> perms = List.of(new Personalizacao(), new Personalizacao());
 
-            when(statusRepository.findByNome("Em preparo")).thenReturn(Optional.of(new Status("Em preparo")));
+            when(statusRepository.findByNome("Pendente")).thenReturn(Optional.of(new Status("Pendente")));
             when(funcionarioRepository.findById(1L)).thenReturn(Optional.of(new Funcionario()));
             when(produtoRepository.findById(10L)).thenReturn(Optional.of(produto));
             when(personalizacaoRepository.findAllById(List.of(1L, 2L))).thenReturn(perms);
@@ -197,7 +198,7 @@ class PedidoServiceTest {
             Produto produto = new Produto();
             produto.setPrecoUnidade(BigDecimal.TEN);
 
-            when(statusRepository.findByNome("Em preparo")).thenReturn(Optional.of(status));
+            when(statusRepository.findByNome("Pendente")).thenReturn(Optional.of(status));
             when(funcionarioRepository.findById(1L)).thenReturn(Optional.of(funcionario));
             when(produtoRepository.findById(10L)).thenReturn(Optional.of(produto));
             when(pedidoRepository.save(any(Pedido.class))).thenAnswer(i -> i.getArgument(0));
@@ -229,7 +230,7 @@ class PedidoServiceTest {
             Produto produto = new Produto();
             produto.setPrecoUnidade(BigDecimal.TEN);
 
-            when(statusRepository.findByNome("Em preparo")).thenReturn(Optional.of(status));
+            when(statusRepository.findByNome("Pendente")).thenReturn(Optional.of(status));
             when(funcionarioRepository.findById(1L)).thenReturn(Optional.of(funcionario));
             when(produtoRepository.findById(10L)).thenReturn(Optional.of(produto));
             when(pedidoRepository.save(any(Pedido.class))).thenAnswer(i -> i.getArgument(0));

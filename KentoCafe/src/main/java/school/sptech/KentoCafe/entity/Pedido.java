@@ -28,6 +28,9 @@ public class Pedido {
     @Column(name = "valor_total", precision = 6, scale = 2)
     private BigDecimal valorTotal;
 
+    @Column(name = "descricao", length = 255)
+    private String descricao;
+
     @ManyToOne
     @JoinColumn(name = "status_id", nullable = false)
     private Status status;
@@ -115,5 +118,13 @@ public class Pedido {
 
     public void setValorTotal(BigDecimal valorTotal) {
         this.valorTotal = valorTotal;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
 }

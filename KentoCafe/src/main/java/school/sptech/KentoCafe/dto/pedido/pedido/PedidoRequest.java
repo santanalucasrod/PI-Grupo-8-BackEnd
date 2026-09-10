@@ -23,10 +23,14 @@ public class PedidoRequest {
     @NotEmpty(message = "O pedido deve ter pelo menos um item")
     private List<ItemRequest> itens;
 
-    public PedidoRequest(String nomeCliente, Long funcionarioId, List<ItemRequest> itens) {
+    @Schema(description = "Observação geral do pedido (ex.: retirar no balcão, alergias)", example = "Cliente vai retirar no balcão")
+    private String descricao;
+
+    public PedidoRequest(String nomeCliente, Long funcionarioId, List<ItemRequest> itens, String descricao) {
         this.nomeCliente = nomeCliente;
         this.funcionarioId = funcionarioId;
         this.itens = itens;
+        this.descricao = descricao;
     }
 
     public PedidoRequest() {
@@ -54,5 +58,13 @@ public class PedidoRequest {
 
     public void setItens(List<ItemRequest> itens) {
         this.itens = itens;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
 }

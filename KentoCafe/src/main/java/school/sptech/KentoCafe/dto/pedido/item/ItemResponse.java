@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class ItemResponse {
+    private Long id;
     private String nomeProduto;
     private Integer quantidade;
     private BigDecimal precoUnitario;
@@ -11,6 +12,32 @@ public class ItemResponse {
     private List<String> personalizacoes;
     private String tamanho;
     private Integer volumeMl;
+    private Boolean pronto;
+    private String observacao;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Boolean getPronto() {
+        return pronto;
+    }
+
+    public void setPronto(Boolean pronto) {
+        this.pronto = pronto;
+    }
+
+    public String getObservacao() {
+        return observacao;
+    }
+
+    public void setObservacao(String observacao) {
+        this.observacao = observacao;
+    }
 
     public String getNomeProduto() {
         return nomeProduto;
