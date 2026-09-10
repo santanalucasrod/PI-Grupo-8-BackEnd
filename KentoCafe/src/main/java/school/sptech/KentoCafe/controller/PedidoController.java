@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.sptech.KentoCafe.dto.pedido.pedido.PedidoRequest;
 import school.sptech.KentoCafe.dto.pedido.pedido.PedidoResponse;
+import school.sptech.KentoCafe.entity.ItemPedido;
 import school.sptech.KentoCafe.entity.Pedido;
 import school.sptech.KentoCafe.mapper.PedidoMapper;
 import school.sptech.KentoCafe.service.PedidoService;
@@ -26,7 +27,7 @@ public class PedidoController {
     }
 
     @Operation(summary = "Criar pedido",
-            description = "Registra um novo pedido com status 'Em preparo' automaticamente")
+            description = "Registra um novo pedido com status 'Pendente' automaticamente")
     @ApiResponse(responseCode = "201", description = "Pedido criado com sucesso")
     @ApiResponse(responseCode = "400", description = "Dados inválidos")
     @ApiResponse(responseCode = "404", description = "Funcionário ou produto não encontrado")
@@ -36,12 +37,14 @@ public class PedidoController {
         return ResponseEntity.status(201).body(PedidoMapper.toResponse(pedido));
     }
 
-    @Operation(summary = "Listar todos os pedidos")
+    @Operation(summary = "Listar pedidos",
+            description = "Use ?ativos=true para retornar somente pedidos Pendente/Em preparo (fila do barista)")
     @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso")
     @ApiResponse(responseCode = "204", description = "Nenhum pedido encontrado")
     @GetMapping
-    public ResponseEntity<List<PedidoResponse>> listarTodos() {
-        List<Pedido> pedidos = pedidoService.listarTodos();
+    public ResponseEntity<List<PedidoResponse>> listarTodos(
+            @RequestParam(required = false, defaultValue = "false") boolean ativos) {
+        List<Pedido> pedidos = ativos ? pedidoService.listarAtivos() : pedidoService.listarTodos();
         return pedidos.isEmpty()
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.ok(PedidoMapper.toResponseList(pedidos));
@@ -52,7 +55,7 @@ public class PedidoController {
     @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
     @GetMapping("/{id}")
     public ResponseEntity<PedidoResponse> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(PedidoMapper.toResponse(pedidoService.concluir(id)));
+        return ResponseEntity.ok(PedidoMapper.toResponse(pedidoService.buscarPorId(id)));
     }
 
     @Operation(summary = "Listar pedidos por status",
@@ -85,5 +88,43 @@ public class PedidoController {
     @PatchMapping("/{id}/cancelar")
     public ResponseEntity<PedidoResponse> cancelar(@PathVariable Long id) {
         return ResponseEntity.ok(PedidoMapper.toResponse(pedidoService.cancelar(id)));
+    }
+
+    @Operation(summary = "Atualizar status do pedido",
+            description = "Move o pedido entre PENDENTE, EM_PREPARO ou PRONTO. Usado pela tela de fila do barista.")
+    @ApiResponse(responseCode = "200", description = "Status atualizado com sucesso")
+    @ApiResponse(responseCode = "400", description = "Status inválido")
+    @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
+    @ApiResponse(responseCode = "409", description = "Pedido já está pronto ou foi cancelado")
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<PedidoResponse> atualizarStatus(@PathVariable Long id,
+                                                            @RequestBody AtualizarStatusRequest request) {
+        Pedido pedido = pedidoService.atualizarStatus(id, request.getStatus());
+        return ResponseEntity.ok(PedidoMapper.toResponse(pedido));
+    }
+
+    @Operation(summary = "Marcar/desmarcar item do pedido como pronto",
+            description = "Usado pelo barista para riscar cada item da fila conforme prepara")
+    @ApiResponse(responseCode = "200", description = "Item atualizado com sucesso")
+    @ApiResponse(responseCode = "404", description = "Item não encontrado")
+    @PatchMapping("/itens/{itemId}/pronto")
+    public ResponseEntity<PedidoResponse> marcarItemPronto(@PathVariable Long itemId,
+                                                             @RequestBody MarcarItemProntoRequest request) {
+        ItemPedido item = pedidoService.marcarItemPronto(itemId, request.isPronto());
+        return ResponseEntity.ok(PedidoMapper.toResponse(item.getPedido()));
+    }
+
+    public static class AtualizarStatusRequest {
+        private String status;
+
+        public String getStatus() { return status; }
+        public void setStatus(String status) { this.status = status; }
+    }
+
+    public static class MarcarItemProntoRequest {
+        private boolean pronto;
+
+        public boolean isPronto() { return pronto; }
+        public void setPronto(boolean pronto) { this.pronto = pronto; }
     }
 }
