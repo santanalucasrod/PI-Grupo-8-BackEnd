@@ -155,7 +155,7 @@ CREATE TABLE IF NOT EXISTS `status` (
                                         `nome` VARCHAR(20) NOT NULL,
     PRIMARY KEY (`id`)
     );
-INSERT IGNORE INTO `status` (`nome`) VALUES ('Em preparo'), ('Pronto'), ('Cancelado');
+INSERT IGNORE INTO `status` (`nome`) VALUES ('Pendente'), ('Em preparo'), ('Pronto'), ('Cancelado');
 
 -- Pedidos
 CREATE TABLE IF NOT EXISTS `pedido` (
@@ -164,6 +164,7 @@ CREATE TABLE IF NOT EXISTS `pedido` (
     `dt_hr_pedido`   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `dt_hr_pronto`   DATETIME     NULL,
     `valor_total`    DECIMAL(6,2) NULL,
+    `descricao`      VARCHAR(255) NULL,
     `status_id`      BIGINT       NOT NULL DEFAULT 1,
     `funcionario_id` BIGINT       NOT NULL,
     PRIMARY KEY (`id`),
@@ -176,6 +177,8 @@ CREATE TABLE IF NOT EXISTS `item_pedido` (
                                              `id`            BIGINT       NOT NULL AUTO_INCREMENT,
                                              `quantidade`    INT          NOT NULL,
                                              `preco_unidade` DECIMAL(5,2) NOT NULL,
+    `pronto`        TINYINT(1)   NOT NULL DEFAULT 0,
+    `observacao`    VARCHAR(255) NULL,
     `pedido_id`     BIGINT       NOT NULL,
     `produto_id`    BIGINT       NOT NULL,
     `tamanho_id`    BIGINT       NULL, -- preenchido só para bebidas com tamanho
