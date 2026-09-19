@@ -16,6 +16,7 @@ import school.sptech.KentoCafe.entity.Funcionario;
 
 import school.sptech.KentoCafe.repository.FuncionarioRepository;
 import school.sptech.KentoCafe.security.JwtService;
+import school.sptech.KentoCafe.security.SecurityUtils;
 
 import java.util.List;
 
@@ -116,5 +117,25 @@ public class FuncionarioService {
         return repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Funcionário não encontrado"));
+    }
+
+    public Funcionario atualizarPerfil(Long id, FuncionarioRequest dto) {
+        Long id_logado = SecurityUtils.getUsuarioId();
+        Funcionario funcionarioExistente = repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Funcionário não encontrado"));
+        if (!id_logado.equals(id)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Você não tem permissão para editar o perfil");
+        }
+        if (!funcionarioExistente.getEmail().equals(dto.getEmail())) {
+            if (repository.findByEmail(dto.getEmail()).isPresent()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Email já em uso por outro funcionário");
+            }
+            funcionarioExistente.setEmail(dto.getEmail());
+        }
+
+        funcionarioExistente.setSenha(passwordEncoder.encode(dto.getSenha()));
+        funcionarioExistente.setNome(dto.getNome());
+
+        return repository.save(funcionarioExistente);
     }
 }

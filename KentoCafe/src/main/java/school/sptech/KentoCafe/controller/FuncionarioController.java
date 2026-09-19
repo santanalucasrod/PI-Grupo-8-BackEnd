@@ -104,4 +104,14 @@ public class FuncionarioController {
     public ResponseEntity<Funcionario> reativar(@PathVariable Long id) {
         return ResponseEntity.ok(funcionarioService.reativar(id));
     }
+
+    @Operation(summary = "Atualizar o próprio cadastro do login", description = "Atualiza informações do funcionário")
+    @ApiResponse(responseCode = "200", description = "Funcionário atualizado com sucesso")
+    @PutMapping("/perfil/{id}")
+    public ResponseEntity<FuncionarioResponse> atualizarPerfil(@PathVariable Long id, @RequestBody @Valid FuncionarioRequest dto) {
+        Funcionario salvo = funcionarioService.atualizarPerfil(id, dto);
+        FuncionarioResponse responseDto = FuncionarioMapper.toResponse(salvo);
+
+        return ResponseEntity.ok(responseDto);
+    }
 }
