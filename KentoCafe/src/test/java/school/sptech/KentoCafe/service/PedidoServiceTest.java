@@ -33,6 +33,7 @@ class PedidoServiceTest {
     @Mock private ProdutoRepository produtoRepository;
     @Mock private PersonalizacaoRepository personalizacaoRepository;
     @Mock private ItemPedidoRepository itemPedidoRepository;
+    @Mock private ProdutoTamanhoRepository produtoTamanhoRepository;
 
     @InjectMocks private PedidoService pedidoService;
 
@@ -241,6 +242,91 @@ class PedidoServiceTest {
             // Assert
             assertNotNull(resultado);
             verifyNoInteractions(personalizacaoRepository);
+        }
+
+        @Test
+        @DisplayName("criar: Deve gravar o tamanho no item e usar o preço do tamanho escolhido")
+        void criarComTamanho() {
+            PedidoRequest request = new PedidoRequest();
+            request.setFuncionarioId(1L);
+
+            ItemRequest itemReq = new ItemRequest();
+            itemReq.setProdutoId(10L);
+            itemReq.setQuantidade(2);
+            itemReq.setTamanhoId(3L);
+            request.setItens(List.of(itemReq));
+
+            Produto produto = new Produto();
+            produto.setId(10L);
+            produto.setPrecoUnidade(new BigDecimal("10.00"));
+
+            Tamanho grande = new Tamanho(3L, "Grande", 500);
+            ProdutoTamanho produtoTamanho = new ProdutoTamanho();
+            produtoTamanho.setTamanho(grande);
+            produtoTamanho.setPrecoUnidade(new BigDecimal("14.00"));
+
+            when(statusRepository.findByNome("Pendente")).thenReturn(Optional.of(new Status("Pendente")));
+            when(funcionarioRepository.findById(1L)).thenReturn(Optional.of(new Funcionario()));
+            when(produtoRepository.findById(10L)).thenReturn(Optional.of(produto));
+            when(produtoTamanhoRepository.findByProdutoIdAndTamanhoId(10L, 3L)).thenReturn(Optional.of(produtoTamanho));
+            when(pedidoRepository.save(any(Pedido.class))).thenAnswer(i -> i.getArgument(0));
+
+            Pedido resultado = pedidoService.criar(request);
+
+            ItemPedido item = resultado.getItens().getFirst();
+            assertEquals(grande, item.getTamanho());
+            assertEquals(new BigDecimal("14.00"), item.getPrecoUnidade());
+            assertEquals(new BigDecimal("28.00"), resultado.getValorTotal());
+        }
+
+        @Test
+        @DisplayName("criar: Deve lançar BAD_REQUEST quando o tamanho não existir para o produto")
+        void criarComTamanhoIndisponivel() {
+            PedidoRequest request = new PedidoRequest();
+            request.setFuncionarioId(1L);
+
+            ItemRequest itemReq = new ItemRequest();
+            itemReq.setProdutoId(10L);
+            itemReq.setQuantidade(1);
+            itemReq.setTamanhoId(9L);
+            request.setItens(List.of(itemReq));
+
+            Produto produto = new Produto();
+            produto.setId(10L);
+
+            when(statusRepository.findByNome("Pendente")).thenReturn(Optional.of(new Status("Pendente")));
+            when(funcionarioRepository.findById(1L)).thenReturn(Optional.of(new Funcionario()));
+            when(produtoRepository.findById(10L)).thenReturn(Optional.of(produto));
+            when(produtoTamanhoRepository.findByProdutoIdAndTamanhoId(10L, 9L)).thenReturn(Optional.empty());
+
+            ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> pedidoService.criar(request));
+            assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
+            verify(pedidoRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("criar: Deve lançar BAD_REQUEST quando o produto tem tamanhos e nenhum foi escolhido")
+        void criarSemTamanhoEmProdutoComTamanhos() {
+            PedidoRequest request = new PedidoRequest();
+            request.setFuncionarioId(1L);
+
+            ItemRequest itemReq = new ItemRequest();
+            itemReq.setProdutoId(10L);
+            itemReq.setQuantidade(1);
+            request.setItens(List.of(itemReq));
+
+            Produto produto = new Produto();
+            produto.setId(10L);
+            produto.setPrecoUnidade(new BigDecimal("10.00"));
+
+            when(statusRepository.findByNome("Pendente")).thenReturn(Optional.of(new Status("Pendente")));
+            when(funcionarioRepository.findById(1L)).thenReturn(Optional.of(new Funcionario()));
+            when(produtoRepository.findById(10L)).thenReturn(Optional.of(produto));
+            when(produtoTamanhoRepository.findByProdutoId(10L)).thenReturn(List.of(new ProdutoTamanho()));
+
+            ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> pedidoService.criar(request));
+            assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
+            verify(pedidoRepository, never()).save(any());
         }
     }
 

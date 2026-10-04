@@ -23,19 +23,22 @@ public class PedidoService {
     private final ProdutoRepository produtoRepository;
     private final PersonalizacaoRepository personalizacaoRepository;
     private final ItemPedidoRepository itemPedidoRepository;
+    private final ProdutoTamanhoRepository produtoTamanhoRepository;
 
     public PedidoService(PedidoRepository pedidoRepository,
                          StatusRepository statusRepository,
                          FuncionarioRepository funcionarioRepository,
                          ProdutoRepository produtoRepository,
                          PersonalizacaoRepository personalizacaoRepository,
-                         ItemPedidoRepository itemPedidoRepository) {
+                         ItemPedidoRepository itemPedidoRepository,
+                         ProdutoTamanhoRepository produtoTamanhoRepository) {
         this.pedidoRepository = pedidoRepository;
         this.statusRepository = statusRepository;
         this.funcionarioRepository = funcionarioRepository;
         this.produtoRepository = produtoRepository;
         this.personalizacaoRepository = personalizacaoRepository;
         this.itemPedidoRepository = itemPedidoRepository;
+        this.produtoTamanhoRepository = produtoTamanhoRepository;
     }
 
     @Transactional
@@ -70,7 +73,7 @@ public class PedidoService {
             item.setPedido(pedido);
             item.setProduto(produto);
             item.setQuantidade(itemReq.getQuantidade());
-            item.setPrecoUnidade(produto.getPrecoUnidade());
+            BigDecimal precoUnidade = definirTamanhoEPreco(item, produto, itemReq.getTamanhoId());
             item.setObservacao(itemReq.getObservacao());
             item.setPronto(false);
 
@@ -81,7 +84,7 @@ public class PedidoService {
             }
 
             total = total.add(
-                    produto.getPrecoUnidade().multiply(BigDecimal.valueOf(itemReq.getQuantidade()))
+                    precoUnidade.multiply(BigDecimal.valueOf(itemReq.getQuantidade()))
             );
 
             itens.add(item);
@@ -184,6 +187,36 @@ public class PedidoService {
 
         item.setPronto(pronto);
         return itemPedidoRepository.save(item);
+    }
+
+    // Produtos com tamanhos cadastrados (bebidas) usam o preço do tamanho escolhido;
+    // os demais usam o preço do próprio produto. Grava o tamanho no item e devolve o preço aplicado.
+    private BigDecimal definirTamanhoEPreco(ItemPedido item, Produto produto, Long tamanhoId) {
+        BigDecimal preco;
+
+        if (tamanhoId != null) {
+            ProdutoTamanho produtoTamanho = produtoTamanhoRepository
+                    .findByProdutoIdAndTamanhoId(produto.getId(), tamanhoId)
+                    .orElseThrow(() -> new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST,
+                            "Tamanho não disponível para o produto: " + produto.getNome()));
+            item.setTamanho(produtoTamanho.getTamanho());
+            preco = produtoTamanho.getPrecoUnidade();
+        } else {
+            if (!produtoTamanhoRepository.findByProdutoId(produto.getId()).isEmpty()) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Escolha o tamanho do produto: " + produto.getNome());
+            }
+            preco = produto.getPrecoUnidade();
+        }
+
+        if (preco == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Produto sem preço cadastrado: " + produto.getNome());
+        }
+
+        item.setPrecoUnidade(preco);
+        return preco;
     }
 
     // Converte o status enviado pelo front (ex.: "EM_PREPARO") para o nome salvo no banco (ex.: "Em preparo")
