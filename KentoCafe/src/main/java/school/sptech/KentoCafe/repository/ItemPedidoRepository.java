@@ -13,10 +13,20 @@ public interface ItemPedidoRepository extends JpaRepository<ItemPedido, Long> {
 
     // ── Dashboard ──────────────────────────────────────────────────────────
 
-    // cada linha: [0] = nome do produto (String), [1] = quantidade total vendida (Long)
-    // ordenado do mais vendido para o menos vendido; pegue o item 0 da lista pro "produto mais vendido"
+    // total de unidades vendidas (soma das quantidades) dos pedidos não cancelados
     @Query("""
-        SELECT ip.produto.nome, SUM(ip.quantidade) AS totalVendido
+        SELECT COALESCE(SUM(ip.quantidade), 0)
+        FROM ItemPedido ip
+        WHERE ip.pedido.dtHrPedido BETWEEN :inicio AND :fim
+          AND ip.pedido.status.nome <> 'Cancelado'
+        """)
+    Long buscarTotalItensVendidos(@Param("inicio") LocalDateTime inicio,
+                                  @Param("fim") LocalDateTime fim);
+
+    // cada linha: [0] = nome do produto (String), [1] = quantidade vendida (Long), [2] = faturamento (BigDecimal)
+    // ordenado do mais vendido para o menos vendido
+    @Query("""
+        SELECT ip.produto.nome, SUM(ip.quantidade) AS totalVendido, SUM(ip.precoUnidade * ip.quantidade)
         FROM ItemPedido ip
         WHERE ip.pedido.dtHrPedido BETWEEN :inicio AND :fim
           AND ip.pedido.status.nome <> 'Cancelado'
@@ -37,4 +47,16 @@ public interface ItemPedidoRepository extends JpaRepository<ItemPedido, Long> {
         """)
     List<Object[]> buscarFaturamentoPorCategoria(@Param("inicio") LocalDateTime inicio,
                                                  @Param("fim") LocalDateTime fim);
+
+    // cada linha: [0] = nome da personalização (String), [1] = unidades pedidas com ela (Long)
+    @Query("""
+        SELECT per.nome, SUM(ip.quantidade) AS total
+        FROM ItemPedido ip JOIN ip.personalizacoes per
+        WHERE ip.pedido.dtHrPedido BETWEEN :inicio AND :fim
+          AND ip.pedido.status.nome <> 'Cancelado'
+        GROUP BY per.nome
+        ORDER BY total DESC
+        """)
+    List<Object[]> buscarPersonalizacoesMaisPedidas(@Param("inicio") LocalDateTime inicio,
+                                                    @Param("fim") LocalDateTime fim);
 }
