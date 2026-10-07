@@ -23,10 +23,12 @@ public class DashboardController {
     }
 
     @Operation(summary = "Resumo do dashboard",
-            description = "Retorna faturamento, total de pedidos, tempo médio de preparo, " +
-                    "produto mais vendido e breakdown por categoria no xperíodo informado")
+            description = "Retorna, para o período informado e para o período anterior de mesmo tamanho, " +
+                    "faturamento, pedidos, ticket médio e atendimento dentro da meta de tempo; além do " +
+                    "movimento médio por hora, da espera por volume de pedidos na hora, dos produtos mais " +
+                    "vendidos, do faturamento por categoria e das personalizações mais pedidas")
     @ApiResponse(responseCode = "200", description = "Resumo calculado com sucesso")
-    @ApiResponse(responseCode = "400", description = "Período inválido")
+    @ApiResponse(responseCode = "400", description = "Período inválido ou maior que 366 dias")
     @GetMapping("/resumo")
     public ResponseEntity<DashboardResponse> buscarResumo(
             @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,

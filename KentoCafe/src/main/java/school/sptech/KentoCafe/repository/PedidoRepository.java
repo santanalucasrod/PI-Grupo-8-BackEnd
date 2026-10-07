@@ -19,38 +19,14 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
     // ── Dashboard ──────────────────────────────────────────────────────────
 
-    // resumo[0] = faturamento total (BigDecimal), resumo[1] = total de pedidos (Long)
+    // cada linha: [0] = dtHrPedido (LocalDateTime), [1] = dtHrPronto (LocalDateTime, pode ser null),
+    // [2] = valorTotal (BigDecimal), [3] = nome do status (String).
+    // Os indicadores (mediana, médias por hora etc.) são calculados no DashboardService.
     @Query("""
-        SELECT COALESCE(SUM(p.valorTotal), 0), COUNT(p)
+        SELECT p.dtHrPedido, p.dtHrPronto, p.valorTotal, p.status.nome
         FROM Pedido p
         WHERE p.dtHrPedido BETWEEN :inicio AND :fim
-          AND p.status.nome <> 'Cancelado'
         """)
-    Object[] buscarResumoFaturamentoEPedidos(@Param("inicio") LocalDateTime inicio,
-                                             @Param("fim") LocalDateTime fim);
-
-    // CAST(... AS double) é necessário porque o Hibernate 6.6 não sabe que
-    // FUNCTION('TIMESTAMPDIFF', ...) devolve um número — sem o CAST, AVG()
-    // rejeita a query na inicialização com FunctionArgumentException.
-    @Query("""
-        SELECT AVG(CAST(FUNCTION('TIMESTAMPDIFF', MINUTE, p.dtHrPedido, p.dtHrPronto) AS double))
-        FROM Pedido p
-        WHERE p.dtHrPedido BETWEEN :inicio AND :fim
-          AND p.status.nome <> 'Cancelado'
-          AND p.dtHrPronto IS NOT NULL
-        """)
-    Double buscarTempoMedioPreparoMinutos(@Param("inicio") LocalDateTime inicio,
+    List<Object[]> buscarPedidosDoPeriodo(@Param("inicio") LocalDateTime inicio,
                                           @Param("fim") LocalDateTime fim);
-
-    // cada linha: [0] = data (java.sql.Date), [1] = faturamento do dia (BigDecimal), [2] = total de pedidos do dia (Long)
-    @Query("""
-        SELECT FUNCTION('DATE', p.dtHrPedido), COALESCE(SUM(p.valorTotal), 0), COUNT(p)
-        FROM Pedido p
-        WHERE p.dtHrPedido BETWEEN :inicio AND :fim
-          AND p.status.nome <> 'Cancelado'
-        GROUP BY FUNCTION('DATE', p.dtHrPedido)
-        ORDER BY FUNCTION('DATE', p.dtHrPedido)
-        """)
-    List<Object[]> buscarSerieDiaria(@Param("inicio") LocalDateTime inicio,
-                                     @Param("fim") LocalDateTime fim);
 }
