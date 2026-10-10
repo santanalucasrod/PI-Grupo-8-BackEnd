@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import school.sptech.KentoCafe.entity.Personalizacao;
@@ -39,9 +40,9 @@ class PersonalizacaoServiceTest {
             List<Personalizacao> listaSimulada = List.of(new Personalizacao(), new Personalizacao());
             when(personalizacaoRepository.findAll()).thenReturn(listaSimulada);
 
-            List<Personalizacao> resultado = personalizacaoService.buscarTodas();
+            Page<Personalizacao> resultado = personalizacaoService.buscarTodas(0, 10);
 
-            assertEquals(2, resultado.size());
+            assertEquals(2, resultado.getContent().size());
             verify(personalizacaoRepository, times(1)).findAll();
         }
     }
