@@ -1,6 +1,9 @@
 package school.sptech.KentoCafe.service;
 
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -64,8 +67,10 @@ public class FuncionarioService {
         return repository.save(funcionario);
     }
 
-    public List<Funcionario> listarTodos() {
-        return repository.findAll();
+    public Page<Funcionario> listarTodos(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        return repository.findAll(pageable);
     }
 
     public List<Funcionario> listarTodosPositivo() {

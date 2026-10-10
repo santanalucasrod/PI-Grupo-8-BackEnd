@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +28,13 @@ public class PersonalizacaoController {
     @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso")
     @ApiResponse(responseCode = "204", description = "Nenhuma personalização cadastrada")
     @GetMapping
-    public ResponseEntity<List<Personalizacao>> listarTodas() {
-        List<Personalizacao> personalizacoes = personalizacaoService.buscarTodas();
+    public ResponseEntity<Page<Personalizacao>> listarTodas(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<Personalizacao> personalizacoes =
+                personalizacaoService.buscarTodas(page, size);
+
         return personalizacoes.isEmpty()
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.ok(personalizacoes);

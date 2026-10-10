@@ -5,6 +5,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import school.sptech.KentoCafe.entity.Personalizacao;
 import school.sptech.KentoCafe.repository.PersonalizacaoRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -17,8 +20,10 @@ public class PersonalizacaoService {
         this.personalizacaoRepository = personalizacaoRepository;
     }
 
-    public List<Personalizacao> buscarTodas() {
-        return personalizacaoRepository.findAll();
+    public Page<Personalizacao> buscarTodas(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        return personalizacaoRepository.findAll(pageable);
     }
 
     public Personalizacao buscarPorId(Long id) {

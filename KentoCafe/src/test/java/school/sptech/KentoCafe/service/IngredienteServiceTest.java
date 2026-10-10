@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import school.sptech.KentoCafe.dto.ingrediente.IngredienteRequest;
@@ -44,9 +45,9 @@ class IngredienteServiceTest {
             List<Ingrediente> lista = List.of(new Ingrediente(), new Ingrediente());
             when(ingredienteRepository.findAll()).thenReturn(lista);
 
-            List<Ingrediente> resultado = ingredienteService.buscarTodos();
+            Page<Ingrediente> resultado = ingredienteService.buscarTodos(1,10);
 
-            assertEquals(2, resultado.size());
+            assertEquals(2, resultado.getContent().size());
             verify(ingredienteRepository, times(1)).findAll();
         }
     }

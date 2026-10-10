@@ -1,5 +1,6 @@
 package school.sptech.KentoCafe.mapper;
 
+import org.springframework.data.domain.Page;
 import school.sptech.KentoCafe.dto.funcionario.FuncionarioRequest;
 import school.sptech.KentoCafe.dto.funcionario.FuncionarioResponse;
 import school.sptech.KentoCafe.entity.Funcionario;
@@ -40,5 +41,10 @@ public class FuncionarioMapper {
         return games.stream()
                 .map(FuncionarioMapper::toResponse)
                 .toList();
+    }
+
+
+    public static Page<FuncionarioResponse> toResponseDto(Page<Funcionario> funcionarios) {
+        return funcionarios.map(FuncionarioMapper::toResponse);
     }
 }

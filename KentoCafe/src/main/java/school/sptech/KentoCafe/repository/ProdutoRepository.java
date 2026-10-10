@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface ProdutoRepository extends JpaRepository<Produto, Long> {
 
-    List<Produto> findByCategoriaId(Long id);
+    Pa<Produto> findByCategoriaId(Long id);
 
     @Query("SELECT p FROM Produto p JOIN p.ingredientes i WHERE i.id = :ingredienteId")
     List<Produto> findByIngredienteId(@Param("ingredienteId") Long ingredienteId);
