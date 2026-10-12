@@ -17,6 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -125,13 +127,18 @@ class FuncionarioServiceTest {
         @Test
         @DisplayName("Deve retornar todos os funcionários (Cenário 3.1)")
         void listarTodos() {
-            List<Funcionario> lista = List.of(new Funcionario(), new Funcionario());
-            when(repository.findAll()).thenReturn(lista);
+            Page<Funcionario> pagina = new PageImpl<>(
+                    List.of(
+                            new Funcionario(),
+                            new Funcionario()
+                    )
+            );
+            when(repository.findAll(any(Pageable.class))).thenReturn(pagina);
 
             Page<Funcionario> resultado = funcionarioService.listarTodos(1, 10);
 
             assertEquals(2, resultado.getContent().size());
-            verify(repository, times(1)).findAll();
+            verify(repository, times(1)).findAll(any(Pageable.class));
         }
 
         @Test
