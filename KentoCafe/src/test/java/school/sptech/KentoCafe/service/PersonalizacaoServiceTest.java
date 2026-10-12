@@ -16,6 +16,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import school.sptech.KentoCafe.entity.Personalizacao;
@@ -37,13 +39,19 @@ class PersonalizacaoServiceTest {
         @Test
         @DisplayName("Deve retornar a lista de todas as personalizações")
         void deveRetornarTodasAsPersonalizacoes() {
-            List<Personalizacao> listaSimulada = List.of(new Personalizacao(), new Personalizacao());
-            when(personalizacaoRepository.findAll()).thenReturn(listaSimulada);
+            Page<Personalizacao> pagina = new PageImpl<>(
+                    List.of(
+                            new Personalizacao(),
+                            new Personalizacao()
+                    )
+            );
+
+            when(personalizacaoRepository.findAll(any(Pageable.class))).thenReturn(pagina);
 
             Page<Personalizacao> resultado = personalizacaoService.buscarTodas(0, 10);
 
             assertEquals(2, resultado.getContent().size());
-            verify(personalizacaoRepository, times(1)).findAll();
+            verify(personalizacaoRepository, times(1)).findAll(any(Pageable.class));
         }
     }
 
