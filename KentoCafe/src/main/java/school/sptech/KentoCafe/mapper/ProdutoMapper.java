@@ -15,7 +15,6 @@ public class ProdutoMapper {
         produto.setCategoria(categoria);
         produto.setPrecoUnidade(dto.getPrecoUnidade());
         produto.setDescricao(dto.getDescricao());
-        produto.setPathFt(dto.getPathFt());
         return produto;
     }
 
