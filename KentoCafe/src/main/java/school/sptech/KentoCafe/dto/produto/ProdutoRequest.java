@@ -22,11 +22,6 @@ public class ProdutoRequest {
     @Size(max = 200)
     private String descricao;
 
-    @Schema(description = "Caminho da foto do produto", example = "cappuccino.jpg")
-    @NotBlank
-    @Size(max = 45)
-    private String pathFt;
-
     private Categoria categoria;
 
     public static class Categoria{
@@ -66,11 +61,10 @@ public class ProdutoRequest {
         this.categoria = categoria;
     }
 
-    public ProdutoRequest(String nome, BigDecimal precoUnidade, String descricao, String pathFt, Categoria categoria) {
+    public ProdutoRequest(String nome, BigDecimal precoUnidade, String descricao, Categoria categoria) {
         this.nome = nome;
         this.precoUnidade = precoUnidade;
         this.descricao = descricao;
-        this.pathFt = pathFt;
         this.categoria = categoria;
     }
 
@@ -89,7 +83,4 @@ public class ProdutoRequest {
 
     public String getDescricao() { return descricao; }
     public void setDescricao(String descricao) { this.descricao = descricao; }
-
-    public String getPathFt() { return pathFt; }
-    public void setPathFt(String pathFt) { this.pathFt = pathFt; }
 }

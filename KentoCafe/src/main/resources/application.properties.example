@@ -19,3 +19,16 @@ springdoc.swagger-ui.path=/swagger-ui.html
 springdoc.api-docs.path=/v3/api-docs
 springdoc.swagger-ui.tags-sorter=alpha
 springdoc.swagger-ui.operations-sorter=method
+
+# Configure com a região real do bucket e use o nome do seu bucket bronze.
+aws.region=${AWS_REGION:us-east-1}
+aws.s3.bucket-bronze=${AWS_S3_BUCKET_BRONZE:cafeteria-raw-6424ffh1}
+
+# Limites HTTP de upload; o serviço também valida os bytes e dimensões.
+spring.servlet.multipart.max-file-size=5MB
+spring.servlet.multipart.max-request-size=5MB
+
+# A cada 30 segundos, o worker busca no máximo 20 tarefas de limpeza.
+app.imagens.cleanup-delay-ms=30000
+
+jwt.secret=${JWT_SECRET:...}
