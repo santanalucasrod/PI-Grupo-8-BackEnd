@@ -203,7 +203,19 @@ CREATE TABLE IF NOT EXISTS `item_pedido_personalizacao` (
     CONSTRAINT `fk_ip_personalizacao` FOREIGN KEY (`personalizacao_id`) REFERENCES `personalizacao`(`id`)
 );
 
-
+CREATE TABLE IF NOT EXISTS s3_cleanup_outbox (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    object_key VARCHAR(1024) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDENTE',
+    tentativas INT NOT NULL DEFAULT 0,
+    created_at DATETIME(6) NOT NULL,
+    next_attempt_at DATETIME(6) NOT NULL,
+    locked_at DATETIME(6) NULL,
+    last_error VARCHAR(1000) NULL,
+    PRIMARY KEY (id),
+    INDEX idx_s3_cleanup_due (status, next_attempt_at),
+    INDEX idx_s3_cleanup_lock (status, locked_at)
+);
 
 -- inserts 
 INSERT INTO funcionario (nome, senha, email, gerente) VALUES
