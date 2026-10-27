@@ -1,9 +1,11 @@
 package school.sptech.KentoCafe.dto.pedido.item;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class ItemResponse {
+public class ItemResponse implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String nomeProduto;
     private Integer quantidade;
     private BigDecimal precoUnitario;

@@ -1,12 +1,15 @@
 package school.sptech.KentoCafe.service;
 
 import jakarta.transaction.Transactional;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import school.sptech.KentoCafe.dto.pedido.item.ItemRequest;
 import school.sptech.KentoCafe.dto.pedido.pedido.PedidoRequest;
+import school.sptech.KentoCafe.dto.pedido.pedido.PedidoResponse;
 import school.sptech.KentoCafe.entity.*;
+import school.sptech.KentoCafe.mapper.PedidoMapper;
 import school.sptech.KentoCafe.repository.*;
 
 import java.math.BigDecimal;
@@ -134,8 +137,13 @@ public class PedidoService {
         return pedidoRepository.save(pedido);
     }
 
-    public List<Pedido> listarTodos() {
-        return pedidoRepository.findAll();
+    @Cacheable(value = "pedidos")
+    public List<PedidoResponse> listarTodos() {
+        System.out.println("Buscando pedidos");
+        List<Pedido> pedidos = pedidoRepository.findAll();
+
+        // Converte para DTO aqui dentro, antes de salvar no cache
+        return PedidoMapper.toResponseList(pedidos);
     }
 
     public List<Pedido> listarPorStatus(String statusNome) {

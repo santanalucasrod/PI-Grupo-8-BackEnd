@@ -41,10 +41,12 @@ public class PedidoController {
     @ApiResponse(responseCode = "204", description = "Nenhum pedido encontrado")
     @GetMapping
     public ResponseEntity<List<PedidoResponse>> listarTodos() {
-        List<Pedido> pedidos = pedidoService.listarTodos();
+        // O service já te entrega a lista de DTOs (pode vir direto da memória/cache)
+        List<PedidoResponse> pedidos = pedidoService.listarTodos();
+
         return pedidos.isEmpty()
                 ? ResponseEntity.noContent().build()
-                : ResponseEntity.ok(PedidoMapper.toResponseList(pedidos));
+                : ResponseEntity.ok(pedidos);
     }
 
     @Operation(summary = "Buscar pedido por ID")
