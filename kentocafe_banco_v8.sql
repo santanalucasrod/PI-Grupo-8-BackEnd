@@ -209,6 +209,20 @@ INSERT INTO funcionario (nome, senha, email, gerente) VALUES
                                                           ('Felipe Rocha',   '$2a$10$CcdT4yBJ39B9KJbplgpXQeqdWl8WVXyLd7iwnfQP5.XMavMkvrsxG', 'felipe.rocha@cafeteria.com',   0),
                                                           ('Gabriela Nunes', '$2a$10$CcdT4yBJ39B9KJbplgpXQeqdWl8WVXyLd7iwnfQP5.XMavMkvrsxG', 'gabriela.nunes@cafeteria.com', 1),
                                                           ('Henrique Dias',  '$2a$10$CcdT4yBJ39B9KJbplgpXQeqdWl8WVXyLd7iwnfQP5.XMavMkvrsxG', 'henrique.dias@cafeteria.com',  0);
+                                                          
+CREATE TABLE IF NOT EXISTS s3_cleanup_outbox (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    object_key VARCHAR(1024) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDENTE',
+    tentativas INT NOT NULL DEFAULT 0,
+    created_at DATETIME(6) NOT NULL,
+    next_attempt_at DATETIME(6) NOT NULL,
+    locked_at DATETIME(6) NULL,
+    last_error VARCHAR(1000) NULL,
+    PRIMARY KEY (id),
+    INDEX idx_s3_cleanup_due (status, next_attempt_at),
+    INDEX idx_s3_cleanup_lock (status, locked_at)
+);
 
 -- ============================================================================
 -- DADOS SIMULADOS DE FUNCIONAMENTO (01/04/2026 a 04/10/2026, das 9h às 18h)
