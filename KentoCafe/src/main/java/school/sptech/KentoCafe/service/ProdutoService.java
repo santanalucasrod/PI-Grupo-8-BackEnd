@@ -67,7 +67,6 @@ public class ProdutoService {
         produto.setCategoria(categoria);
         produto.setPrecoUnidade(dto.getPrecoUnidade());
         produto.setDescricao(dto.getDescricao());
-        produto.setPathFt(dto.getPathFt());
 
         return ProdutoMapper.toResponse(produtoRepository.save(produto));
     }

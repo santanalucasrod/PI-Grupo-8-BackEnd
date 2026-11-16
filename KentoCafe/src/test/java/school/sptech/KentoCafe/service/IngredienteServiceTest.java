@@ -14,6 +14,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import school.sptech.KentoCafe.dto.ingrediente.IngredienteRequest;
@@ -41,13 +44,19 @@ class IngredienteServiceTest {
         @Test
         @DisplayName("Deve retornar todos os ingredientes (Cenário 1.1)")
         void deveRetornarTodos() {
-            List<Ingrediente> lista = List.of(new Ingrediente(), new Ingrediente());
-            when(ingredienteRepository.findAll()).thenReturn(lista);
+            Page<Ingrediente> pagina = new PageImpl<>(
+                    List.of(
+                            new Ingrediente(),
+                            new Ingrediente()
+                    )
+            );
 
-            List<Ingrediente> resultado = ingredienteService.buscarTodos();
+            when(ingredienteRepository.findAll(any(Pageable.class))).thenReturn(pagina);
 
-            assertEquals(2, resultado.size());
-            verify(ingredienteRepository, times(1)).findAll();
+            Page<Ingrediente> resultado = ingredienteService.buscarTodos(1, 10);
+
+            assertEquals(2, resultado.getContent().size());
+            verify(ingredienteRepository, times(1)).findAll(any(Pageable.class));
         }
     }
 

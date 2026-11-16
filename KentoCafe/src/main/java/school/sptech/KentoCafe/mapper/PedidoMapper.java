@@ -17,15 +17,19 @@ public class PedidoMapper {
         resp.setNomeCliente(pedido.getNomeCliente());
         resp.setDtHrPedido(pedido.getDtHrPedido());
         resp.setDtHrPronto(pedido.getDtHrPronto());
-        resp.setStatus(pedido.getStatus().getNome());
+        resp.setStatus(normalizarStatus(pedido.getStatus().getNome()));
         resp.setValorTotal(pedido.getValorTotal());
+        resp.setDescricao(pedido.getDescricao());
 
         List<ItemResponse> itensResp = pedido.getItens().stream()
                 .map(item -> {
                     ItemResponse itemResp = new ItemResponse();
+                    itemResp.setId(item.getId());
                     itemResp.setNomeProduto(item.getProduto().getNome());
                     itemResp.setQuantidade(item.getQuantidade());
                     itemResp.setPrecoUnitario(item.getPrecoUnidade());
+                    itemResp.setPronto(item.getPronto());
+                    itemResp.setObservacao(item.getObservacao());
 
                     BigDecimal subtotal = item.getPrecoUnidade()
                             .multiply(BigDecimal.valueOf(item.getQuantidade()));
@@ -56,5 +60,16 @@ public class PedidoMapper {
         return pedidos.stream()
                 .map(PedidoMapper::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Converte o nome do status salvo no banco ("Em preparo", "Pronto"...)
+     * para o formato usado pelo front (EM_PREPARO, PRONTO...).
+     */
+    private static String normalizarStatus(String nome) {
+        if (nome == null) return null;
+        return nome.trim()
+                .toUpperCase()
+                .replace(" ", "_");
     }
 }

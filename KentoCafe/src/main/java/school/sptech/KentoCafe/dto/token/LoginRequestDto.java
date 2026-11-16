@@ -5,6 +5,9 @@ public class LoginRequestDto {
     private String email;
     private String senha;
 
+    public LoginRequestDto() {
+    }
+
     public LoginRequestDto(String email, String senha) {
         this.email = email;
         this.senha = senha;

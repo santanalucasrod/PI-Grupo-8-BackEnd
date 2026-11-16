@@ -129,6 +129,13 @@ public class Produto {
         this.tamanhos = tamanhos;
     }
 
+    public Produto(Long id, String nome, Categoria categoria, BigDecimal precoUnidade) {
+        this.id = id;
+        this.nome = nome;
+        this.categoria = categoria;
+        this.precoUnidade = precoUnidade;
+    }
+
     public Produto(Long id, String nome, Categoria categoria, BigDecimal precoUnidade, String descricao, String pathFt, List<Ingrediente> ingredientes) {
         this.id = id;
         this.nome = nome;

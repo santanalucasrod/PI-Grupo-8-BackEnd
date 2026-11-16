@@ -6,6 +6,7 @@ import java.util.List;
 
 public class ItemResponse implements Serializable {
     private static final long serialVersionUID = 1L;
+    private Long id;
     private String nomeProduto;
     private Integer quantidade;
     private BigDecimal precoUnitario;
@@ -13,6 +14,32 @@ public class ItemResponse implements Serializable {
     private List<String> personalizacoes;
     private String tamanho;
     private Integer volumeMl;
+    private Boolean pronto;
+    private String observacao;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Boolean getPronto() {
+        return pronto;
+    }
+
+    public void setPronto(Boolean pronto) {
+        this.pronto = pronto;
+    }
+
+    public String getObservacao() {
+        return observacao;
+    }
+
+    public void setObservacao(String observacao) {
+        this.observacao = observacao;
+    }
 
     public String getNomeProduto() {
         return nomeProduto;

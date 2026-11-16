@@ -1,5 +1,8 @@
 package school.sptech.KentoCafe.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,8 +26,10 @@ public class IngredienteService {
         this.produtoRepository = produtoRepository;
     }
 
-    public List<Ingrediente> buscarTodos() {
-        return ingredienteRepository.findAll();
+    public Page<Ingrediente> buscarTodos(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        return ingredienteRepository.findAll(pageable);
     }
 
     public Ingrediente buscarPorId(Long id) {

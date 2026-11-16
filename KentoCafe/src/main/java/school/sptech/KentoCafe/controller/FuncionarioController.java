@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -56,12 +57,15 @@ public class FuncionarioController {
 
     @Operation(summary = "Listar funcionários")
     @GetMapping("crud")
-    public ResponseEntity<List<FuncionarioResponse>> listar() {
+    public ResponseEntity<Page<FuncionarioResponse>> listar(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
         //serviço
-        List<Funcionario> funcionarios = funcionarioService.listarTodos();
+        Page<Funcionario> funcionarios = funcionarioService.listarTodos(page,size);
 
         //dto
-        List<FuncionarioResponse> response = FuncionarioMapper.toResponseDto(funcionarios);
+        Page<FuncionarioResponse> response = FuncionarioMapper.toResponseDto(funcionarios);
 
         //retorno
         return ResponseEntity.ok(response);
@@ -103,5 +107,15 @@ public class FuncionarioController {
     @PatchMapping("/{id}/reativar")
     public ResponseEntity<Funcionario> reativar(@PathVariable Long id) {
         return ResponseEntity.ok(funcionarioService.reativar(id));
+    }
+
+    @Operation(summary = "Atualizar o próprio cadastro do login", description = "Atualiza informações do funcionário")
+    @ApiResponse(responseCode = "200", description = "Funcionário atualizado com sucesso")
+    @PutMapping("/perfil/{id}")
+    public ResponseEntity<FuncionarioResponse> atualizarPerfil(@PathVariable Long id, @RequestBody @Valid FuncionarioRequest dto) {
+        Funcionario salvo = funcionarioService.atualizarPerfil(id, dto);
+        FuncionarioResponse responseDto = FuncionarioMapper.toResponse(salvo);
+
+        return ResponseEntity.ok(responseDto);
     }
 }

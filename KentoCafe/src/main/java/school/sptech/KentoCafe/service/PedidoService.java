@@ -25,25 +25,31 @@ public class PedidoService {
     private final FuncionarioRepository funcionarioRepository;
     private final ProdutoRepository produtoRepository;
     private final PersonalizacaoRepository personalizacaoRepository;
+    private final ItemPedidoRepository itemPedidoRepository;
+    private final ProdutoTamanhoRepository produtoTamanhoRepository;
 
     public PedidoService(PedidoRepository pedidoRepository,
                          StatusRepository statusRepository,
                          FuncionarioRepository funcionarioRepository,
                          ProdutoRepository produtoRepository,
-                         PersonalizacaoRepository personalizacaoRepository) {
+                         PersonalizacaoRepository personalizacaoRepository,
+                         ItemPedidoRepository itemPedidoRepository,
+                         ProdutoTamanhoRepository produtoTamanhoRepository) {
         this.pedidoRepository = pedidoRepository;
         this.statusRepository = statusRepository;
         this.funcionarioRepository = funcionarioRepository;
         this.produtoRepository = produtoRepository;
         this.personalizacaoRepository = personalizacaoRepository;
+        this.itemPedidoRepository = itemPedidoRepository;
+        this.produtoTamanhoRepository = produtoTamanhoRepository;
     }
 
     @Transactional
     public Pedido criar(PedidoRequest request) {
 
-        Status emPreparo = statusRepository.findByNome("Em preparo")
+        Status pendente = statusRepository.findByNome("Pendente")
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Status 'Em preparo' não encontrado"));
+                        HttpStatus.NOT_FOUND, "Status 'Pendente' não encontrado"));
 
         Funcionario funcionario = funcionarioRepository.findById(request.getFuncionarioId())
                 .orElseThrow(() -> new ResponseStatusException(
@@ -53,7 +59,8 @@ public class PedidoService {
         pedido.setNomeCliente(request.getNomeCliente());
         pedido.setDtHrPedido(LocalDateTime.now());
         pedido.setDtHrPronto(null);
-        pedido.setStatus(emPreparo);
+        pedido.setDescricao(request.getDescricao());
+        pedido.setStatus(pendente);
         pedido.setFuncionario(funcionario);
 
         List<ItemPedido> itens = new ArrayList<>();
@@ -69,7 +76,9 @@ public class PedidoService {
             item.setPedido(pedido);
             item.setProduto(produto);
             item.setQuantidade(itemReq.getQuantidade());
-            item.setPrecoUnidade(produto.getPrecoUnidade());
+            BigDecimal precoUnidade = definirTamanhoEPreco(item, produto, itemReq.getTamanhoId());
+            item.setObservacao(itemReq.getObservacao());
+            item.setPronto(false);
 
             if (itemReq.getPersonalizacaoIds() != null && !itemReq.getPersonalizacaoIds().isEmpty()) {
                 List<Personalizacao> personalizacoes = personalizacaoRepository
@@ -78,7 +87,7 @@ public class PedidoService {
             }
 
             total = total.add(
-                    produto.getPrecoUnidade().multiply(BigDecimal.valueOf(itemReq.getQuantidade()))
+                    precoUnidade.multiply(BigDecimal.valueOf(itemReq.getQuantidade()))
             );
 
             itens.add(item);
@@ -146,12 +155,86 @@ public class PedidoService {
         return PedidoMapper.toResponseList(pedidos);
     }
 
+    public List<PedidoResponse> listarAtivos() {
+        return pedidoRepository.findByStatusNomeIn(List.of("Pendente", "Em preparo"));
+    }
+
     public List<Pedido> listarPorStatus(String statusNome) {
         return pedidoRepository.findByStatusNome(statusNome);
     }
 
     public Pedido buscarPorId(Long id) {
         return buscarOuLancarErro(id);
+    }
+
+    @Transactional
+    public Pedido atualizarStatus(Long id, String statusFront) {
+        Pedido pedido = buscarOuLancarErro(id);
+
+        if (pedido.getStatus().getNome().equals("Pronto")
+                || pedido.getStatus().getNome().equals("Cancelado")) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "Pedido já está pronto ou foi cancelado");
+        }
+
+        Status novoStatus = buscarStatusPorNomeFront(statusFront);
+        pedido.setStatus(novoStatus);
+
+        if (novoStatus.getNome().equals("Pronto")) {
+            pedido.setDtHrPronto(LocalDateTime.now());
+        }
+
+        return pedidoRepository.save(pedido);
+    }
+
+    @Transactional
+    public ItemPedido marcarItemPronto(Long itemId, boolean pronto) {
+        ItemPedido item = itemPedidoRepository.findById(itemId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Item não encontrado"));
+
+        item.setPronto(pronto);
+        return itemPedidoRepository.save(item);
+    }
+
+    // Produtos com tamanhos cadastrados (bebidas) usam o preço do tamanho escolhido;
+    // os demais usam o preço do próprio produto. Grava o tamanho no item e devolve o preço aplicado.
+    private BigDecimal definirTamanhoEPreco(ItemPedido item, Produto produto, Long tamanhoId) {
+        BigDecimal preco;
+
+        if (tamanhoId != null) {
+            ProdutoTamanho produtoTamanho = produtoTamanhoRepository
+                    .findByProdutoIdAndTamanhoId(produto.getId(), tamanhoId)
+                    .orElseThrow(() -> new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST,
+                            "Tamanho não disponível para o produto: " + produto.getNome()));
+            item.setTamanho(produtoTamanho.getTamanho());
+            preco = produtoTamanho.getPrecoUnidade();
+        } else {
+            if (!produtoTamanhoRepository.findByProdutoId(produto.getId()).isEmpty()) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Escolha o tamanho do produto: " + produto.getNome());
+            }
+            preco = produto.getPrecoUnidade();
+        }
+
+        if (preco == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Produto sem preço cadastrado: " + produto.getNome());
+        }
+
+        item.setPrecoUnidade(preco);
+        return preco;
+    }
+
+    // Converte o status enviado pelo front (ex.: "EM_PREPARO") para o nome salvo no banco (ex.: "Em preparo")
+    private Status buscarStatusPorNomeFront(String statusFront) {
+        String alvo = statusFront == null ? "" : statusFront.trim().toUpperCase().replace(" ", "_");
+        return statusRepository.findAll().stream()
+                .filter(s -> s.getNome().trim().toUpperCase().replace(" ", "_").equals(alvo))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Status inválido: " + statusFront));
     }
 
     private Pedido buscarOuLancarErro(Long id) {

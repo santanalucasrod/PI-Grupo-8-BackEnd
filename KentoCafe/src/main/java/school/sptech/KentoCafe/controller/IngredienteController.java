@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jmx.export.annotation.ManagedOperationParameter;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -31,8 +32,11 @@ public class IngredienteController {
     @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso")
     @ApiResponse(responseCode = "204", description = "Nenhum ingrediente cadastrado")
     @GetMapping
-    public ResponseEntity<List<IngredienteResponse>> listarTodos() {
-        List<Ingrediente> ingredientes = ingredienteService.buscarTodos();
+    public ResponseEntity<Page<IngredienteResponse>> listarTodos(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<Ingrediente> ingredientes = ingredienteService.buscarTodos(page,size);
         if (ingredientes.isEmpty()) {
             return ResponseEntity.noContent().build();
         }

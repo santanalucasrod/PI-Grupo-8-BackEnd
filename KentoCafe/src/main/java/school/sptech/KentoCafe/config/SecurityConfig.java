@@ -52,6 +52,7 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.DELETE, "/pedidos/**").hasRole("ADMIN")
                         .requestMatchers("/pedidos/{id}/cancelar").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/funcionarios/perfil/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/funcionarios/**").hasRole("ADMIN")
 
                         .requestMatchers(HttpMethod.GET, "/produtos/**").hasAnyRole("ADMIN", "USER")
@@ -63,6 +64,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT,    "/tamanhos/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/tamanhos/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET,    "/tamanhos/**").hasAnyRole("ADMIN", "USER")
+
+                        .requestMatchers(HttpMethod.GET, "/dashboard/**").hasRole("ADMIN")
 
                         .requestMatchers("/pedidos/**").permitAll()
 

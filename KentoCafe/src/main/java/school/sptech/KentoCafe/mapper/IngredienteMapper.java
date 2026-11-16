@@ -1,5 +1,6 @@
 package school.sptech.KentoCafe.mapper;
 
+import org.springframework.data.domain.Page;
 import school.sptech.KentoCafe.dto.ingrediente.IngredienteRequest;
 import school.sptech.KentoCafe.dto.ingrediente.IngredienteResponse;
 import school.sptech.KentoCafe.entity.Ingrediente;
@@ -25,5 +26,10 @@ public class IngredienteMapper {
         return ingredientes.stream()
                 .map(IngredienteMapper::toResponse)
                 .toList();
+    }
+
+    public static Page<IngredienteResponse> toResponseList(Page<Ingrediente> ingredientes){
+        return ingredientes
+                .map(IngredienteMapper::toResponse);
     }
 }
