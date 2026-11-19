@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import school.sptech.KentoCafe.dto.pedido.pedido.PedidoResponse;
 import school.sptech.KentoCafe.entity.Pedido;
 
 import java.time.LocalDateTime;
@@ -13,7 +14,7 @@ import java.util.List;
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     List<Pedido> findByStatusNome(String statusNome);
 
-    List<Pedido> findByStatusNomeIn(List<String> statusNomes);
+    List<PedidoResponse> findByStatusNomeIn(List<String> statusNomes);
 
     List<Pedido> findByFuncionarioId(Integer funcionarioId);
 

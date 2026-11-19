@@ -44,10 +44,10 @@ public class PedidoController {
     @GetMapping
     public ResponseEntity<List<PedidoResponse>> listarTodos(
             @RequestParam(required = false, defaultValue = "false") boolean ativos) {
-        List<Pedido> pedidos = ativos ? pedidoService.listarAtivos() : pedidoService.listarTodos();
+        List<PedidoResponse> pedidos = ativos ? pedidoService.listarAtivos() : pedidoService.listarTodos();
         return pedidos.isEmpty()
                 ? ResponseEntity.noContent().build()
-                : ResponseEntity.ok(PedidoMapper.toResponseList(pedidos));
+                : ResponseEntity.ok(pedidos);
     }
 
     @Operation(summary = "Buscar pedido por ID")
