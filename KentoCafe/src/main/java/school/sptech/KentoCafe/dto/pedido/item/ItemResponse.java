@@ -4,8 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class ItemResponse implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class ItemResponse {
     private Long id;
     private String nomeProduto;
     private Integer quantidade;

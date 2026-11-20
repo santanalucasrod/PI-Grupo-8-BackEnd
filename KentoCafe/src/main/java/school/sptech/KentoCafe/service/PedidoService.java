@@ -1,7 +1,9 @@
+
 package school.sptech.KentoCafe.service;
 
 import jakarta.transaction.Transactional;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -44,7 +46,9 @@ public class PedidoService {
         this.produtoTamanhoRepository = produtoTamanhoRepository;
     }
 
+    // CRIAR PEDIDO
     @Transactional
+    @CacheEvict(value = "pedidos", allEntries = true)
     public Pedido criar(PedidoRequest request) {
 
         Status pendente = statusRepository.findByNome("Pendente")
@@ -76,7 +80,9 @@ public class PedidoService {
             item.setPedido(pedido);
             item.setProduto(produto);
             item.setQuantidade(itemReq.getQuantidade());
+
             BigDecimal precoUnidade = definirTamanhoEPreco(item, produto, itemReq.getTamanhoId());
+
             item.setObservacao(itemReq.getObservacao());
             item.setPronto(false);
 
@@ -99,7 +105,9 @@ public class PedidoService {
         return pedidoRepository.save(pedido);
     }
 
+    // CONCLUIR PEDIDO
     @Transactional
+    @CacheEvict(value = "pedidos", allEntries = true)
     public Pedido concluir(Long id) {
         Pedido pedido = buscarOuLancarErro(id);
 
@@ -123,7 +131,9 @@ public class PedidoService {
         return pedidoRepository.save(pedido);
     }
 
+    // CANCELAR PEDIDO
     @Transactional
+    @CacheEvict(value = "pedidos", allEntries = true)
     public Pedido cancelar(Long id) {
         Pedido pedido = buscarOuLancarErro(id);
 
@@ -146,6 +156,7 @@ public class PedidoService {
         return pedidoRepository.save(pedido);
     }
 
+    // LISTAR TODOS
     @Cacheable(value = "pedidos")
     public List<PedidoResponse> listarTodos() {
         System.out.println("Buscando pedidos");
@@ -159,15 +170,21 @@ public class PedidoService {
         return pedidoRepository.findByStatusNomeIn(List.of("Pendente", "Em preparo"));
     }
 
+    // LISTAR POR STATUS
+    @Cacheable(value = "pedidos", key = "'status:' + #statusNome")
     public List<Pedido> listarPorStatus(String statusNome) {
         return pedidoRepository.findByStatusNome(statusNome);
     }
 
+    // BUSCAR PEDIDO POR ID
+    @Cacheable(value = "pedidos", key = "'id:' + #id")
     public Pedido buscarPorId(Long id) {
         return buscarOuLancarErro(id);
     }
 
+    // ATUALIZAR STATUS
     @Transactional
+    @CacheEvict(value = "pedidos", allEntries = true)
     public Pedido atualizarStatus(Long id, String statusFront) {
         Pedido pedido = buscarOuLancarErro(id);
 
@@ -187,18 +204,22 @@ public class PedidoService {
         return pedidoRepository.save(pedido);
     }
 
+    // MARCAR ITEM COMO PRONTO
     @Transactional
+    @CacheEvict(value = "pedidos", allEntries = true)
     public ItemPedido marcarItemPronto(Long itemId, boolean pronto) {
         ItemPedido item = itemPedidoRepository.findById(itemId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Item não encontrado"));
 
         item.setPronto(pronto);
+
         return itemPedidoRepository.save(item);
     }
 
+    // DEFINIR TAMANHO E PREÇO
     // Produtos com tamanhos cadastrados (bebidas) usam o preço do tamanho escolhido;
-    // os demais usam o preço do próprio produto. Grava o tamanho no item e devolve o preço aplicado.
+    // os demais usam o preço do próprio produto.
     private BigDecimal definirTamanhoEPreco(ItemPedido item, Produto produto, Long tamanhoId) {
         BigDecimal preco;
 
@@ -208,13 +229,16 @@ public class PedidoService {
                     .orElseThrow(() -> new ResponseStatusException(
                             HttpStatus.BAD_REQUEST,
                             "Tamanho não disponível para o produto: " + produto.getNome()));
+
             item.setTamanho(produtoTamanho.getTamanho());
             preco = produtoTamanho.getPrecoUnidade();
+
         } else {
             if (!produtoTamanhoRepository.findByProdutoId(produto.getId()).isEmpty()) {
                 throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST, "Escolha o tamanho do produto: " + produto.getNome());
             }
+
             preco = produto.getPrecoUnidade();
         }
 
@@ -227,9 +251,10 @@ public class PedidoService {
         return preco;
     }
 
-    // Converte o status enviado pelo front (ex.: "EM_PREPARO") para o nome salvo no banco (ex.: "Em preparo")
+    // CONVERTER STATUS DO FRONT
     private Status buscarStatusPorNomeFront(String statusFront) {
         String alvo = statusFront == null ? "" : statusFront.trim().toUpperCase().replace(" ", "_");
+
         return statusRepository.findAll().stream()
                 .filter(s -> s.getNome().trim().toUpperCase().replace(" ", "_").equals(alvo))
                 .findFirst()
@@ -237,6 +262,7 @@ public class PedidoService {
                         HttpStatus.BAD_REQUEST, "Status inválido: " + statusFront));
     }
 
+    // BUSCAR PEDIDO OU LANÇAR ERRO
     private Pedido buscarOuLancarErro(Long id) {
         return pedidoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(

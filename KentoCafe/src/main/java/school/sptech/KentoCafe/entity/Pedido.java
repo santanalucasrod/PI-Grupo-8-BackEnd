@@ -11,8 +11,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "pedido")
-public class Pedido implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Pedido  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

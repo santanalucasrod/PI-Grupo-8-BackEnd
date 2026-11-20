@@ -7,8 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class PedidoResponse implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class PedidoResponse {
     private Long id;
     private String nomeCliente;
     private LocalDateTime dtHrPedido;

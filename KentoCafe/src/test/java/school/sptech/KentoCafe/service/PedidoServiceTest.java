@@ -469,20 +469,10 @@ class PedidoServiceTest {
         @Test
         @DisplayName("Deve listar todos os pedidos (Cenário 4.1)")
         void listarTodos() {
-            Status status = new Status("Pendente");
-
-            Pedido pedido1 = new Pedido();
-            pedido1.setStatus(status);
-            pedido1.setItens(Collections.emptyList());
-
-            Pedido pedido2 = new Pedido();
-            pedido2.setStatus(status);
-            pedido2.setItens(Collections.emptyList());
-
-            List<Pedido> lista = List.of(pedido1, pedido2);
+            List<Pedido> lista = List.of(new Pedido(), new Pedido());
             when(pedidoRepository.findAll()).thenReturn(lista);
 
-            List<PedidoResponse> resultado = pedidoService.listarTodos();
+            List<Pedido> resultado = pedidoService.listarTodos();
             assertEquals(2, resultado.size());
         }
 
