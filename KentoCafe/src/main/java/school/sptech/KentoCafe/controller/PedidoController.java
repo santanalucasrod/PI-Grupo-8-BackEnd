@@ -1,3 +1,4 @@
+
 package school.sptech.KentoCafe.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,7 +56,7 @@ public class PedidoController {
     @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
     @GetMapping("/{id}")
     public ResponseEntity<PedidoResponse> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(PedidoMapper.toResponse(pedidoService.buscarPorId(id)));
+        return ResponseEntity.ok(pedidoService.buscarPorId(id));
     }
 
     @Operation(summary = "Listar pedidos por status",
@@ -63,8 +64,8 @@ public class PedidoController {
     @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso")
     @ApiResponse(responseCode = "204", description = "Nenhum pedido encontrado para esse status")
     @GetMapping("/status/{statusNome}")
-    public ResponseEntity<List<Pedido>> listarPorStatus(@PathVariable String statusNome) {
-        List<Pedido> pedidos = pedidoService.listarPorStatus(statusNome);
+    public ResponseEntity<List<PedidoResponse>> listarPorStatus(@PathVariable String statusNome) {
+        List<PedidoResponse> pedidos = pedidoService.listarPorStatus(statusNome);
         return pedidos.isEmpty()
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.ok(pedidos);

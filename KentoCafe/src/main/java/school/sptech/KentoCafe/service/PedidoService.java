@@ -1,7 +1,7 @@
 
 package school.sptech.KentoCafe.service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
@@ -48,7 +48,7 @@ public class PedidoService {
 
     // CRIAR PEDIDO
     @Transactional
-    @CacheEvict(value = "pedidos", allEntries = true)
+    @CacheEvict(value = {"pedidos", "pedidosAtivos"}, allEntries = true)
     public Pedido criar(PedidoRequest request) {
 
         Status pendente = statusRepository.findByNome("Pendente")
@@ -107,7 +107,7 @@ public class PedidoService {
 
     // CONCLUIR PEDIDO
     @Transactional
-    @CacheEvict(value = "pedidos", allEntries = true)
+    @CacheEvict(value = {"pedidos", "pedidosAtivos"}, allEntries = true)
     public Pedido concluir(Long id) {
         Pedido pedido = buscarOuLancarErro(id);
 
@@ -133,7 +133,7 @@ public class PedidoService {
 
     // CANCELAR PEDIDO
     @Transactional
-    @CacheEvict(value = "pedidos", allEntries = true)
+    @CacheEvict(value = {"pedidos", "pedidosAtivos"}, allEntries = true)
     public Pedido cancelar(Long id) {
         Pedido pedido = buscarOuLancarErro(id);
 
@@ -158,6 +158,7 @@ public class PedidoService {
 
     // LISTAR TODOS
     @Cacheable(value = "pedidos")
+    @Transactional(readOnly = true)
     public List<PedidoResponse> listarTodos() {
         System.out.println("Buscando pedidos");
         List<Pedido> pedidos = pedidoRepository.findAll();
@@ -166,25 +167,41 @@ public class PedidoService {
         return PedidoMapper.toResponseList(pedidos);
     }
 
+    @Cacheable(value = "pedidosAtivos")
+    @Transactional(readOnly = true)
     public List<PedidoResponse> listarAtivos() {
-        return pedidoRepository.findByStatusNomeIn(List.of("Pendente", "Em preparo"));
+        System.out.println("Buscando pedidos ativos");
+
+        List<Pedido> pedidos = pedidoRepository.findByStatusNomeIn(
+                List.of("Pendente", "Em preparo")
+        );
+
+        return PedidoMapper.toResponseList(pedidos);
     }
 
     // LISTAR POR STATUS
     @Cacheable(value = "pedidos", key = "'status:' + #statusNome")
-    public List<Pedido> listarPorStatus(String statusNome) {
-        return pedidoRepository.findByStatusNome(statusNome);
+    @Transactional(readOnly = true)
+    public List<PedidoResponse> listarPorStatus(String statusNome) {
+        System.out.println("Listar por status");
+        List<Pedido> pedidos = pedidoRepository.findByStatusNome(statusNome);
+
+        return PedidoMapper.toResponseList(pedidos);
     }
 
     // BUSCAR PEDIDO POR ID
     @Cacheable(value = "pedidos", key = "'id:' + #id")
-    public Pedido buscarPorId(Long id) {
-        return buscarOuLancarErro(id);
+    @Transactional(readOnly = true)
+    public PedidoResponse buscarPorId(Long id) {
+        System.out.println("Buscar 1 pedido");
+        Pedido pedido = buscarOuLancarErro(id);
+
+        return PedidoMapper.toResponse(pedido);
     }
 
     // ATUALIZAR STATUS
     @Transactional
-    @CacheEvict(value = "pedidos", allEntries = true)
+    @CacheEvict(value = {"pedidos", "pedidosAtivos"}, allEntries = true)
     public Pedido atualizarStatus(Long id, String statusFront) {
         Pedido pedido = buscarOuLancarErro(id);
 
@@ -206,7 +223,7 @@ public class PedidoService {
 
     // MARCAR ITEM COMO PRONTO
     @Transactional
-    @CacheEvict(value = "pedidos", allEntries = true)
+    @CacheEvict(value = {"pedidos", "pedidosAtivos"}, allEntries = true)
     public ItemPedido marcarItemPronto(Long itemId, boolean pronto) {
         ItemPedido item = itemPedidoRepository.findById(itemId)
                 .orElseThrow(() -> new ResponseStatusException(

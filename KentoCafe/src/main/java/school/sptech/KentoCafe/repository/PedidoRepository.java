@@ -14,7 +14,7 @@ import java.util.List;
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     List<Pedido> findByStatusNome(String statusNome);
 
-    List<PedidoResponse> findByStatusNomeIn(List<String> statusNomes);
+    List<Pedido> findByStatusNomeIn(List<String> statusNomes);
 
     List<Pedido> findByFuncionarioId(Integer funcionarioId);
 
