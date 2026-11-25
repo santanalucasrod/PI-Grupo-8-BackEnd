@@ -12,6 +12,7 @@ import school.sptech.KentoCafe.dto.pedido.pedido.PedidoResponse;
 import school.sptech.KentoCafe.entity.*;
 import school.sptech.KentoCafe.repository.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -466,33 +467,58 @@ class PedidoServiceTest {
     @DisplayName("Cenários de consultas gerais")
     class ConsultasTests {
 
+        private Pedido criarPedidoValido() {
+            Pedido pedido = new Pedido();
+
+            Status status = new Status();
+            status.setNome("Pronto");
+
+            pedido.setStatus(status);
+            pedido.setItens(new ArrayList<>());
+            pedido.setValorTotal(BigDecimal.ZERO);
+
+            return pedido;
+        }
+
         @Test
         @DisplayName("Deve listar todos os pedidos (Cenário 4.1)")
         void listarTodos() {
-            List<Pedido> lista = List.of(new Pedido(), new Pedido());
+            List<Pedido> lista = List.of(
+                    criarPedidoValido(),
+                    criarPedidoValido()
+            );
+
             when(pedidoRepository.findAll()).thenReturn(lista);
 
-            List<Pedido> resultado = pedidoService.listarTodos();
+            List<PedidoResponse> resultado = pedidoService.listarTodos();
+
             assertEquals(2, resultado.size());
         }
 
         @Test
         @DisplayName("Deve listar pedidos filtrando por nome do status (Cenário 4.2)")
         void listarPorStatus() {
-            List<Pedido> lista = List.of(new Pedido());
-            when(pedidoRepository.findByStatusNome("Pronto")).thenReturn(lista);
+            List<Pedido> lista = List.of(criarPedidoValido());
 
-            List<Pedido> resultado = pedidoService.listarPorStatus("Pronto");
+            when(pedidoRepository.findByStatusNome("Pronto"))
+                    .thenReturn(lista);
+
+            List<PedidoResponse> resultado =
+                    pedidoService.listarPorStatus("Pronto");
+
             assertEquals(1, resultado.size());
         }
 
         @Test
         @DisplayName("Deve buscar pedido por ID com sucesso (Cenário 4.3)")
         void buscarPorIdComSucesso() {
-            Pedido pedido = new Pedido();
-            when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
+            Pedido pedido = criarPedidoValido();
 
-            Pedido resultado = pedidoService.buscarPorId(1L);
+            when(pedidoRepository.findById(1L))
+                    .thenReturn(Optional.of(pedido));
+
+            PedidoResponse resultado = pedidoService.buscarPorId(1L);
+
             assertNotNull(resultado);
         }
     }
