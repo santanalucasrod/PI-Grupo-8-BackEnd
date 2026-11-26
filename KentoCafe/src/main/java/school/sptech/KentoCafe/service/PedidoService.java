@@ -157,7 +157,6 @@ public class PedidoService {
     }
 
     // LISTAR TODOS
-    @Cacheable(value = "pedidos")
     @Transactional(readOnly = true)
     public List<PedidoResponse> listarTodos() {
         System.out.println("Buscando pedidos");
